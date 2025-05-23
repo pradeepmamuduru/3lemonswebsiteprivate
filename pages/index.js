@@ -17,8 +17,17 @@ export default function Home() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'quantity' && (value.includes('.') || value.includes(','))) return;
-    if (name === 'contact' && value.length > 10) return;
+
+    if (name === 'quantity') {
+      if (value.includes('.') || value.includes(',')) return; // integer only
+    }
+
+    if (name === 'contact') {
+      // Allow only digits, max length 10
+      if (!/^\d*$/.test(value)) return;
+      if (value.length > 10) return;
+    }
+
     setForm({ ...form, [name]: value });
   };
 
@@ -91,7 +100,7 @@ export default function Home() {
       </header>
 
       <main className="p-4 sm:p-8 space-y-16 max-w-7xl mx-auto">
-        <section className="relative w-full h-[90vh]">
+        <section className="relative w-full h-[60vh] sm:h-[50vh] md:h-[40vh] mb-12">
           <Image
             src="/lemons-hero.jpg"
             alt="Fresh Lemons"
@@ -101,7 +110,7 @@ export default function Home() {
             priority
           />
           <div className="absolute inset-0 flex items-center justify-center">
-            <p className="text-3xl sm:text-4xl font-bold text-white bg-black bg-opacity-50 px-6 py-4 rounded-xl shadow-xl">
+            <p className="text-3xl sm:text-4xl font-bold text-white bg-black bg-opacity-50 px-6 py-4 rounded-xl shadow-xl max-w-[90%] text-center">
               Your trusted source for premium quality lemons in India.
             </p>
           </div>
@@ -134,7 +143,17 @@ export default function Home() {
             <textarea name="delivery" placeholder="Delivery Address" value={form.delivery} onChange={handleChange} className="w-full border p-3 rounded" required></textarea>
             <div className="relative">
               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-700">🇮🇳 +91</span>
-              <input name="contact" type="tel" placeholder="10-digit mobile number" value={form.contact} onChange={handleChange} className="w-full border p-3 rounded pl-20" maxLength={10} pattern="\d{10}" required />
+              <input
+                name="contact"
+                type="tel"
+                placeholder="10-digit mobile number"
+                value={form.contact}
+                onChange={handleChange}
+                className="w-full border p-3 rounded pl-20"
+                maxLength={10}
+                pattern="\d{10}"
+                required
+              />
             </div>
             {quantity > 0 && (
               <p className="text-md text-green-700 font-medium">
@@ -155,30 +174,14 @@ export default function Home() {
             {orderStatus && <p className="text-center mt-2 text-sm text-gray-700">{orderStatus}</p>}
           </form>
           <div className="mt-6 text-center">
-            <a
-              href={getWhatsappLink()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 text-white bg-green-600 hover:bg-green-700 px-6 py-3 rounded-xl text-lg font-semibold"
-            >
+            <a href={getWhatsappLink()} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 text-white bg-green-600 hover:bg-green-700 px-6 py-3 rounded-xl text-lg font-semibold">
               <FaWhatsapp className="text-2xl" /> Chat on WhatsApp
             </a>
           </div>
         </section>
 
-        <section className="bg-yellow-50 p-6 rounded-xl">
-          <h2 className="text-3xl font-bold mb-4 text-green-700">Contact Us</h2>
-          <p className="text-lg">Email: <a href="mailto:3lemons.traders@gmail.com" className="text-green-700 font-medium">3lemons.traders@gmail.com</a></p>
-          <p className="text-lg">Phone/WhatsApp: <a href="tel:+918500130926" className="text-green-700 font-medium">8500130926</a></p>
-          <p className="text-lg">Instagram: <a href="https://instagram.com/3Lemons_Traders" target="_blank" className="text-green-700 font-medium">@3Lemons_Traders</a></p>
-        </section>
-
-        <section className="bg-white p-6 rounded-xl shadow">
-          <h2 className="text-3xl font-bold mb-4 text-green-700">Testimonials</h2>
-          <div className="italic text-gray-800 space-y-2">
-            <p>“The lemons were juicy and fresh. Great service!” — Rahul, Hyderabad</p>
-            <p>“Affordable and quality product. I ordered 60kg and got 10% off!” — Sneha, Bangalore</p>
-          </div>
+        <section className="text-center text-sm text-gray-600 mt-16">
+          <p>© 2025 3 Lemons Traders. All rights reserved.</p>
         </section>
       </main>
     </div>
