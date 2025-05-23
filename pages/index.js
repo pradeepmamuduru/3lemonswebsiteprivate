@@ -1,109 +1,102 @@
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useState } from 'react';
 
 export default function Home() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
-  });
-  const [status, setStatus] = useState('');
+  const [form, setForm] = useState({ name: '', quantity: '', delivery: '', contact: '' });
+  const [lemons, setLemons] = useState([]);
+  const [orderStatus, setOrderStatus] = useState('');
+
+  useEffect(() => {
+    fetch("https://sheetdb.io/api/v1/wm0oxtmmfkndt")
+      .then(res => res.json())
+      .then(data => setLemons(data));
+  }, []);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus('Submitting...');
+    setOrderStatus('Submitting...');
 
-    const response = await fetch('https://sheetdb.io/api/v1/q6ryvlhjjmu4q', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ data: formData })
+    const response = await fetch("https://sheetdb.io/api/v1/q6ryvlhjjmu4q", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data: form })
     });
 
     if (response.ok) {
-      setFormData({ name: '', email: '', message: '' });
-      setStatus('Thank you for your message!');
+      setOrderStatus("Order submitted successfully!");
+      setForm({ name: '', quantity: '', delivery: '', contact: '' });
     } else {
-      setStatus('Failed to send message. Please try again.');
+      setOrderStatus("Failed to submit order. Please try again.");
     }
   };
 
   return (
-    <div style={{ fontFamily: 'Arial, sans-serif', padding: '2rem', maxWidth: '800px', margin: 'auto' }}>
-      <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Welcome to 3 Lemons Website</h1>
-      <Image src="/lemons-with-leaves.jpg" alt="Lemons with Leaves" width={800} height={500} />
+    <div className="min-h-screen bg-yellow-50 text-green-800 font-sans">
+      <header className="bg-green-600 text-white p-4 text-center shadow-lg">
+        <h1 className="text-3xl font-bold">3 Lemons Traders</h1>
+        <p className="text-sm">Fresh Lemons, Fresher Deals!</p>
+      </header>
 
-      <section style={{ marginTop: '2rem' }}>
-        <h2>About Our Lemons</h2>
-        <p>
-          Our lemons are farm fresh and organically grown with love. We ensure the best quality and rich flavor in every piece.
-        </p>
-        <Image src="/sliced-lemon.jpg" alt="Sliced Lemon" width={800} height={500} />
-      </section>
+      <main className="p-4 space-y-12">
+        <section className="text-center">
+          <Image src="/lemons-hero.jpg" alt="Fresh Lemons" width={600} height={400} className="mx-auto rounded-xl shadow" />
+          <p className="mt-4 text-lg">Your trusted source for premium quality lemons in India.</p>
+        </section>
 
-      <section style={{ marginTop: '2rem' }}>
-        <h2>Our Orchard</h2>
-        <Image src="/lemon-tree.jpg" alt="Lemon Tree" width={800} height={500} />
-        <p>
-          Explore our lemon orchards that span over acres, growing the finest citrus fruits in the region.
-        </p>
-      </section>
+        <section>
+          <h2 className="text-2xl font-bold mb-2">About Us</h2>
+          <p>We are a passionate team led by <strong>Pradeep Mamuduru</strong>, Business Executive & Partner, committed to delivering top-grade lemons across India. Our mission is to provide freshness, quality, and customer satisfaction with every order.</p>
+        </section>
 
-      <section style={{ marginTop: '2rem' }}>
-        <h2>Freshly Squeezed</h2>
-        <Image src="/lemon-juice.jpg" alt="Lemon Juice" width={800} height={500} />
-        <p>
-          Try our natural lemon juice, squeezed from premium lemons for the perfect zest and taste.
-        </p>
-      </section>
+        <section>
+          <h2 className="text-2xl font-bold mb-2">Our Lemons</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-white p-4 rounded shadow">
+              <Image src="/lemons-with-leaves.jpg" alt="Lemons with Leaves" width={300} height={200} className="rounded-lg" />
+              <p className="mt-2 font-semibold">Premium Grade A - ₹80/kg</p>
+              <p>Handpicked lemons with leaves, rich in juice and flavor.</p>
+            </div>
+            <div className="bg-white p-4 rounded shadow">
+              <Image src="/sliced-lemon.jpeg" alt="Sliced Lemons" width={300} height={200} className="rounded-lg" />
+              <p className="mt-2 font-semibold">Juicy Slices - ₹75/kg</p>
+              <p>Perfectly sliced for instant use in kitchens and juice shops.</p>
+            </div>
+            <div className="bg-white p-4 rounded shadow">
+              <Image src="/basket-of-lemons.jpeg" alt="Basket of Lemons" width={300} height={200} className="rounded-lg" />
+              <p className="mt-2 font-semibold">Bulk Basket - ₹70/kg</p>
+              <p>Ideal for wholesale buyers and markets.</p>
+            </div>
+          </div>
+        </section>
 
-      <section style={{ marginTop: '2rem' }}>
-        <h2>Contact Us</h2>
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <input
-            type="text"
-            name="name"
-            placeholder="Your Name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            style={{ padding: '0.5rem' }}
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Your Email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            style={{ padding: '0.5rem' }}
-          />
-          <textarea
-            name="message"
-            placeholder="Your Message"
-            value={formData.message}
-            onChange={handleChange}
-            required
-            style={{ padding: '0.5rem' }}
-          />
-          <button type="submit" style={{ padding: '0.75rem', backgroundColor: '#fcd34d', border: 'none', cursor: 'pointer' }}>
-            Submit
-          </button>
-        </form>
-        <p style={{ marginTop: '1rem' }}>{status}</p>
-      </section>
+        <section>
+          <h2 className="text-2xl font-bold mb-2">Buy Now</h2>
+          <form onSubmit={handleSubmit} className="space-y-4 max-w-xl mx-auto bg-white p-6 rounded-lg shadow">
+            <input name="name" type="text" placeholder="Your Name" value={form.name} onChange={handleChange} className="w-full border p-2 rounded" required />
+            <input name="quantity" type="text" placeholder="Quantity (in kg)" value={form.quantity} onChange={handleChange} className="w-full border p-2 rounded" required />
+            <textarea name="delivery" placeholder="Delivery Address" value={form.delivery} onChange={handleChange} className="w-full border p-2 rounded" required></textarea>
+            <input name="contact" type="text" placeholder="WhatsApp Number" value={form.contact} onChange={handleChange} className="w-full border p-2 rounded" required />
+            <button type="submit" className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded">Place Order</button>
+            {orderStatus && <p className="text-center mt-2 text-sm text-gray-700">{orderStatus}</p>}
+          </form>
+        </section>
 
-      <footer style={{ marginTop: '3rem', textAlign: 'center', fontSize: '0.9rem', color: '#555' }}>
-        <p>&copy; 2025 3 Lemons. All rights reserved.</p>
-      </footer>
+        <section>
+          <h2 className="text-2xl font-bold mb-2">Contact Us</h2>
+          <p>Email: <a href="mailto:3lemons.traders@gmail.com" className="text-green-600">3lemons.traders@gmail.com</a></p>
+          <p>Phone/WhatsApp: <a href="tel:+918500130926" className="text-green-600">8500130926</a></p>
+          <p>Instagram: <a href="https://instagram.com/3Lemons_Traders" target="_blank" className="text-green-600">@3Lemons_Traders</a></p>
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-bold mb-2">Testimonials</h2>
+          <p className="italic">(Coming soon: Hear what our happy customers have to say!)</p>
+        </section>
+      </main>
     </div>
   );
 }
