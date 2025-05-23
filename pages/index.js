@@ -28,7 +28,7 @@ export default function Home() {
 
     const quantity = parseInt(form.quantity);
     if (isNaN(quantity) || quantity <= 0) {
-      setOrderStatus("Please enter a valid quantity (integer).");
+      setOrderStatus("Please enter a valid quantity (integer).);
       setIsSubmitting(false);
       return;
     }
@@ -52,12 +52,24 @@ export default function Home() {
   };
 
   const getWhatsappLink = () => {
-    const message = `Hi, I'm interested in ordering lemons. My name is ${form.name}, I'd like ${form.quantity}kg of ${form.quality} quality. Here's my address: ${form.delivery}`;
+    const { name, quantity, quality, delivery, contact } = form;
+    const message = `\nHi! I'm interested in ordering lemons:\n👤 Name: ${name}\n📞 Contact: ${contact}\n📦 Quantity: ${quantity}kg\n⭐ Quality: ${quality}\n🏠 Address: ${delivery}\n\nPlease confirm availability.`;
     return `https://wa.me/918500130926?text=${encodeURIComponent(message)}`;
   };
 
+  const pricePerKg = {
+    A1: 80,
+    A2: 70,
+    A3: 60
+  };
+  const quantity = parseInt(form.quantity) || 0;
+  const isBulk = quantity > 50;
+  const basePrice = pricePerKg[form.quality] * quantity;
+  const discount = isBulk ? 0.1 : 0;
+  const totalPrice = basePrice * (1 - discount);
+
   return (
-    <div className="min-h-screen bg-yellow-50 bg-[url('/bg-pattern.svg')] bg-cover bg-no-repeat text-green-800 font-sans">
+    <div className="min-h-screen bg-[url('/bg-pattern.svg')] bg-cover bg-fixed text-green-900 font-sans">
       <Head>
         <title>3 Lemons Traders – Buy Fresh Lemons Online</title>
         <meta name="description" content="Buy premium quality lemons at affordable prices across India. Direct farm to home delivery." />
@@ -75,33 +87,15 @@ export default function Home() {
         </section>
 
         <section>
-          <h2 className="text-3xl font-bold mb-4">About Us</h2>
-          <p className="text-lg">We are a passionate team led by <strong>Pradeep Mamuduru</strong>, Business Executive & Partner, committed to delivering top-grade lemons across India. Our mission is to provide freshness, quality, and customer satisfaction with every order.</p>
-        </section>
-
-        <section>
           <h2 className="text-3xl font-bold mb-6">Our Lemons</h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-white p-4 rounded-xl shadow-lg">
-              <Image src="/lemons-with-leaves.jpg" alt="A1 Quality Lemons" width={300} height={200} className="rounded-lg" />
-              <p className="mt-3 font-semibold text-lg">A1 Quality – ₹80/kg</p>
-              <p>Handpicked lemons with premium leaves, rich in juice and flavor.</p>
-            </div>
-            <div className="bg-white p-4 rounded-xl shadow-lg">
-              <Image src="/sliced-lemon.jpeg" alt="A2 Quality Lemons" width={300} height={200} className="rounded-lg" />
-              <p className="mt-3 font-semibold text-lg">A2 Quality – ₹70/kg</p>
-              <p>Good for regular home and restaurant use, moderately juicy.</p>
-            </div>
-            <div className="bg-white p-4 rounded-xl shadow-lg">
-              <Image src="/lemon-tree.jpeg" alt="A3 Quality Lemons" width={300} height={200} className="rounded-lg" />
-              <p className="mt-3 font-semibold text-lg">A3 Quality – ₹60/kg</p>
-              <p>Suitable for bulk uses, minor visual imperfections, high utility.</p>
-            </div>
-            <div className="bg-white p-4 rounded-xl shadow-lg">
-              <Image src="/basket-of-lemons.jpeg" alt="Bulk Orders" width={300} height={200} className="rounded-lg" />
-              <p className="mt-3 font-semibold text-lg">Bulk Orders (50kg+) – ₹63/kg</p>
-              <p>Flat 10% discount on any lemon quality for large orders.</p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {lemons.map((lemon, index) => (
+              <div key={index} className="bg-white p-4 rounded-xl shadow-lg">
+                <Image src={lemon['Image url']} alt={lemon['Grade']} width={300} height={200} className="rounded-lg" />
+                <p className="mt-3 font-semibold text-lg">{lemon['Grade']} – ₹{lemon['Price Per Kg']}/kg</p>
+                <p>{lemon['Description']}</p>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -110,7 +104,7 @@ export default function Home() {
           <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg">
             <input name="name" type="text" placeholder="Your Name" value={form.name} onChange={handleChange} className="w-full border p-3 rounded" required />
             <input name="quantity" type="number" step="1" placeholder="Quantity (in kg)" value={form.quantity} onChange={handleChange} className="w-full border p-3 rounded" required />
-            {parseInt(form.quantity) > 50 && <p className="text-green-600 text-sm font-medium">Bulk order detected: 10% discount will be applied.</p>}
+            {isBulk && <p className="text-green-600 text-sm font-medium">Bulk order detected: 10% discount will be applied.</p>}
             <select name="quality" value={form.quality} onChange={handleChange} className="w-full border p-3 rounded">
               <option value="A1">A1 Quality</option>
               <option value="A2">A2 Quality</option>
@@ -118,8 +112,21 @@ export default function Home() {
             </select>
             <textarea name="delivery" placeholder="Delivery Address" value={form.delivery} onChange={handleChange} className="w-full border p-3 rounded" required></textarea>
             <input name="contact" type="text" placeholder="WhatsApp Number" value={form.contact} onChange={handleChange} className="w-full border p-3 rounded" required />
+            {quantity > 0 && (
+              <p className="text-md text-green-700 font-medium">
+                Total Price: ₹{totalPrice} {isBulk && <span>(10% bulk discount applied)</span>}
+              </p>
+            )}
             <button type="submit" disabled={isSubmitting} className="bg-green-700 hover:bg-green-800 text-white py-3 px-6 rounded font-semibold">
-              {isSubmitting ? 'Placing Order...' : 'Place Order'}
+              {isSubmitting ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path d="M22 12a10 10 0 01-10 10" fill="currentColor" />
+                  </svg>
+                  Placing Order...
+                </span>
+              ) : 'Place Order'}
             </button>
             {orderStatus && <p className="text-center mt-2 text-sm text-gray-700">{orderStatus}</p>}
           </form>
