@@ -1,10 +1,16 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Head from 'next/head';
 import { FaWhatsapp } from 'react-icons/fa';
 
 export default function Home() {
-  const [form, setForm] = useState({ name: '', quantity: '', quality: 'A1', delivery: '', contact: '' });
+  const [form, setForm] = useState({
+    name: '',
+    quantity: '',
+    quality: 'A1',
+    delivery: '',
+    contact: ''
+  });
   const [lemons, setLemons] = useState([]);
   const [orderStatus, setOrderStatus] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,7 +47,12 @@ export default function Home() {
     }
 
     const isBulk = quantity > 50;
-    const dataToSend = { ...form, contact: `+91${form.contact}`, quantity, discount: isBulk ? '10%' : '0%' };
+    const dataToSend = {
+      ...form,
+      contact: `+91${form.contact}`,
+      quantity,
+      discount: isBulk ? '10%' : '0%'
+    };
 
     const response = await fetch("https://sheetdb.io/api/v1/q6ryvlhjjmu4q", {
       method: "POST",
@@ -60,7 +71,14 @@ export default function Home() {
 
   const getWhatsappLink = () => {
     const { name, quantity, quality, delivery, contact } = form;
-    const message = `\nHi! I'm interested in ordering lemons:\n👤 Name: ${name}\n📞 Contact: +91${contact}\n📦 Quantity: ${quantity}kg\n⭐ Quality: ${quality}\n🏠 Address: ${delivery}\n\nPlease confirm availability.`;
+    const message = `Hi! I'm interested in ordering lemons:
+👤 Name: ${name}
+📞 Contact: +91${contact}
+📦 Quantity: ${quantity}kg
+⭐ Quality: ${quality}
+🏠 Address: ${delivery}
+
+Please confirm availability.`;
     return `https://wa.me/918500130926?text=${encodeURIComponent(message)}`;
   };
 
@@ -76,7 +94,7 @@ export default function Home() {
   const totalPrice = basePrice * (1 - discount);
 
   return (
-    <div className="min-h-screen bg-[#fcfcfc] text-green-900 font-sans">
+    <div className="min-h-screen bg-[#fffefc] text-green-900 font-sans">
       <Head>
         <title>3 Lemons Traders – Buy Fresh Lemons Online</title>
         <meta name="description" content="Buy premium quality lemons at affordable prices across India. Direct farm to home delivery." />
@@ -85,26 +103,26 @@ export default function Home() {
         <meta property="og:image" content="/lemons-hero.jpg" />
       </Head>
 
-      <header className="bg-gradient-to-r from-lime-700 to-yellow-500 text-white p-6 text-center shadow-lg">
-        <h1 className="text-5xl font-extrabold tracking-wider uppercase drop-shadow-md">3 Lemons Traders</h1>
-        <p className="text-xl mt-3 font-semibold italic">Fresh Lemons, Fresher Deals – Direct to Your Doorstep</p>
+      <header className="bg-gradient-to-r from-yellow-600 to-lime-600 text-white p-8 text-center shadow-xl">
+        <h1 className="text-5xl font-black uppercase drop-shadow-md tracking-wide">3 Lemons Traders</h1>
+        <p className="text-2xl mt-4 font-medium italic">Fresh Lemons, Fresher Deals – Direct to Your Doorstep</p>
       </header>
 
       <main className="p-4 sm:p-8 space-y-16 max-w-7xl mx-auto">
-        <section className="text-center p-0 m-0">
-          <div className="relative w-full h-[80vh] overflow-hidden">
-            <Image
-              src="/lemons-hero.jpg"
-              alt="Fresh Lemons"
-              layout="fill"
-              objectFit="cover"
-              priority
-              className="object-cover"
-            />
+        <section className="relative w-full h-screen overflow-hidden">
+          <Image
+            src="/lemons-hero.jpg"
+            alt="Fresh Lemons"
+            layout="fill"
+            objectFit="cover"
+            className="rounded-none shadow-inner"
+            priority
+          />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <p className="text-3xl sm:text-5xl font-bold text-white bg-black bg-opacity-60 px-8 py-6 rounded-xl shadow-2xl">
+              Your trusted source for premium quality lemons in India.
+            </p>
           </div>
-          <p className="mt-6 text-2xl font-semibold text-green-800 bg-white bg-opacity-70 p-4 rounded-xl inline-block shadow-xl">
-            Your trusted source for premium quality lemons in India.
-          </p>
         </section>
 
         <section className="bg-yellow-50 p-6 rounded-xl">
@@ -120,8 +138,8 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-white p-8 rounded-xl shadow-lg">
-          <h2 className="text-4xl font-bold mb-6 text-green-700">Buy Now</h2>
+        <section className="bg-lime-50 p-8 rounded-xl shadow-lg">
+          <h2 className="text-4xl font-bold mb-6 text-green-800">Buy Now</h2>
           <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl mx-auto">
             <input name="name" type="text" placeholder="Your Name" value={form.name} onChange={handleChange} className="w-full border p-3 rounded" required />
             <input name="quantity" type="number" step="1" min="1" placeholder="Quantity (in kg)" value={form.quantity} onChange={handleChange} className="w-full border p-3 rounded" required />
@@ -134,7 +152,7 @@ export default function Home() {
             <textarea name="delivery" placeholder="Delivery Address" value={form.delivery} onChange={handleChange} className="w-full border p-3 rounded" required></textarea>
             <div className="relative">
               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-700">🇮🇳 +91</span>
-              <input name="contact" type="tel" placeholder="10-digit mobile number" value={form.contact} onChange={handleChange} className="w-full border p-3 rounded pl-20" maxLength={10} pattern="\d{10}" required />
+              <input name="contact" type="tel" placeholder="10-digit mobile number" value={form.contact} onChange={handleChange} className="w-full border p-3 rounded pl-20" maxLength={10} pattern="\\d{10}" required />
             </div>
             {quantity > 0 && (
               <p className="text-md text-green-700 font-medium">
@@ -155,27 +173,6 @@ export default function Home() {
             {orderStatus && <p className="text-center mt-2 text-sm text-gray-700">{orderStatus}</p>}
           </form>
           <div className="mt-6 text-center">
-            <a href={getWhatsappLink()} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 text-white bg-green-600 hover:bg-green-700 px-6 py-3 rounded-xl text-lg font-semibold">
-              <FaWhatsapp className="text-2xl" /> Chat on WhatsApp
-            </a>
-          </div>
-        </section>
-
-        <section className="bg-yellow-50 p-6 rounded-xl">
-          <h2 className="text-3xl font-bold mb-4 text-green-700">Contact Us</h2>
-          <p className="text-lg">Email: <a href="mailto:3lemons.traders@gmail.com" className="text-green-700 font-medium">3lemons.traders@gmail.com</a></p>
-          <p className="text-lg">Phone/WhatsApp: <a href="tel:+918500130926" className="text-green-700 font-medium">8500130926</a></p>
-          <p className="text-lg">Instagram: <a href="https://instagram.com/3Lemons_Traders" target="_blank" className="text-green-700 font-medium">@3Lemons_Traders</a></p>
-        </section>
-
-        <section className="bg-white p-6 rounded-xl shadow">
-          <h2 className="text-3xl font-bold mb-4 text-green-700">Testimonials</h2>
-          <div className="italic text-gray-800 space-y-2">
-            <p>“The lemons were juicy and fresh. Great service!” — Rahul, Hyderabad</p>
-            <p>“Affordable and quality product. I ordered 60kg and got 10% off!” — Sneha, Bangalore</p>
-          </div>
-        </section>
-      </main>
-    </div>
-  );
-}
+            <a href={getWhatsappLink()}
+::contentReference[oaicite:21]{index=21}
+ 
