@@ -28,7 +28,7 @@ export default function Home() {
 
     const quantity = parseInt(form.quantity);
     if (isNaN(quantity) || quantity <= 0) {
-      setOrderStatus("Please enter a valid quantity (integer).);
+      setOrderStatus("Please enter a valid quantity (integer).");
       setIsSubmitting(false);
       return;
     }
