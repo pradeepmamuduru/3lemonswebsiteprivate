@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Head from 'next/head';
+import { FaWhatsapp } from 'react-icons/fa';
 
 export default function Home() {
   const [form, setForm] = useState({ name: '', quantity: '', quality: 'A1', delivery: '', contact: '' });
   const [lemons, setLemons] = useState([]);
   const [orderStatus, setOrderStatus] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetch("https://sheetdb.io/api/v1/wm0oxtmmfkndt")
@@ -15,18 +17,19 @@ export default function Home() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Prevent decimal quantities
     if (name === 'quantity' && (value.includes('.') || value.includes(','))) return;
     setForm({ ...form, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     setOrderStatus('Submitting...');
 
     const quantity = parseInt(form.quantity);
     if (isNaN(quantity) || quantity <= 0) {
       setOrderStatus("Please enter a valid quantity (integer).");
+      setIsSubmitting(false);
       return;
     }
 
@@ -45,6 +48,12 @@ export default function Home() {
     } else {
       setOrderStatus("Failed to submit order. Please try again.");
     }
+    setIsSubmitting(false);
+  };
+
+  const getWhatsappLink = () => {
+    const message = `Hi, I'm interested in ordering lemons. My name is ${form.name}, I'd like ${form.quantity}kg of ${form.quality} quality. Here's my address: ${form.delivery}`;
+    return `https://wa.me/918500130926?text=${encodeURIComponent(message)}`;
   };
 
   return (
@@ -101,6 +110,7 @@ export default function Home() {
           <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg">
             <input name="name" type="text" placeholder="Your Name" value={form.name} onChange={handleChange} className="w-full border p-3 rounded" required />
             <input name="quantity" type="number" step="1" placeholder="Quantity (in kg)" value={form.quantity} onChange={handleChange} className="w-full border p-3 rounded" required />
+            {parseInt(form.quantity) > 50 && <p className="text-green-600 text-sm font-medium">Bulk order detected: 10% discount will be applied.</p>}
             <select name="quality" value={form.quality} onChange={handleChange} className="w-full border p-3 rounded">
               <option value="A1">A1 Quality</option>
               <option value="A2">A2 Quality</option>
@@ -108,9 +118,16 @@ export default function Home() {
             </select>
             <textarea name="delivery" placeholder="Delivery Address" value={form.delivery} onChange={handleChange} className="w-full border p-3 rounded" required></textarea>
             <input name="contact" type="text" placeholder="WhatsApp Number" value={form.contact} onChange={handleChange} className="w-full border p-3 rounded" required />
-            <button type="submit" className="bg-green-700 hover:bg-green-800 text-white py-3 px-6 rounded font-semibold">Place Order</button>
+            <button type="submit" disabled={isSubmitting} className="bg-green-700 hover:bg-green-800 text-white py-3 px-6 rounded font-semibold">
+              {isSubmitting ? 'Placing Order...' : 'Place Order'}
+            </button>
             {orderStatus && <p className="text-center mt-2 text-sm text-gray-700">{orderStatus}</p>}
           </form>
+          <div className="mt-6 text-center">
+            <a href={getWhatsappLink()} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 text-white bg-green-600 hover:bg-green-700 px-6 py-3 rounded-xl text-lg font-semibold">
+              <FaWhatsapp className="text-2xl" /> Chat on WhatsApp
+            </a>
+          </div>
         </section>
 
         <section>
