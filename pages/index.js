@@ -80,7 +80,7 @@ export default function Home({ lemons }) {
   const totalPrice = basePrice * (1 - discount);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 text-green-100 font-sans">
+    <div className="min-h-screen bg-blue-900 text-green-100 font-sans">
       <Head>
         <title>3 Lemons Traders – Buy Fresh Lemons Online</title>
         <meta name="description" content="Buy premium quality lemons at affordable prices across India. Direct farm to home delivery." />
