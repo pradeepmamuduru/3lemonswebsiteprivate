@@ -119,10 +119,85 @@ export default function Home() {
 
         <section id="buy-now" className="bg-white p-8 rounded-xl shadow-lg">
           <h2 className="text-4xl font-bold mb-6 text-green-700">Buy Now</h2>
-          {/* form content remains unchanged */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                type="text"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                placeholder="Your Name"
+                required
+                className="border rounded p-3 w-full"
+              />
+              <input
+                type="text"
+                name="contact"
+                value={form.contact}
+                onChange={handleChange}
+                placeholder="10-digit Mobile Number"
+                maxLength={10}
+                required
+                className="border rounded p-3 w-full"
+              />
+              <input
+                type="number"
+                name="quantity"
+                value={form.quantity}
+                onChange={handleChange}
+                placeholder="Quantity (kg)"
+                required
+                className="border rounded p-3 w-full"
+              />
+              <select
+                name="quality"
+                value={form.quality}
+                onChange={handleChange}
+                className="border rounded p-3 w-full"
+              >
+                <option value="A1">A1 – ₹80/kg</option>
+                <option value="A2">A2 – ₹70/kg</option>
+                <option value="A3">A3 – ₹60/kg</option>
+              </select>
+              <input
+                type="text"
+                name="delivery"
+                value={form.delivery}
+                onChange={handleChange}
+                placeholder="Delivery Address"
+                required
+                className="border rounded p-3 w-full md:col-span-2"
+              />
+            </div>
+
+            <div className="text-lg font-medium text-green-800">
+              Total Price: ₹{totalPrice} {isBulk && <span className="text-sm text-green-600">(10% bulk discount applied)</span>}
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 mt-4">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-green-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-800 transition"
+              >
+                {isSubmitting ? 'Submitting...' : 'Place Order'}
+              </button>
+              <a
+                href={getWhatsappLink()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center px-6 py-3 border border-green-700 text-green-700 rounded-lg hover:bg-green-50 transition"
+              >
+                <FaWhatsapp className="mr-2" /> Order via WhatsApp
+              </a>
+            </div>
+
+            {orderStatus && (
+              <p className="mt-4 text-center font-semibold text-green-800">{orderStatus}</p>
+            )}
+          </form>
         </section>
 
-        {/* rest of the sections remain unchanged */}
       </main>
     </div>
   );
