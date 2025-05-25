@@ -119,10 +119,10 @@ export default function Home() {
 
         <section id="buy-now" className="bg-white p-8 rounded-xl shadow-lg">
           <h2 className="text-4xl font-bold mb-6 text-green-700">Buy Now</h2>
-          <!-- form content remains unchanged -->
+          {/* form content remains unchanged */}
         </section>
 
-        <!-- rest of the sections remain unchanged -->
+        {/* rest of the sections remain unchanged */}
       </main>
     </div>
   );
