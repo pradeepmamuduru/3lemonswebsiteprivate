@@ -1,245 +1,182 @@
-import { useState } from 'react';
-import Image from 'next/image';
+// pages/index.js
+
+import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
-import { FaWhatsapp } from 'react-icons/fa';
+import Image from 'next/image';
+import axios from 'axios';
 import styles from '../styles/styles.module.css';
 
-export async function getStaticProps() {
-  const res = await fetch("https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Lemons");
-  const lemons = await res.json();
-
-  return {
-    props: { lemons },
-    revalidate: 3600,
-  };
-}
-
-export default function Home({ lemons }) {
-  const [form, setForm] = useState({
+export default function Home() {
+  const [lemons, setLemons] = useState([]);
+  const [formData, setFormData] = useState({
     name: '',
+    phone: '',
+    grade: '',
     quantity: '',
-    quality: 'A1',
-    delivery: '',
-    contact: '',
   });
-  const [orderStatus, setOrderStatus] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState('');
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === 'quantity' && (value.includes('.') || value.includes(','))) return;
-    if (name === 'contact' && (!/^[0-9]*$/.test(value) || value.length > 10)) return;
-    setForm({ ...form, [name]: value });
+  useEffect(() => {
+    fetchLemons();
+  }, []);
+
+  const fetchLemons = async () => {
+    try {
+      const res = await axios.get('https://sheetdb.io/api/v1/wm0oxtmmfkndt');
+      setLemons(res.data);
+    } catch (error) {
+      console.error('Error fetching lemons:', error);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const calculateTotal = () => {
+    const selected = lemons.find(l => l.Grade === formData.grade);
+    const qty = parseFloat(formData.quantity);
+    if (!selected || isNaN(qty)) return '₹0';
+    let price = parseFloat(selected['Price Per Kg']) * qty;
+    if (qty >= 100) price *= 0.95;
+    return `₹${price.toFixed(2)}`;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setOrderStatus('Submitting...');
-
-    const quantity = Number(form.quantity);
-    if (!Number.isInteger(quantity) || quantity <= 0) {
-      setOrderStatus("Please enter a valid quantity (integer).");
-      setIsSubmitting(false);
+    if (!formData.name || !formData.phone || !formData.grade || !formData.quantity) {
+      setStatus('Please fill in all fields.');
       return;
     }
-
-    if (!/^[0-9]{10}$/.test(form.contact)) {
-      setOrderStatus("Please enter a valid 10-digit mobile number.");
-      setIsSubmitting(false);
-      return;
-    }
-
-    const isBulk = quantity > 50;
-    const dataToSend = {
-      ...form,
-      contact: `+91${form.contact}`,
-      quantity,
-      discount: isBulk ? '10%' : '0%',
-    };
-
     try {
-      const response = await fetch(
-        "https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=orders",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ data: dataToSend }),
-        }
-      );
-
-      if (response.ok) {
-        setOrderStatus("Order submitted successfully!");
-        setForm({
-          name: '',
-          quantity: '',
-          quality: 'A1',
-          delivery: '',
-          contact: '',
-        });
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        setOrderStatus("Failed to submit order. Please try again.");
-      }
-    } catch {
-      setOrderStatus("Failed to submit order. Please try again.");
+      await axios.post('https://sheetdb.io/api/v1/wm0oxtmmfkndt', {
+        data: formData,
+      });
+      setStatus('Order placed successfully!');
+      setFormData({ name: '', phone: '', grade: '', quantity: '' });
+    } catch (err) {
+      console.error(err);
+      setStatus('Failed to place order.');
     }
-    setIsSubmitting(false);
   };
 
-  const getWhatsappLink = () => {
-    const { name, quantity, quality, delivery, contact } = form;
-    const message = `\nHi! I'm interested in ordering lemons:\n👤 Name: ${name}\n📞 Contact: +91${contact}\n📦 Quantity: ${quantity}kg\n⭐ Quality: ${quality}\n🏠 Address: ${delivery}\n\nPlease confirm availability.`;
-    return `https://wa.me/918500130926?text=${encodeURIComponent(message)}`;
-  };
-
-  const pricePerKg = {
-    A1: 80,
-    A2: 70,
-    A3: 60,
-  };
-  const quantity = Number(form.quantity) || 0;
-  const isBulk = quantity > 50;
-  const basePrice = pricePerKg[form.quality] * quantity;
-  const discount = isBulk ? 0.1 : 0;
-  const totalPrice = basePrice * (1 - discount);
+  const whatsappLink = `https://wa.me/91${formData.phone}?text=Hello, I want to order ${formData.quantity} kg of ${formData.grade} lemons.`;
 
   return (
     <div className={styles.page}>
       <Head>
-        <title>3 Lemons Traders – Buy Fresh Lemons Online</title>
-        <meta
-          name="description"
-          content="Buy premium quality lemons at affordable prices across India. Direct farm to home delivery."
-        />
-        <meta property="og:title" content="Buy Fresh Lemons Online – 3 Lemons Traders" />
-        <meta
-          property="og:description"
-          content="Get premium lemons delivered to your door at unbeatable prices. Farm fresh quality."
-        />
-        <meta property="og:image" content="/lemons-hero.jpg" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="canonical" href="https://3lemons.in" />
+        <title>3 Lemons - Fresh Lemons Delivered</title>
+        <meta name="description" content="Order fresh, high-quality lemons directly from farmers." />
       </Head>
 
       <main className={styles.container}>
         <section className={styles.hero}>
-          <img
-            src="/lemons-hero.jpg"
+          <Image
+            src="/lemon-banner.jpg"
             alt="Fresh Lemons"
+            width={1200}
+            height={500}
             className={styles.heroImage}
           />
           <div className={styles.heroOverlay}>
-            <h1 className={styles.heroTitle}>3 Lemons Traders</h1>
-            <p className={styles.heroSubtitle}>Buy fresh, farm-direct lemons delivered across India</p>
-            <a href="#buy-now" className={styles.heroButton}>
-              Order Now
-            </a>
+            <h1 className={styles.heroTitle}>3 Lemons</h1>
+            <p className={styles.heroSubtitle}>Fresh Lemons Delivered to Your Doorstep</p>
+            <a href="#order" className={styles.heroButton}>Order Now</a>
           </div>
         </section>
 
-        <section className={styles.lemonsSection}>
+        <section>
           <h2 className={styles.sectionTitle}>Our Lemons</h2>
           <div className={styles.lemonsGrid}>
-            {Array.isArray(lemons) &&
-              lemons.map((lemon, index) => (
-                <div key={index} className={styles.lemonCard}>
-                  <Image
-                    src={lemon['Image url']}
-                    alt={lemon['Grade'] || 'Lemon'}
-                    width={300}
-                    height={200}
-                    loading="lazy"
-                    className={styles.cardImage}
-                  />
-                  <p className={styles.cardTitle}>
-                    {lemon['Grade']} – ₹{lemon['Price Per Kg']}/kg
-                  </p>
-                  <p className={styles.cardDescription}>{lemon['Description']}</p>
-                </div>
-              ))}
+            {lemons.map((lemon, idx) => (
+              <div key={idx} className={styles.lemonCard}>
+                <Image
+                  src={lemon['Image url'] || '/lemon.jpg'}
+                  alt={lemon.Grade}
+                  width={300}
+                  height={200}
+                  className={styles.cardImage}
+                />
+                <h3 className={styles.cardTitle}>{lemon.Grade}</h3>
+                <p className={styles.cardDescription}>{lemon.Description}</p>
+                <p><strong>₹{lemon['Price Per Kg']}/Kg</strong></p>
+              </div>
+            ))}
           </div>
         </section>
 
-        <section id="buy-now" className={styles.formSection}>
-          <h2 className={styles.sectionTitle}>Buy Now</h2>
+        <section>
+          <h2 className={styles.sectionTitle}>What Our Customers Say</h2>
+          <div className={styles.testimonialGrid}>
+            <div className={styles.testimonialCard}>
+              “The lemons were incredibly fresh and juicy. Delivery was quick too!” – Priya S.
+            </div>
+            <div className={styles.testimonialCard}>
+              “Best prices and reliable service. I’m ordering again!” – Rohit K.
+            </div>
+            <div className={styles.testimonialCard}>
+              “I appreciated the bulk discount. Great for my restaurant.” – Neha D.
+            </div>
+          </div>
+        </section>
+
+        <section id="order" className={styles.formSection}>
+          <h2 className={styles.sectionTitle}>Place Your Order</h2>
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.inputGrid}>
               <input
                 type="text"
                 name="name"
-                value={form.name}
-                onChange={handleChange}
                 placeholder="Your Name"
-                required
-                className={styles.input}
-              />
-              <input
-                type="text"
-                name="contact"
-                value={form.contact}
-                onChange={handleChange}
-                placeholder="10-digit Mobile Number"
-                maxLength={10}
-                required
-                className={styles.input}
-              />
-              <select
-                name="quality"
-                value={form.quality}
-                onChange={handleChange}
-                className={styles.input}
-                required
-              >
-                <option value="A1">A1</option>
-                <option value="A2">A2</option>
-                <option value="A3">A3</option>
-              </select>
-              <input
-                type="text"
-                name="delivery"
-                value={form.delivery}
-                onChange={handleChange}
-                placeholder="Delivery Address"
-                required
+                value={formData.name}
+                onChange={handleInputChange}
                 className={`${styles.input} ${styles.inputFull}`}
               />
               <input
+                type="tel"
+                name="phone"
+                placeholder="Phone Number"
+                value={formData.phone}
+                onChange={handleInputChange}
+                className={`${styles.input} ${styles.inputFull}`}
+              />
+              <select
+                name="grade"
+                value={formData.grade}
+                onChange={handleInputChange}
+                className={`${styles.input} ${styles.inputFull}`}
+              >
+                <option value="">Select Grade</option>
+                {lemons.map((lemon, idx) => (
+                  <option key={idx} value={lemon.Grade}>{lemon.Grade}</option>
+                ))}
+              </select>
+              <input
                 type="number"
-                min={1}
                 name="quantity"
-                value={form.quantity}
-                onChange={handleChange}
                 placeholder="Quantity (kg)"
-                required
-                className={styles.input}
+                value={formData.quantity}
+                onChange={handleInputChange}
+                className={`${styles.input} ${styles.inputFull}`}
               />
             </div>
 
-            <p className={styles.total}>
-              Total Price: ₹{totalPrice.toFixed(2)}{' '}
-              {isBulk && <span className={styles.discountNote}>(10% bulk discount applied)</span>}
-            </p>
+            <p className={styles.total}>Total: {calculateTotal()}</p>
+            {parseFloat(formData.quantity) >= 100 && <p className={styles.discountNote}>5% discount applied!</p>}
 
             <div className={styles.actions}>
-              <button
-                type="submit"
-                className={styles.submitButton}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Ordering..." : "Place Order"}
-              </button>
-
+              <button type="submit" className={styles.submitButton}>Submit</button>
               <a
-                href={getWhatsappLink()}
+                href={whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={styles.whatsappButton}
               >
-                <FaWhatsapp className={styles.whatsappIcon} /> Order on WhatsApp
+                Chat on WhatsApp
               </a>
             </div>
-            {orderStatus && <p className={styles.statusMessage}>{orderStatus}</p>}
+
+            {status && <p className={styles.statusMessage}>{status}</p>}
           </form>
         </section>
       </main>
