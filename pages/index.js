@@ -4,8 +4,9 @@ import styles from '../styles/styles.module.css';
 export default function Home() {
   const [lemons, setLemons] = useState([]);
   const [orders, setOrders] = useState([{ grade: '', quantity: 1 }]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [form, setForm] = useState({ name: '', delivery: '', contact: '' });
   const [total, setTotal] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetch('https://sheetdb.io/api/v1/wm0oxtmmfkndt')
@@ -26,6 +27,10 @@ export default function Home() {
     setOrders(updated);
   };
 
+  const handleAddVariety = () => {
+    setOrders([...orders, { grade: '', quantity: 1 }]);
+  };
+
   const calculateTotal = () => {
     let totalPrice = 0;
     orders.forEach(order => {
@@ -37,40 +42,41 @@ export default function Home() {
     setTotal(totalPrice);
   };
 
-  const handleAddVariety = () => {
-    setOrders([...orders, { grade: '', quantity: 1 }]);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const rows = orders.map(order => ({
+      name: form.name,
+      quantity: order.quantity,
+      quality: order.grade,
+      delivery: form.delivery,
+      contact: form.contact,
+      discount: '0%',
+    }));
+
+    try {
+      await fetch('https://sheetdb.io/api/v1/wm0oxtmmfkndt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: rows }),
+      });
+      alert('Order submitted successfully!');
+      setOrders([{ grade: '', quantity: 1 }]);
+      setForm({ name: '', delivery: '', contact: '' });
+    } catch (err) {
+      console.error(err);
+      alert('Failed to submit order.');
+    }
+
+    setIsSubmitting(false);
   };
 
   const getWhatsappLink = () => {
     const msg = orders
       .map(order => `${order.quantity} kg of ${order.grade}`)
       .join(', ');
-    return `https://wa.me/919966886685?text=I want to order: ${msg} - Total: ₹${total}`;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    const formData = {
-      orders: orders.map(o => `${o.quantity} kg of ${o.grade}`).join(', '),
-      total,
-    };
-
-    try {
-      await fetch('/api/order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-      alert('Order placed successfully!');
-      setOrders([{ grade: '', quantity: 1 }]);
-    } catch (error) {
-      console.error('Order failed', error);
-      alert('Failed to place order.');
-    }
-
-    setIsSubmitting(false);
+    return `https://wa.me/91${form.contact}?text=Hi, I'm ${form.name}. I want to order: ${msg}. Delivery: ${form.delivery}. Total: ₹${total}`;
   };
 
   return (
@@ -78,6 +84,37 @@ export default function Home() {
       <h1>🍋 3 Lemons Traders</h1>
 
       <form onSubmit={handleSubmit}>
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Your Name</label>
+          <input
+            className={styles.input}
+            required
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+          />
+        </div>
+
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Delivery Address</label>
+          <input
+            className={styles.input}
+            required
+            value={form.delivery}
+            onChange={(e) => setForm({ ...form, delivery: e.target.value })}
+          />
+        </div>
+
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Contact Number</label>
+          <input
+            type="tel"
+            className={styles.input}
+            required
+            value={form.contact}
+            onChange={(e) => setForm({ ...form, contact: e.target.value })}
+          />
+        </div>
+
         {orders.map((order, index) => (
           <div className={styles.formGroup} key={index}>
             <label className={styles.label}>Select Grade</label>
@@ -117,7 +154,13 @@ export default function Home() {
         <button type="submit" disabled={isSubmitting} className={styles.button}>
           {isSubmitting ? 'Ordering...' : '🛒 Place Order on Website'}
         </button>
-        <a href={getWhatsappLink()} target="_blank" rel="noopener noreferrer" className={styles.button}>
+
+        <a
+          href={getWhatsappLink()}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.button}
+        >
           🟢 Place Order on WhatsApp
         </a>
       </form>
