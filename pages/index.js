@@ -43,7 +43,7 @@ export default function Home() {
     const isBulk = quantity > 50;
     const dataToSend = { ...form, contact: `+91${form.contact}`, quantity, discount: isBulk ? '10%' : '0%' };
 
-    const response = await fetch("https://sheetdb.io/api/v1/q6ryvlhjjmu4q", {
+    const response = await fetch("https://sheetdb.io/api/v1/wm0oxtmmfkndt", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ data: dataToSend })
