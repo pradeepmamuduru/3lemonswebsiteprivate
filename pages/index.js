@@ -85,16 +85,6 @@ export default function Home() {
         <meta property="og:image" content="/lemons-hero.jpg" />
       </Head>
 
-      <header className="relative h-[25vh] w-full overflow-hidden">
-        <Image src="/lemons-hero.jpg" alt="Hero Lemons" layout="fill" objectFit="cover" priority />
-        <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-          <div className="text-white text-center px-6">
-            <h1 className="text-4xl md:text-5xl font-extrabold drop-shadow-lg">3 Lemons Traders</h1>
-            <p className="text-lg md:text-xl mt-2 md:mt-4 font-light">Fresh. Affordable. Delivered to your Doorstep.</p>
-          </div>
-        </div>
-      </header>
-
       <main className="p-4 sm:p-8 space-y-16 max-w-7xl mx-auto">
         <section className="bg-yellow-50 p-6 rounded-xl">
           <h2 className="text-4xl font-bold mb-6 text-green-700">Our Lemons</h2>
@@ -164,6 +154,10 @@ export default function Home() {
             <p>“Affordable and quality product. I ordered 60kg and got 10% off!” — Sneha, Bangalore</p>
           </div>
         </section>
+
+        <footer className="text-center text-sm text-gray-700 pt-8 pb-4">
+          &copy; {new Date().getFullYear()} 3 Lemons Traders. All rights reserved.
+        </footer>
       </main>
     </div>
   );
