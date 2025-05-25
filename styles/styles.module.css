@@ -1,144 +1,166 @@
-/* styles/styles.module.css */
 .page {
   font-family: Arial, sans-serif;
-  background: #fff;
-  color: #333;
-  padding: 0;
+  color: #222;
+  background-color: #fefefc;
   margin: 0;
+  padding: 0;
 }
+
 .container {
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 1rem;
 }
+
 .hero {
   position: relative;
   text-align: center;
+  margin-bottom: 2rem;
 }
+
 .heroImage {
   width: 100%;
   height: auto;
+  object-fit: cover;
 }
+
 .heroOverlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  color: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  top: 20%;
+  left: 5%;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  max-width: 80%;
 }
+
 .heroTitle {
-  font-size: 4rem;
-  font-weight: bold;
+  font-size: 2.5rem;
+  margin: 0;
 }
+
 .heroSubtitle {
-  font-size: 1.5rem;
-}
-.heroButton {
-  margin-top: 1rem;
-  background: #ffcc00;
-  padding: 0.5rem 1rem;
-  color: black;
-  text-decoration: none;
-  border-radius: 5px;
-}
-.sectionTitle {
-  font-size: 2rem;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  text-align: center;
-}
-.lemonsGrid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: center;
-}
-.lemonCard {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 1rem;
-  text-align: center;
-  width: 300px;
-}
-.cardImage {
-  border-radius: 6px;
-}
-.cardTitle {
   font-size: 1.2rem;
   margin-top: 0.5rem;
 }
-.cardDescription {
-  font-size: 0.9rem;
-  color: #555;
+
+.heroButton {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.7rem 1.5rem;
+  background-color: #f6b300;
+  color: white;
+  font-weight: bold;
+  border-radius: 8px;
+  text-decoration: none;
 }
-.testimonialGrid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: center;
+
+.lemonsSection {
+  padding: 2rem 0;
 }
-.testimonialCard {
-  background: #f9f9f9;
+
+.sectionTitle {
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.lemonsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.lemonCard {
+  border: 1px solid #ddd;
+  border-radius: 10px;
   padding: 1rem;
-  border-left: 4px solid #ffcc00;
-  max-width: 300px;
+  background: #fff;
+  text-align: center;
 }
-.formSection {
-  background: #f0f0f0;
+
+.cardImage {
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.testimonials {
+  background: #fff8dc;
   padding: 2rem 1rem;
+  margin: 2rem 0;
 }
-.form {
-  max-width: 500px;
-  margin: 0 auto;
-}
-.inputGrid {
+
+.testimonialGrid {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
-.input {
-  padding: 0.5rem;
+
+.testimonialCard {
+  background: #fff;
+  padding: 1rem;
+  border-left: 4px solid #f6b300;
+  border-radius: 6px;
+  font-style: italic;
+}
+
+.formSection {
+  padding: 2rem 0;
+}
+
+.form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.inputGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.inputGrid input,
+.inputGrid select {
+  padding: 0.8rem;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 6px;
+  font-size: 1rem;
 }
-.inputFull {
-  width: 100%;
-}
-.total {
-  font-size: 1.2rem;
-  margin-top: 1rem;
-}
-.discountNote {
-  color: green;
-}
+
 .actions {
-  margin-top: 1rem;
   display: flex;
   gap: 1rem;
+  margin-top: 1rem;
   flex-wrap: wrap;
 }
-.submitButton {
-  background: #0070f3;
+
+.actions button,
+.actions a {
+  padding: 0.8rem 1.5rem;
+  background-color: #28a745;
   color: white;
+  font-weight: bold;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  border-radius: 6px;
+  text-decoration: none;
   cursor: pointer;
 }
-.whatsappButton {
-  background: #25D366;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  text-decoration: none;
+
+.actions a {
+  background-color: #25d366;
 }
+
 .statusMessage {
   margin-top: 1rem;
-  color: blue;
+  color: #555;
+}
+
+.total {
+  font-weight: bold;
+  margin-top: 1rem;
+}
+
+.discountNote {
+  color: green;
+  font-size: 0.9rem;
 }
