@@ -1,175 +1,133 @@
-import { useState } from 'react';
-import Image from 'next/image';
-import Head from 'next/head';
+import { useState, useEffect } from 'react';
 import styles from '../styles/styles.module.css';
 
-export async function getStaticProps() {
-  const res = await fetch("https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Lemons");
-  const lemons = await res.json();
-  return { props: { lemons }, revalidate: 3600 };
-}
-
-export default function Home({ lemons }) {
-  const [form, setForm] = useState({
-    name: '',
-    contact: '',
-    delivery: '',
-    items: lemons.map(lemon => ({ grade: lemon['Grade'], quantity: '' })),
-  });
-  const [orderStatus, setOrderStatus] = useState('');
+export default function Home() {
+  const [lemons, setLemons] = useState([]);
+  const [orders, setOrders] = useState([{ grade: '', quantity: 1 }]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [total, setTotal] = useState(0);
 
-  const priceMap = lemons.reduce((map, lemon) => {
-    map[lemon['Grade']] = parseInt(lemon['Price Per Kg'], 10);
-    return map;
-  }, {});
+  useEffect(() => {
+    fetch('https://sheetdb.io/api/v1/wm0oxtmmfkndt')
+      .then(res => res.json())
+      .then(data => setLemons(data));
+  }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    if (name === 'contact' && (!/^\d*$/.test(value) || value.length > 10)) return;
-    setForm({ ...form, [name]: value });
+  useEffect(() => {
+    calculateTotal();
+  }, [orders]);
+
+  const handleOrderChange = (index, field, value) => {
+    const updated = [...orders];
+    if (field === 'quantity') {
+      value = Math.max(0, parseInt(value) || 0);
+    }
+    updated[index][field] = value;
+    setOrders(updated);
   };
 
-  const handleItemChange = (index, value) => {
-    const newItems = [...form.items];
-    if (!/^\d*$/.test(value)) return;
-    newItems[index].quantity = value;
-    setForm({ ...form, items: newItems });
+  const calculateTotal = () => {
+    let totalPrice = 0;
+    orders.forEach(order => {
+      const lemon = lemons.find(l => l.Grade === order.grade);
+      if (lemon && order.quantity) {
+        totalPrice += parseInt(lemon['Price Per Kg']) * order.quantity;
+      }
+    });
+    setTotal(totalPrice);
   };
 
-  const totalPrice = form.items.reduce((sum, item) => {
-    const qty = parseInt(item.quantity, 10) || 0;
-    const price = priceMap[item.grade] || 0;
-    return sum + qty * price;
-  }, 0);
+  const handleAddVariety = () => {
+    setOrders([...orders, { grade: '', quantity: 1 }]);
+  };
+
+  const getWhatsappLink = () => {
+    const msg = orders
+      .map(order => `${order.quantity} kg of ${order.grade}`)
+      .join(', ');
+    return `https://wa.me/919966886685?text=I want to order: ${msg} - Total: ₹${total}`;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setOrderStatus('Submitting...');
 
-    if (!/^\d{10}$/.test(form.contact)) {
-      setOrderStatus('Please enter a valid 10-digit mobile number.');
-      setIsSubmitting(false);
-      return;
-    }
-
-    const orderData = {
-      name: form.name,
-      contact: `+91${form.contact}`,
-      delivery: form.delivery,
-      items: form.items.filter(item => parseInt(item.quantity, 10) > 0),
+    const formData = {
+      orders: orders.map(o => `${o.quantity} kg of ${o.grade}`).join(', '),
+      total,
     };
 
-    if (orderData.items.length === 0) {
-      setOrderStatus('Please enter quantity for at least one grade.');
-      setIsSubmitting(false);
-      return;
+    try {
+      await fetch('/api/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      alert('Order placed successfully!');
+      setOrders([{ grade: '', quantity: 1 }]);
+    } catch (error) {
+      console.error('Order failed', error);
+      alert('Failed to place order.');
     }
 
-    try {
-      const response = await fetch(
-        'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=orders',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ data: orderData }),
-        }
-      );
-      if (response.ok) {
-        setOrderStatus('Order submitted successfully!');
-        setForm({
-          name: '',
-          contact: '',
-          delivery: '',
-          items: lemons.map(lemon => ({ grade: lemon['Grade'], quantity: '' })),
-        });
-      } else {
-        setOrderStatus('Failed to submit order.');
-      }
-    } catch {
-      setOrderStatus('Network error. Try again.');
-    }
     setIsSubmitting(false);
   };
 
-  const getWhatsappLink = () => {
-    const message = `Hi! I'd like to place an order:
-👤 Name: ${form.name}
-📞 Contact: +91${form.contact}
-🏠 Address: ${form.delivery}
-🛒 Items:
-${form.items.filter(i => parseInt(i.quantity, 10) > 0).map(i => `- ${i.grade}: ${i.quantity}kg`).join('\n')}
-Total: ₹${totalPrice}`;
-    return `https://wa.me/918500130926?text=${encodeURIComponent(message)}`;
-  };
-
   return (
-    <div className={styles.page}>
-      <Head>
-        <title>3 Lemons Traders – Buy Fresh Lemons Online</title>
-        <meta name="description" content="Farm fresh lemons at best prices. Buy online from 3 Lemons Traders." />
-        <meta property="og:image" content="/lemons-hero.jpg" />
-        <link rel="canonical" href="https://3lemons.in" />
-      </Head>
+    <div className={styles.container}>
+      <h1>🍋 3 Lemons Traders</h1>
 
-      <main className={styles.container}>
-        <section className={styles.hero}>
-          <img src="/lemons-hero.jpg" className={styles.heroImage} alt="Lemons" />
-          <div className={styles.heroOverlay}>
-            <h1>3 Lemons Traders</h1>
-            <p>Buy farm-direct, fresh lemons across India</p>
-            <a href="#order" className={styles.heroButton}>Order Now</a>
+      <form onSubmit={handleSubmit}>
+        {orders.map((order, index) => (
+          <div className={styles.formGroup} key={index}>
+            <label className={styles.label}>Select Grade</label>
+            <select
+              className={styles.select}
+              value={order.grade}
+              onChange={(e) => handleOrderChange(index, 'grade', e.target.value)}
+              required
+            >
+              <option value="">-- Select --</option>
+              {lemons.map((lemon, idx) => (
+                <option key={idx} value={lemon.Grade}>
+                  {lemon.Grade} – ₹{lemon['Price Per Kg']}/kg
+                </option>
+              ))}
+            </select>
+
+            <label className={styles.label}>Quantity (kg)</label>
+            <input
+              type="number"
+              min="0"
+              className={styles.input}
+              value={order.quantity}
+              onChange={(e) => handleOrderChange(index, 'quantity', e.target.value)}
+            />
           </div>
-        </section>
+        ))}
 
-        <section className={styles.lemonsSection}>
-          <h2>Our Lemons</h2>
-          <div className={styles.lemonsGrid}>
-            {lemons.map((lemon, i) => (
-              <div className={styles.lemonCard} key={i}>
-                <Image src={lemon['Image url']} alt={lemon['Grade']} width={300} height={200} />
-                <h3>{lemon['Grade']} – ₹{lemon['Price Per Kg']}/kg</h3>
-                <p>{lemon['Description']}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+        <button type="button" onClick={handleAddVariety} className={styles.button}>
+          ➕ Add Another Variety
+        </button>
 
-        <section id="order" className={styles.formSection}>
-          <h2>Place Your Order</h2>
-          <form onSubmit={handleSubmit} className={styles.form}>
-            <input type="text" name="name" value={form.name} onChange={handleInputChange} placeholder="Your Name" required />
-            <input type="text" name="contact" value={form.contact} onChange={handleInputChange} placeholder="10-digit Mobile Number" maxLength={10} required />
-            <input type="text" name="delivery" value={form.delivery} onChange={handleInputChange} placeholder="Delivery Address" required />
+        <div className={styles.orderSummary}>
+          <h3>Total: ₹{total}</h3>
+        </div>
 
-            {form.items.map((item, i) => (
-              <div key={i} className={styles.itemRow}>
-                <label>{item.grade}</label>
-                <input type="number" min={0} value={item.quantity} onChange={(e) => handleItemChange(i, e.target.value)} placeholder="Quantity (kg)" />
-              </div>
-            ))}
+        <button type="submit" disabled={isSubmitting} className={styles.button}>
+          {isSubmitting ? 'Ordering...' : '🛒 Place Order on Website'}
+        </button>
+        <a href={getWhatsappLink()} target="_blank" rel="noopener noreferrer" className={styles.button}>
+          🟢 Place Order on WhatsApp
+        </a>
+      </form>
 
-            <p className={styles.total}>Total Price: ₹{totalPrice}</p>
-
-            <div className={styles.buttonRow}>
-              <button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Ordering...' : 'Place Order on Website'}
-              </button>
-              <a href={getWhatsappLink()} target="_blank" rel="noopener noreferrer" className={styles.whatsapp}>
-                🟢 Place Order on WhatsApp
-              </a>
-            </div>
-            {orderStatus && <p className={styles.status}>{orderStatus}</p>}
-          </form>
-        </section>
-
-        <footer className={styles.footer}>
-          <p>👨‍🌾 Pradeep Mamuduru</p>
-          <p>📷 <a href="https://instagram.com/3Lemons_Traders" target="_blank">@3Lemons_Traders</a></p>
-          <p>🌐 <a href="https://3lemons.in" target="_blank">3lemons.in</a></p>
-        </footer>
-      </main>
+      <div className={styles.footer}>
+        <p>Pradeep Mamuduru</p>
+        <p>
+          📸 <a href="https://www.instagram.com/3Lemons_Traders" target="_blank" rel="noopener noreferrer">3Lemons_Traders</a> | 🌐 <a href="https://3lemons.vercel.app">3lemons.vercel.app</a>
+        </p>
+      </div>
     </div>
   );
 }
