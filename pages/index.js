@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
-import axios from 'axios';
 import styles from '../styles/styles.module.css';
 
 export default function Home() {
@@ -22,8 +21,9 @@ export default function Home() {
 
   const fetchLemons = async () => {
     try {
-      const res = await axios.get('https://sheetdb.io/api/v1/wm0oxtmmfkndt');
-      setLemons(res.data);
+      const res = await fetch('https://sheetdb.io/api/v1/wm0oxtmmfkndt');
+      const data = await res.json();
+      setLemons(data);
     } catch (error) {
       console.error('Error fetching lemons:', error);
     }
@@ -49,8 +49,12 @@ export default function Home() {
       return;
     }
     try {
-      await axios.post('https://sheetdb.io/api/v1/wm0oxtmmfkndt', {
-        data: formData,
+      await fetch('https://sheetdb.io/api/v1/wm0oxtmmfkndt', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ data: formData }),
       });
       setStatus('Order placed successfully!');
       setFormData({ name: '', phone: '', grade: '', quantity: '' });
@@ -162,7 +166,9 @@ export default function Home() {
             </div>
 
             <p className={styles.total}>Total: {calculateTotal()}</p>
-            {parseFloat(formData.quantity) >= 100 && <p className={styles.discountNote}>5% discount applied!</p>}
+            {parseFloat(formData.quantity) >= 100 && (
+              <p className={styles.discountNote}>5% discount applied!</p>
+            )}
 
             <div className={styles.actions}>
               <button type="submit" className={styles.submitButton}>Submit</button>
