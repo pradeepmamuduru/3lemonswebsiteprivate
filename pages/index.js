@@ -77,7 +77,7 @@ export default function Home() {
   const totalPrice = basePrice * (1 - discount);
 
   return (
-    <div className="min-h-screen bg-blue-200 text-green-900 font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-sky-100 via-sky-200 to-sky-300 text-green-900 font-sans">
       <Head>
         <title>3 Lemons Traders – Buy Fresh Lemons Online</title>
         <meta name="description" content="Buy premium quality lemons at affordable prices across India. Direct farm to home delivery." />
@@ -108,7 +108,7 @@ export default function Home() {
           <h2 className="text-4xl font-bold mb-6 text-green-900">Our Lemons</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {lemons.map((lemon, index) => (
-              <div key={index} className="bg-blue-50 p-4 rounded-xl shadow-lg">
+              <div key={index} className="bg-blue-50 p-4 rounded-xl shadow-md">
                 <Image src={lemon['Image url']} alt={lemon['Grade'] || 'Lemon'} width={300} height={200} loading="lazy" className="rounded-lg w-full h-48 object-cover" />
                 <p className="mt-3 font-bold text-lg text-green-800">{lemon['Grade']} – ₹{lemon['Price Per Kg']}/kg</p>
                 <p className="text-gray-700">{lemon['Description']}</p>
