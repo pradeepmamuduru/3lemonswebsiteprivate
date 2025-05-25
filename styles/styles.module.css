@@ -1,47 +1,38 @@
-/* styles.css */
+/* styles.module.css */
 
-body {
-  margin: 0;
+.page {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(to bottom right, #001f3f, #003366, #004080);
   color: #d4fcdc;
+  min-height: 100vh;
+  margin: 0;
 }
 
-main {
+.container {
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-section {
-  background-color: rgba(0, 51, 102, 0.8);
-  padding: 2rem;
-  border-radius: 1rem;
-  margin-bottom: 4rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-}
-
-.hero-image {
+.hero {
   position: relative;
   height: 24rem;
   width: 100%;
   overflow: hidden;
   border-radius: 1rem;
+  margin-bottom: 4rem;
 }
 
-.hero-image img {
+.heroImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
   opacity: 0.6;
 }
 
-.hero-content {
+.heroOverlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -51,20 +42,20 @@ section {
   z-index: 10;
 }
 
-.hero-content h1 {
+.heroTitle {
   font-size: 3rem;
   font-weight: 800;
   margin-bottom: 1rem;
   text-shadow: 2px 2px #000;
 }
 
-.hero-content p {
+.heroSubtitle {
   font-size: 1.25rem;
   font-weight: 500;
   text-shadow: 1px 1px #000;
 }
 
-.hero-content a {
+.heroButton {
   margin-top: 1.5rem;
   padding: 0.75rem 1.5rem;
   background-color: #006400;
@@ -75,87 +66,178 @@ section {
   transition: background-color 0.3s;
 }
 
-.hero-content a:hover {
+.heroButton:hover {
   background-color: #004d00;
 }
 
-.lemon-card {
+.lemonsSection {
+  background-color: rgba(0, 51, 102, 0.8);
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  margin-bottom: 4rem;
+}
+
+.sectionTitle {
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  font-size: 2rem;
+  text-align: center;
+}
+
+.lemonsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.lemonCard {
   background-color: #002244;
   padding: 1rem;
   border-radius: 0.75rem;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.lemon-card img {
+.cardImage {
   width: 100%;
   height: 12rem;
   object-fit: cover;
   border-radius: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
-.lemon-card p {
-  margin-top: 0.75rem;
+.cardTitle {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
 }
 
-form input,
-form select {
+.cardDescription {
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.formSection {
+  background-color: rgba(0, 51, 102, 0.8);
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.inputGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.inputFull {
+  grid-column: 1 / -1;
+}
+
+.input {
   background-color: #001f3f;
   border: 1px solid #66ff99;
   padding: 0.75rem;
   color: #d4fcdc;
   border-radius: 0.5rem;
+  font-size: 1rem;
   width: 100%;
+  box-sizing: border-box;
 }
 
-form button,
-form a {
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
+.total {
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
   text-align: center;
-  cursor: pointer;
-  display: inline-block;
 }
 
-form button {
+.discountNote {
+  color: #00ff99;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.submitButton {
   background-color: #006400;
   color: white;
   border: none;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
   transition: background-color 0.3s;
+  flex: 1 1 180px;
+  text-align: center;
 }
 
-form button:hover {
+.submitButton:hover:not(:disabled) {
   background-color: #004d00;
 }
 
-form a {
+.submitButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.whatsappButton {
   color: #00cc66;
   border: 1px solid #00cc66;
   text-decoration: none;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 180px;
   transition: background-color 0.3s;
 }
 
-form a:hover {
+.whatsappButton:hover {
   background-color: #003322;
 }
 
-.order-status {
+.whatsappIcon {
+  margin-right: 0.5rem;
+  font-size: 1.25rem;
+}
+
+.statusMessage {
   margin-top: 1rem;
   text-align: center;
   font-weight: 600;
   color: #d4fcdc;
 }
 
-@media (min-width: 768px) {
-  .grid-cols-2 {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+@media (max-width: 600px) {
+  .inputGrid {
+    grid-template-columns: 1fr;
   }
 
-  .grid-cols-3 {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
+  .actions {
+    flex-direction: column;
+  }
+
+  .submitButton,
+  .whatsappButton {
+    flex: 1 1 auto;
   }
 }
