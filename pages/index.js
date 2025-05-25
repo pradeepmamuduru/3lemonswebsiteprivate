@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Head from 'next/head';
 import { FaWhatsapp } from 'react-icons/fa';
-import styles from '../styles/styles.module.css';
+import styles from '../styles/styles.css';
 
 export async function getStaticProps() {
   const res = await fetch("https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Lemons");
