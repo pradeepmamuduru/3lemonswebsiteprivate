@@ -77,7 +77,7 @@ export default function Home() {
   const totalPrice = basePrice * (1 - discount);
 
   return (
-    <div className="min-h-screen bg-[url('/deca30a0-9675-4778-9175-c2d8820e04fc.png')] bg-cover bg-center text-green-100 font-sans">
+    <div className="min-h-screen bg-blue-200 text-green-900 font-sans">
       <Head>
         <title>3 Lemons Traders – Buy Fresh Lemons Online</title>
         <meta name="description" content="Buy premium quality lemons at affordable prices across India. Direct farm to home delivery." />
@@ -95,7 +95,7 @@ export default function Home() {
             alt="Fresh Lemons"
             className="w-full h-96 object-cover opacity-60 rounded-xl"
           />
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white z-10 p-4">
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-green-900 z-10 p-4">
             <h1 className="text-5xl sm:text-6xl font-extrabold mb-4 drop-shadow-lg">3 Lemons Traders</h1>
             <p className="text-xl sm:text-2xl font-medium drop-shadow-lg">Buy fresh, farm-direct lemons delivered across India</p>
             <a href="#buy-now" className="inline-block mt-6 px-6 py-3 bg-green-700 text-white rounded-full font-semibold shadow-lg hover:bg-green-800 transition">
@@ -104,11 +104,11 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-white bg-opacity-80 p-6 rounded-xl">
+        <section className="bg-blue-100 bg-opacity-70 p-6 rounded-xl">
           <h2 className="text-4xl font-bold mb-6 text-green-900">Our Lemons</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {lemons.map((lemon, index) => (
-              <div key={index} className="bg-white p-4 rounded-xl shadow-lg">
+              <div key={index} className="bg-blue-50 p-4 rounded-xl shadow-lg">
                 <Image src={lemon['Image url']} alt={lemon['Grade'] || 'Lemon'} width={300} height={200} loading="lazy" className="rounded-lg w-full h-48 object-cover" />
                 <p className="mt-3 font-bold text-lg text-green-800">{lemon['Grade']} – ₹{lemon['Price Per Kg']}/kg</p>
                 <p className="text-gray-700">{lemon['Description']}</p>
@@ -117,7 +117,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="buy-now" className="bg-white bg-opacity-90 p-8 rounded-xl shadow-lg">
+        <section id="buy-now" className="bg-blue-100 bg-opacity-80 p-8 rounded-xl shadow-lg">
           <h2 className="text-4xl font-bold mb-6 text-green-900">Buy Now</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
