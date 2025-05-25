@@ -59,12 +59,6 @@ export default function Home() {
     setIsSubmitting(false);
   };
 
-  const getWhatsappLink = () => {
-    const { name, quantity, quality, delivery, contact } = form;
-    const message = `\nHi! I'm interested in ordering lemons:\n👤 Name: ${name}\n📞 Contact: +91${contact}\n📦 Quantity: ${quantity}kg\n⭐ Quality: ${quality}\n🏠 Address: ${delivery}\n\nPlease confirm availability.`;
-    return `https://wa.me/918500130926?text=${encodeURIComponent(message)}`;
-  };
-
   const pricePerKg = {
     A1: 80,
     A2: 70,
@@ -77,7 +71,7 @@ export default function Home() {
   const totalPrice = basePrice * (1 - discount);
 
   return (
-    <div className="min-h-screen bg-[#C5C6C7] text-green-900 font-sans scroll-smooth">
+    <div className="min-h-screen bg-[#C5C6C7] text-green-900 font-sans">
       <Head>
         <title>3 Lemons Traders – Buy Fresh Lemons Online</title>
         <meta name="description" content="Buy premium quality lemons at affordable prices across India. Direct farm to home delivery." />
@@ -87,18 +81,6 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="canonical" href="https://3lemons.in" />
       </Head>
-
-      {/* Navigation Bar */}
-      <header className="bg-green-800 text-white sticky top-0 z-50 shadow-md">
-        <div className="max-w-7xl mx-auto flex justify-between items-center p-4">
-          <h1 className="text-xl font-bold">3 Lemons Traders</h1>
-          <nav className="space-x-6">
-            <a href="#lemons" className="hover:underline">Our Lemons</a>
-            <a href="#buy-now" className="hover:underline">Buy Now</a>
-            <a href="#contact" className="hover:underline">Contact</a>
-          </nav>
-        </div>
-      </header>
 
       <main className="p-4 sm:p-8 space-y-16 max-w-7xl mx-auto">
         <section className="relative bg-yellow-100 rounded-xl overflow-hidden mb-10">
@@ -116,7 +98,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="lemons" className="bg-yellow-50 p-6 rounded-xl">
+        <section className="bg-yellow-50 p-6 rounded-xl">
           <h2 className="text-4xl font-bold mb-6 text-green-700">Our Lemons</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {lemons.map((lemon, index) => (
@@ -131,27 +113,32 @@ export default function Home() {
 
         <section id="buy-now" className="bg-white p-8 rounded-xl shadow-lg">
           <h2 className="text-4xl font-bold mb-6 text-green-700">Buy Now</h2>
-          {/* form content remains unchanged */}
-        </section>
-
-        <section id="contact" className="bg-yellow-50 p-6 rounded-xl">
-          <h2 className="text-3xl font-bold mb-4 text-green-700">Contact Us</h2>
-          <p className="text-lg">Email: <a href="mailto:3lemons.traders@gmail.com" className="text-green-700 font-medium">3lemons.traders@gmail.com</a></p>
-          <p className="text-lg">Phone/WhatsApp: <a href="tel:+918500130926" className="text-green-700 font-medium">8500130926</a></p>
-          <p className="text-lg">Instagram: <a href="https://instagram.com/3Lemons_Traders" target="_blank" className="text-green-700 font-medium">@3Lemons_Traders</a></p>
+          <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl mx-auto">
+            <input name="name" type="text" placeholder="Your Name" value={form.name} onChange={handleChange} className="w-full border p-3 rounded" required />
+            <input name="quantity" type="number" step="1" min="1" placeholder="Quantity (in kg)" value={form.quantity} onChange={handleChange} className="w-full border p-3 rounded" required />
+            {isBulk && <p className="text-green-600 text-sm font-medium">Bulk order detected: 10% discount will be applied.</p>}
+            <select name="quality" value={form.quality} onChange={handleChange} className="w-full border p-3 rounded">
+              <option value="A1">A1 Quality</option>
+              <option value="A2">A2 Quality</option>
+              <option value="A3">A3 Quality</option>
+            </select>
+            <textarea name="delivery" placeholder="Delivery Address" value={form.delivery} onChange={handleChange} className="w-full border p-3 rounded" required></textarea>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-700">🇮🇳 +91</span>
+              <input name="contact" type="tel" placeholder="10-digit mobile number" value={form.contact} onChange={handleChange} className="w-full border p-3 rounded pl-20" maxLength={10} pattern="\d{10}" required />
+            </div>
+            {quantity > 0 && (
+              <p className="text-md text-green-700 font-medium">
+                Total Price: ₹{totalPrice} {isBulk && <span>(10% bulk discount applied)</span>}
+              </p>
+            )}
+            <button type="submit" disabled={isSubmitting} className="bg-green-700 hover:bg-green-800 text-white py-3 px-6 rounded font-semibold">
+              {isSubmitting ? 'Placing Order...' : 'Place Order'}
+            </button>
+            {orderStatus && <p className="text-center mt-2 text-sm text-gray-700">{orderStatus}</p>}
+          </form>
         </section>
       </main>
-
-      {/* Fixed WhatsApp Button */}
-      <a
-        href="https://wa.me/918500130926"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-4 right-4 bg-green-600 text-white p-4 rounded-full shadow-lg hover:bg-green-700 hidden md:flex items-center justify-center"
-        title="Chat on WhatsApp"
-      >
-        <FaWhatsapp className="text-3xl" />
-      </a>
     </div>
   );
 }
