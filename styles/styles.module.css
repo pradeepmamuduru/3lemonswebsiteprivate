@@ -1,243 +1,257 @@
-/* styles.module.css */
+import { useState } from 'react';
+import Image from 'next/image';
+import Head from 'next/head';
+import { FaWhatsapp } from 'react-icons/fa';
+import styles from '../styles/styles.css';
 
-.page {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(to bottom right, #001f3f, #003366, #004080);
-  color: #d4fcdc;
-  min-height: 100vh;
-  margin: 0;
+export async function getStaticProps() {
+  const res = await fetch("https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Lemons");
+  const lemons = await res.json();
+
+  return {
+    props: { lemons },
+    revalidate: 3600,
+  };
 }
 
-.container {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-}
+export default function Home({ lemons }) {
+  const [form, setForm] = useState({ name: '', quantity: '', quality: 'A1', delivery: '', contact: '' });
+  const [orderStatus, setOrderStatus] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-.hero {
-  position: relative;
-  height: 24rem;
-  width: 100%;
-  overflow: hidden;
-  border-radius: 1rem;
-  margin-bottom: 4rem;
-}
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'quantity' && (value.includes('.') || value.includes(','))) return;
+    if (name === 'contact' && (!/^[0-9]*$/.test(value) || value.length > 10)) return;
+    setForm({ ...form, [name]: value });
+  };
 
-.heroImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.6;
-}
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setOrderStatus('Submitting...');
 
-.heroOverlay {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 1rem;
-  z-index: 10;
-}
+    const quantity = Number(form.quantity);
+    if (!Number.isInteger(quantity) || quantity <= 0) {
+      setOrderStatus("Please enter a valid quantity (integer).\");
+      setIsSubmitting(false);
+      return;
+    }
 
-.heroTitle {
-  font-size: 3rem;
-  font-weight: 800;
-  margin-bottom: 1rem;
-  text-shadow: 2px 2px #000;
-}
+    if (!/^[0-9]{10}$/.test(form.contact)) {
+      setOrderStatus("Please enter a valid 10-digit mobile number.");
+      setIsSubmitting(false);
+      return;
+    }
 
-.heroSubtitle {
-  font-size: 1.25rem;
-  font-weight: 500;
-  text-shadow: 1px 1px #000;
-}
+    const isBulk = quantity > 50;
+    const dataToSend = { ...form, contact: `+91${form.contact}`, quantity, discount: isBulk ? '10%' : '0%' };
 
-.heroButton {
-  margin-top: 1.5rem;
-  padding: 0.75rem 1.5rem;
-  background-color: #006400;
-  color: white;
-  font-weight: 600;
-  border-radius: 999px;
-  text-decoration: none;
-  transition: background-color 0.3s;
-}
+    const response = await fetch("https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data: dataToSend })
+    });
 
-.heroButton:hover {
-  background-color: #004d00;
-}
+    if (response.ok) {
+      setOrderStatus("Order submitted successfully!");
+      setForm({ name: '', quantity: '', quality: 'A1', delivery: '', contact: '' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      setOrderStatus("Failed to submit order. Please try again.");
+    }
+    setIsSubmitting(false);
+  };
 
-.lemonsSection {
-  background-color: rgba(0, 51, 102, 0.8);
-  padding: 2rem;
-  border-radius: 1rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-  margin-bottom: 4rem;
-}
+  const getWhatsappLink = () => {
+    const { name, quantity, quality, delivery, contact } = form;
+    const message = `\nHi! I'm interested in ordering lemons:\n👤 Name: ${name}\n📞 Contact: +91${contact}\n📦 Quantity: ${quantity}kg\n⭐ Quality: ${quality}\n🏠 Address: ${delivery}\n\nPlease confirm availability.`;
+    return `https://wa.me/918500130926?text=${encodeURIComponent(message)}`;
+  };
 
-.sectionTitle {
-  margin-bottom: 1.5rem;
-  font-weight: 700;
-  font-size: 2rem;
-  text-align: center;
-}
+  const pricePerKg = {
+    A1: 80,
+    A2: 70,
+    A3: 60
+  };
+  const quantity = Number(form.quantity) || 0;
+  const isBulk = quantity > 50;
+  const basePrice = pricePerKg[form.quality] * quantity;
+  const discount = isBulk ? 0.1 : 0;
+  const totalPrice = basePrice * (1 - discount);
 
-.lemonsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-}
+  return (
+    <div className={styles.page}>
+      <Head>
+        <title>3 Lemons Traders – Buy Fresh Lemons Online</title>
+        <meta name="description" content="Buy premium quality lemons at affordable prices across India. Direct farm to home delivery." />
+        <meta property="og:title" content="Buy Fresh Lemons Online – 3 Lemons Traders" />
+        <meta property="og:description" content="Get premium lemons delivered to your door at unbeatable prices. Farm fresh quality." />
+        <meta property="og:image" content="/lemons-hero.jpg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="3 Lemons Traders" />
+        <meta name="twitter:description" content="Premium farm-direct lemons. PAN India delivery." />
+        <link rel="canonical" href="https://3lemons.in" />
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-XXXXXXXXXX');
+            `,
+          }}
+        />
+      </Head>
 
-.lemonCard {
-  background-color: #002244;
-  padding: 1rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+      <main className={styles.container}>
+        <section className={styles.hero}>
+          <img
+            src="/lemons-hero.jpg"
+            alt="Fresh Lemons"
+            className={styles.heroImage}
+            loading="lazy"
+          />
+          <div className={styles.heroOverlay}>
+            <h1 className={styles.heroTitle}>3 Lemons Traders</h1>
+            <p className={styles.heroSubtitle}>Buy fresh, farm-direct lemons delivered across India</p>
+            <a href="#buy-now" className={styles.heroButton}>
+              Order Now
+            </a>
+          </div>
+        </section>
 
-.cardImage {
-  width: 100%;
-  height: 12rem;
-  object-fit: cover;
-  border-radius: 0.5rem;
-  margin-bottom: 0.75rem;
-}
+        <section className={styles.lemonsSection}>
+          <h2 className={styles.sectionTitle}>Our Lemons</h2>
+          <div className={styles.lemonsGrid}>
+            {Array.isArray(lemons) && lemons.map((lemon, index) => (
+              <div key={index} className={styles.lemonCard}>
+                <Image src={lemon['Image url']} alt={lemon['Grade'] || 'Lemon'} width={300} height={200} loading="lazy" className={styles.cardImage} />
+                <p className={styles.cardTitle}>{lemon['Grade']} – ₹{lemon['Price Per Kg']}/kg</p>
+                <p className={styles.cardDescription}>{lemon['Description']}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
-.cardTitle {
-  font-weight: 700;
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-}
+        <section className={styles.testimonialsSection}>
+          <h2 className={styles.sectionTitle}>What Our Customers Say</h2>
+          <div className={styles.testimonialGrid}>
+            <div className={styles.testimonialCard}>
+              <p>"Excellent lemons, very fresh and delivered on time. Highly recommended!"</p>
+              <strong>– Priya, Mumbai</strong>
+            </div>
+            <div className={styles.testimonialCard}>
+              <p>"Got bulk quantity for my juice shop. Great pricing and quality."</p>
+              <strong>– Rakesh, Pune</strong>
+            </div>
+            <div className={styles.testimonialCard}>
+              <p>"First time buying online – seamless experience and great support."</p>
+              <strong>– Neha, Delhi</strong>
+            </div>
+          </div>
+        </section>
 
-.cardDescription {
-  font-size: 0.9rem;
-  text-align: center;
-}
+        <section id="buy-now" className={styles.formSection}>
+          <h2 className={styles.sectionTitle}>Buy Now</h2>
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.inputGrid}>
+              <input
+                type="text"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                placeholder="Your Name"
+                required
+                className={styles.input}
+              />
+              <input
+                type="text"
+                name="contact"
+                value={form.contact}
+                onChange={handleChange}
+                placeholder="10-digit Mobile Number"
+                maxLength={10}
+                required
+                className={styles.input}
+              />
+              <input
+                type="number"
+                name="quantity"
+                value={form.quantity}
+                onChange={handleChange}
+                placeholder="Quantity (kg)"
+                required
+                className={styles.input}
+              />
+              <select
+                name="quality"
+                value={form.quality}
+                onChange={handleChange}
+                className={styles.input}
+              >
+                <option value="A1">A1 – ₹80/kg</option>
+                <option value="A2">A2 – ₹70/kg</option>
+                <option value="A3">A3 – ₹60/kg</option>
+              </select>
+              <input
+                type="text"
+                name="delivery"
+                value={form.delivery}
+                onChange={handleChange}
+                placeholder="Delivery Address"
+                required
+                className={`${styles.input} ${styles.inputFull}`}
+              />
+            </div>
 
-.formSection {
-  background-color: rgba(0, 51, 102, 0.8);
-  padding: 2rem;
-  border-radius: 1rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-}
+            <div className={styles.total}>
+              Total Price: ₹{totalPrice.toFixed(2)} {isBulk && <span className={styles.discountNote}>(10% bulk discount applied)</span>}
+            </div>
 
-.form {
-  max-width: 600px;
-  margin: 0 auto;
-}
+            <div className={styles.actions}>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={styles.submitButton}
+              >
+                {isSubmitting ? 'Submitting...' : 'Place Order'}
+              </button>
+              <a
+                href={getWhatsappLink()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.whatsappButton}
+              >
+                <FaWhatsapp className={styles.whatsappIcon} /> Order via WhatsApp
+              </a>
+            </div>
 
-.inputGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
+            {orderStatus && (
+              <p className={styles.statusMessage}>{orderStatus}</p>
+            )}
+          </form>
+        </section>
+      </main>
 
-.inputFull {
-  grid-column: 1 / -1;
-}
-
-.input {
-  background-color: #001f3f;
-  border: 1px solid #66ff99;
-  padding: 0.75rem;
-  color: #d4fcdc;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.total {
-  font-weight: 700;
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-  text-align: center;
-}
-
-.discountNote {
-  color: #00ff99;
-  font-weight: 600;
-  font-size: 0.9rem;
-  margin-left: 0.5rem;
-}
-
-.actions {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.submitButton {
-  background-color: #006400;
-  color: white;
-  border: none;
-  font-weight: 600;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  flex: 1 1 180px;
-  text-align: center;
-}
-
-.submitButton:hover:not(:disabled) {
-  background-color: #004d00;
-}
-
-.submitButton:disabled {
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-.whatsappButton {
-  color: #00cc66;
-  border: 1px solid #00cc66;
-  text-decoration: none;
-  font-weight: 600;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1 1 180px;
-  transition: background-color 0.3s;
-}
-
-.whatsappButton:hover {
-  background-color: #003322;
-}
-
-.whatsappIcon {
-  margin-right: 0.5rem;
-  font-size: 1.25rem;
-}
-
-.statusMessage {
-  margin-top: 1rem;
-  text-align: center;
-  font-weight: 600;
-  color: #d4fcdc;
-}
-
-@media (max-width: 600px) {
-  .inputGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .actions {
-    flex-direction: column;
-  }
-
-  .submitButton,
-  .whatsappButton {
-    flex: 1 1 auto;
-  }
+      {/* Live Chat Integration */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+            (function(){
+              var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+              s1.async=true;
+              s1.src='https://embed.tawk.to/65b8e2168d261e1b5f58e41f/1hlkqg2v5';
+              s1.charset='UTF-8';
+              s1.setAttribute('crossorigin','*');
+              s0.parentNode.insertBefore(s1,s0);
+            })();
+          `,
+        }}
+      />
+    </div>
+  );
 }
