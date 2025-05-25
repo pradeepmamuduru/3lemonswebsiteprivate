@@ -18,7 +18,7 @@ export default function Home() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === 'quantity' && (value.includes('.') || value.includes(','))) return;
-    if (name === 'contact' && (!/^\d*$/.test(value) || value.length > 10)) return;
+    if (name === 'contact' && (!/^[0-9]*$/.test(value) || value.length > 10)) return;
     setForm({ ...form, [name]: value });
   };
 
@@ -76,7 +76,7 @@ export default function Home() {
   const totalPrice = basePrice * (1 - discount);
 
   return (
-    <div className="min-h-screen bg-gray-200 text-green-900 font-sans">
+    <div className="min-h-screen bg-gray-300 text-green-900 font-sans">
       <Head>
         <title>3 Lemons Traders – Buy Fresh Lemons Online</title>
         <meta name="description" content="Buy premium quality lemons at affordable prices across India. Direct farm to home delivery." />
@@ -85,7 +85,7 @@ export default function Home() {
         <meta property="og:image" content="/lemons-hero.jpg" />
       </Head>
 
-      <header className="relative h-[40vh] w-full overflow-hidden">
+      <header className="relative h-[25vh] w-full overflow-hidden">
         <Image src="/lemons-hero.jpg" alt="Hero Lemons" layout="fill" objectFit="cover" priority />
         <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
           <div className="text-white text-center px-6">
