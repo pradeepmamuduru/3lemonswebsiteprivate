@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Head from 'next/head';
 import { FaWhatsapp } from 'react-icons/fa';
+import styles from '../styles/styles.module.css';
 
 export async function getStaticProps() {
   const res = await fetch("https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Lemons");
@@ -9,7 +10,7 @@ export async function getStaticProps() {
 
   return {
     props: { lemons },
-    revalidate: 3600, // re-generate the page every hour
+    revalidate: 3600,
   };
 }
 
@@ -80,7 +81,7 @@ export default function Home({ lemons }) {
   const totalPrice = basePrice * (1 - discount);
 
   return (
-    <div className="min-h-screen bg-blue-900 text-green-100 font-sans">
+    <div className={styles.page}>
       <Head>
         <title>3 Lemons Traders – Buy Fresh Lemons Online</title>
         <meta name="description" content="Buy premium quality lemons at affordable prices across India. Direct farm to home delivery." />
@@ -91,39 +92,39 @@ export default function Home({ lemons }) {
         <link rel="canonical" href="https://3lemons.in" />
       </Head>
 
-      <main className="p-4 sm:p-8 space-y-16 max-w-7xl mx-auto">
-        <section className="relative bg-opacity-30 rounded-xl overflow-hidden mb-10">
+      <main className={styles.container}>
+        <section className={styles.hero}>
           <img
             src="/lemons-hero.jpg"
             alt="Fresh Lemons"
-            className="w-full h-96 object-cover opacity-60 rounded-xl"
+            className={styles.heroImage}
           />
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-green-100 z-10 p-4">
-            <h1 className="text-5xl sm:text-6xl font-extrabold mb-4 drop-shadow-lg">3 Lemons Traders</h1>
-            <p className="text-xl sm:text-2xl font-medium drop-shadow-lg">Buy fresh, farm-direct lemons delivered across India</p>
-            <a href="#buy-now" className="inline-block mt-6 px-6 py-3 bg-green-700 text-white rounded-full font-semibold shadow-lg hover:bg-green-800 transition">
+          <div className={styles.heroOverlay}>
+            <h1 className={styles.heroTitle}>3 Lemons Traders</h1>
+            <p className={styles.heroSubtitle}>Buy fresh, farm-direct lemons delivered across India</p>
+            <a href="#buy-now" className={styles.heroButton}>
               Order Now
             </a>
           </div>
         </section>
 
-        <section className="bg-blue-800 bg-opacity-70 p-6 rounded-xl">
-          <h2 className="text-4xl font-bold mb-6 text-green-100">Our Lemons</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <section className={styles.lemonsSection}>
+          <h2 className={styles.sectionTitle}>Our Lemons</h2>
+          <div className={styles.lemonsGrid}>
             {Array.isArray(lemons) && lemons.map((lemon, index) => (
-              <div key={index} className="bg-blue-900 p-4 rounded-xl shadow-md">
-                <Image src={lemon['Image url']} alt={lemon['Grade'] || 'Lemon'} width={300} height={200} loading="lazy" className="rounded-lg w-full h-48 object-cover" />
-                <p className="mt-3 font-bold text-lg text-green-200">{lemon['Grade']} – ₹{lemon['Price Per Kg']}/kg</p>
-                <p className="text-green-300">{lemon['Description']}</p>
+              <div key={index} className={styles.lemonCard}>
+                <Image src={lemon['Image url']} alt={lemon['Grade'] || 'Lemon'} width={300} height={200} loading="lazy" className={styles.cardImage} />
+                <p className={styles.cardTitle}>{lemon['Grade']} – ₹{lemon['Price Per Kg']}/kg</p>
+                <p className={styles.cardDescription}>{lemon['Description']}</p>
               </div>
             ))}
           </div>
         </section>
 
-        <section id="buy-now" className="bg-blue-800 bg-opacity-80 p-8 rounded-xl shadow-lg">
-          <h2 className="text-4xl font-bold mb-6 text-green-100">Buy Now</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <section id="buy-now" className={styles.formSection}>
+          <h2 className={styles.sectionTitle}>Buy Now</h2>
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.inputGrid}>
               <input
                 type="text"
                 name="name"
@@ -131,7 +132,7 @@ export default function Home({ lemons }) {
                 onChange={handleChange}
                 placeholder="Your Name"
                 required
-                className="border border-green-300 rounded p-3 w-full bg-blue-900 text-green-100"
+                className={styles.input}
               />
               <input
                 type="text"
@@ -141,7 +142,7 @@ export default function Home({ lemons }) {
                 placeholder="10-digit Mobile Number"
                 maxLength={10}
                 required
-                className="border border-green-300 rounded p-3 w-full bg-blue-900 text-green-100"
+                className={styles.input}
               />
               <input
                 type="number"
@@ -150,13 +151,13 @@ export default function Home({ lemons }) {
                 onChange={handleChange}
                 placeholder="Quantity (kg)"
                 required
-                className="border border-green-300 rounded p-3 w-full bg-blue-900 text-green-100"
+                className={styles.input}
               />
               <select
                 name="quality"
                 value={form.quality}
                 onChange={handleChange}
-                className="border border-green-300 rounded p-3 w-full bg-blue-900 text-green-100"
+                className={styles.input}
               >
                 <option value="A1">A1 – ₹80/kg</option>
                 <option value="A2">A2 – ₹70/kg</option>
@@ -169,19 +170,19 @@ export default function Home({ lemons }) {
                 onChange={handleChange}
                 placeholder="Delivery Address"
                 required
-                className="border border-green-300 rounded p-3 w-full md:col-span-2 bg-blue-900 text-green-100"
+                className={`${styles.input} ${styles.inputFull}`}
               />
             </div>
 
-            <div className="text-lg font-medium text-green-100">
-              Total Price: ₹{totalPrice.toFixed(2)} {isBulk && <span className="text-sm text-green-400">(10% bulk discount applied)</span>}
+            <div className={styles.total}>
+              Total Price: ₹{totalPrice.toFixed(2)} {isBulk && <span className={styles.discountNote}>(10% bulk discount applied)</span>}
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 mt-4">
+            <div className={styles.actions}>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-green-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-800 transition"
+                className={styles.submitButton}
               >
                 {isSubmitting ? 'Submitting...' : 'Place Order'}
               </button>
@@ -189,18 +190,17 @@ export default function Home({ lemons }) {
                 href={getWhatsappLink()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center px-6 py-3 border border-green-700 text-green-700 rounded-lg hover:bg-green-50 transition"
+                className={styles.whatsappButton}
               >
-                <FaWhatsapp className="mr-2" /> Order via WhatsApp
+                <FaWhatsapp className={styles.whatsappIcon} /> Order via WhatsApp
               </a>
             </div>
 
             {orderStatus && (
-              <p className="mt-4 text-center font-semibold text-green-100">{orderStatus}</p>
+              <p className={styles.statusMessage}>{orderStatus}</p>
             )}
           </form>
         </section>
-
       </main>
     </div>
   );
