@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Head from 'next/head';
 import { FaWhatsapp } from 'react-icons/fa';
-import styles from '../styles/styles.css';
+import styles from '../styles/styles.module.css';
 
 export async function getStaticProps() {
   const res = await fetch("https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Lemons");
@@ -15,7 +15,13 @@ export async function getStaticProps() {
 }
 
 export default function Home({ lemons }) {
-  const [form, setForm] = useState({ name: '', quantity: '', quality: 'A1', delivery: '', contact: '' });
+  const [form, setForm] = useState({
+    name: '',
+    quantity: '',
+    quality: 'A1',
+    delivery: '',
+    contact: '',
+  });
   const [orderStatus, setOrderStatus] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -45,19 +51,37 @@ export default function Home({ lemons }) {
     }
 
     const isBulk = quantity > 50;
-    const dataToSend = { ...form, contact: `+91${form.contact}`, quantity, discount: isBulk ? '10%' : '0%' };
+    const dataToSend = {
+      ...form,
+      contact: `+91${form.contact}`,
+      quantity,
+      discount: isBulk ? '10%' : '0%',
+    };
 
-    const response = await fetch("https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ data: dataToSend })
-    });
+    try {
+      const response = await fetch(
+        "https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=orders",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data: dataToSend }),
+        }
+      );
 
-    if (response.ok) {
-      setOrderStatus("Order submitted successfully!");
-      setForm({ name: '', quantity: '', quality: 'A1', delivery: '', contact: '' });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
+      if (response.ok) {
+        setOrderStatus("Order submitted successfully!");
+        setForm({
+          name: '',
+          quantity: '',
+          quality: 'A1',
+          delivery: '',
+          contact: '',
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        setOrderStatus("Failed to submit order. Please try again.");
+      }
+    } catch {
       setOrderStatus("Failed to submit order. Please try again.");
     }
     setIsSubmitting(false);
@@ -72,7 +96,7 @@ export default function Home({ lemons }) {
   const pricePerKg = {
     A1: 80,
     A2: 70,
-    A3: 60
+    A3: 60,
   };
   const quantity = Number(form.quantity) || 0;
   const isBulk = quantity > 50;
@@ -84,9 +108,15 @@ export default function Home({ lemons }) {
     <div className={styles.page}>
       <Head>
         <title>3 Lemons Traders – Buy Fresh Lemons Online</title>
-        <meta name="description" content="Buy premium quality lemons at affordable prices across India. Direct farm to home delivery." />
+        <meta
+          name="description"
+          content="Buy premium quality lemons at affordable prices across India. Direct farm to home delivery."
+        />
         <meta property="og:title" content="Buy Fresh Lemons Online – 3 Lemons Traders" />
-        <meta property="og:description" content="Get premium lemons delivered to your door at unbeatable prices. Farm fresh quality." />
+        <meta
+          property="og:description"
+          content="Get premium lemons delivered to your door at unbeatable prices. Farm fresh quality."
+        />
         <meta property="og:image" content="/lemons-hero.jpg" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="canonical" href="https://3lemons.in" />
@@ -111,13 +141,23 @@ export default function Home({ lemons }) {
         <section className={styles.lemonsSection}>
           <h2 className={styles.sectionTitle}>Our Lemons</h2>
           <div className={styles.lemonsGrid}>
-            {Array.isArray(lemons) && lemons.map((lemon, index) => (
-              <div key={index} className={styles.lemonCard}>
-                <Image src={lemon['Image url']} alt={lemon['Grade'] || 'Lemon'} width={300} height={200} loading="lazy" className={styles.cardImage} />
-                <p className={styles.cardTitle}>{lemon['Grade']} – ₹{lemon['Price Per Kg']}/kg</p>
-                <p className={styles.cardDescription}>{lemon['Description']}</p>
-              </div>
-            ))}
+            {Array.isArray(lemons) &&
+              lemons.map((lemon, index) => (
+                <div key={index} className={styles.lemonCard}>
+                  <Image
+                    src={lemon['Image url']}
+                    alt={lemon['Grade'] || 'Lemon'}
+                    width={300}
+                    height={200}
+                    loading="lazy"
+                    className={styles.cardImage}
+                  />
+                  <p className={styles.cardTitle}>
+                    {lemon['Grade']} – ₹{lemon['Price Per Kg']}/kg
+                  </p>
+                  <p className={styles.cardDescription}>{lemon['Description']}</p>
+                </div>
+              ))}
           </div>
         </section>
 
@@ -144,24 +184,16 @@ export default function Home({ lemons }) {
                 required
                 className={styles.input}
               />
-              <input
-                type="number"
-                name="quantity"
-                value={form.quantity}
-                onChange={handleChange}
-                placeholder="Quantity (kg)"
-                required
-                className={styles.input}
-              />
               <select
                 name="quality"
                 value={form.quality}
                 onChange={handleChange}
                 className={styles.input}
+                required
               >
-                <option value="A1">A1 – ₹80/kg</option>
-                <option value="A2">A2 – ₹70/kg</option>
-                <option value="A3">A3 – ₹60/kg</option>
+                <option value="A1">A1</option>
+                <option value="A2">A2</option>
+                <option value="A3">A3</option>
               </select>
               <input
                 type="text"
@@ -172,33 +204,42 @@ export default function Home({ lemons }) {
                 required
                 className={`${styles.input} ${styles.inputFull}`}
               />
+              <input
+                type="number"
+                min={1}
+                name="quantity"
+                value={form.quantity}
+                onChange={handleChange}
+                placeholder="Quantity (kg)"
+                required
+                className={styles.input}
+              />
             </div>
 
-            <div className={styles.total}>
-              Total Price: ₹{totalPrice.toFixed(2)} {isBulk && <span className={styles.discountNote}>(10% bulk discount applied)</span>}
-            </div>
+            <p className={styles.total}>
+              Total Price: ₹{totalPrice.toFixed(2)}{' '}
+              {isBulk && <span className={styles.discountNote}>(10% bulk discount applied)</span>}
+            </p>
 
             <div className={styles.actions}>
               <button
                 type="submit"
-                disabled={isSubmitting}
                 className={styles.submitButton}
+                disabled={isSubmitting}
               >
-                {isSubmitting ? 'Submitting...' : 'Place Order'}
+                {isSubmitting ? "Ordering..." : "Place Order"}
               </button>
+
               <a
                 href={getWhatsappLink()}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={styles.whatsappButton}
               >
-                <FaWhatsapp className={styles.whatsappIcon} /> Order via WhatsApp
+                <FaWhatsapp className={styles.whatsappIcon} /> Order on WhatsApp
               </a>
             </div>
-
-            {orderStatus && (
-              <p className={styles.statusMessage}>{orderStatus}</p>
-            )}
+            {orderStatus && <p className={styles.statusMessage}>{orderStatus}</p>}
           </form>
         </section>
       </main>
