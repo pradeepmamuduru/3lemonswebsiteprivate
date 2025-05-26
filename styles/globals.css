@@ -1,0 +1,110 @@
+/* styles/globals.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+/* You can also use Poppins if you prefer:
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+*/
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: 'Inter', sans-serif; /* Or 'Poppins', etc. - match your font import */
+  line-height: 1.6;
+  color: #333;
+  background-color: #f8f8f8;
+  scroll-behavior: smooth;
+  box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Basic spinner for loading states (using simple CSS animation) */
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #fff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px; /* Space between spinner and text */
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Star rating styles (simple filled circles instead of icons) */
+.star-rating {
+    color: #FFD700; /* Gold color for stars */
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.star-rating::before {
+    content: '★★★★★'; /* Unicode stars */
+    letter-spacing: 2px;
+}
+
+/* Generic close button for modals/sidebars */
+.close-button {
+    background: none;
+    border: none;
+    font-size: 2em;
+    color: #999; /* Default color for close button */
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.close-button:hover {
+    color: #333;
+}
+
+/* Hamburger menu icon (simple text or CSS lines) */
+.hamburger-icon {
+    font-size: 2.5em; /* Make it larger for better tap target */
+    cursor: pointer;
+    color: white;
+    transition: color 0.3s ease;
+    z-index: 1001; /* Ensure it's above header elements if any overlap */
+    display: none; /* Hidden by default, shown on small screens */
+    line-height: 1; /* Adjust vertical alignment */
+}
+
+.hamburger-icon:hover {
+    color: #e0e0e0;
+}
+
+/* Trash icon for remove buttons (simple text) */
+.trash-icon {
+    font-size: 1.5em;
+    color: #f44336;
+}
+
+/* Plus icon for add buttons (simple text) */
+.plus-icon {
+    font-size: 1em;
+    color: white; /* Example color */
+}
+
+/* User and Map icons (simple text) */
+.user-icon, .map-icon {
+    font-size: 1.2em;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+/* WhatsApp icon (simple text) */
+.whatsapp-icon {
+    font-size: 1.2em;
+    vertical-align: middle;
+}
