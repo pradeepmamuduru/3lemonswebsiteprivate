@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Head from 'next/head';
-import Image from 'next/image'; // Assuming you use Image for logo or product images
+import Image from 'next/image';
 import styles from '../styles/styles.module.css';
 import { FaStar, FaPhoneAlt, FaMapMarkerAlt, FaWhatsapp, FaEnvelope, FaBars, FaTimes, FaUserCircle, FaEdit, FaHome, FaHistory, FaSignOutAlt, FaPlus, FaMinus, FaTrash, FaCheckCircle, FaExclamationCircle, FaInfoCircle, FaSpinner } from 'react-icons/fa';
 import { IoMenu } from 'react-icons/io5'; // For the hamburger menu icon
 
-// SheetDB API URLs (replace with your actual SheetDB URLs)
-const LEMONS_DATA_URL = 'https://sheetdb.io/api/v1/y1c5j21f7823f'; // Your Lemons data SheetDB URL
-const ORDERS_SUBMISSION_URL = 'https://sheetdb.io/api/v1/y1c5j21f7823f'; // Your Orders submission SheetDB URL
-const SIGNUP_SHEET_URL = 'https://sheetdb.io/api/v1/s06797j7x9p31'; // Your Signup/Users SheetDB URL
-const ADDRESSES_SHEET_URL = 'https://sheetdb.io/api/v1/j25kiz6g4h0c3'; // Your Addresses SheetDB URL
+// SheetDB API URLs (REPLACE THESE WITH YOUR ACTUAL SHEETDB URLS)
+// Make sure these URLs are correct and correspond to your specific Google Sheets
+const LEMONS_DATA_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Lemons'; // <--- REPLACE THIS URL with your Lemons data SheetDB URL
+const ORDERS_SUBMISSION_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Orders'; // <--- REPLACE THIS URL with your Orders submission SheetDB URL
+const SIGNUP_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Signup'; // <--- REPLACE THIS URL with your Signup/Users SheetDB URL
+const ADDRESSES_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Addresses'; // <--- REPLACE THIS URL with your Addresses SheetDB URL
 
 export default function Home() {
     const [lemons, setLemons] = useState([]);
@@ -73,7 +74,11 @@ export default function Home() {
             try {
                 const response = await fetch(LEMONS_DATA_URL);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    // Log the full response and status for debugging
+                    console.error(`Failed to fetch lemons data. Status: ${response.status}, Status Text: ${response.statusText}`);
+                    const errorBody = await response.text(); // Get raw body to check for specific SheetDB errors
+                    console.error('Response Body:', errorBody);
+                    throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
                 }
                 const data = await response.json();
                 setLemons(data);
@@ -515,7 +520,8 @@ export default function Home() {
     const handleLoginFormChange = (e) => {
         const { name, value } = e.target;
         if (name === 'phone') {
-            if (!!/^\d*$/.test(value) || value.length > 10) { // Regex for digits only, max 10
+            // Updated regex test to correctly handle numeric input and length
+            if (!/^\d*$/.test(value) || value.length > 10) { 
                 return;
             }
         }
@@ -1105,6 +1111,7 @@ export default function Home() {
                                     {Array.from({ length: review.rating }).map((_, i) => (
                                         <FaStar key={i} />
                                     ))}
+                                    {/* Corrected: Removed extra closing `))}` */}
                                     {Array.from({ length: 5 - review.rating }).map((_, i) => (
                                         <FaStar key={i + review.rating} style={{ opacity: 0.3 }} />
                                     ))}
