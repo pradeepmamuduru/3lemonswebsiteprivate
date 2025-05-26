@@ -1,38 +1,69 @@
-/* styles/styles.module.css */
-
-/* General Page Layout Styles (not global HTML/BODY) */
-.page {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+/* General Body and HTML styles */
+html,
+body {
+    padding: 0;
+    margin: 0;
+    font-family: 'Poppins', sans-serif; /* Modern, clean font */
+    line-height: 1.6;
+    color: #333;
+    background-color: #f8f8f8; /* Light background */
+    scroll-behavior: smooth; /* Smooth scrolling for anchor links */
 }
 
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  flex-grow: 1; /* Allows main content to grow and push footer down */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box; /* Include padding in element's total width and height */
+    position: relative; /* For sidebar positioning */
 }
 
-/* Header Styles */
+/* Header */
 .header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
     background-color: #4CAF50; /* Green header */
     color: white;
-    padding: 15px 25px; /* Increased right padding for better spacing */
-    display: flex;
-    justify-content: space-between; /* Puts title and right-side elements on opposite ends */
-    align-items: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     position: sticky;
     top: 0;
-    z-index: 1000;
+    z-index: 1000; /* Ensure header stays on top */
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    padding-left: 20px; /* Adjust padding for logo */
+    padding-right: 20px;
 }
 
-.headerTitle {
+.logoContainer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo {
+    border-radius: 50%;
+    /* Add any other specific styling for the logo if needed */
+}
+
+.title {
     margin: 0;
-    font-size: 1.8em;
+    font-size: 2.2em;
     font-weight: 700;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    color: #FFEB3B; /* Yellow for prominence */
+}
+
+.headerActions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
 /* New: Login Button Style */
@@ -48,6 +79,9 @@
     transition: background-color 0.3s ease, transform 0.2s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-left: 20px; /* Space from title if title becomes short */
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .loginButton:hover {
@@ -61,295 +95,359 @@
     color: white;
     transition: color 0.3s ease;
     z-index: 1001; /* Ensure it's above header elements if any overlap */
+    display: none; /* Hidden by default, shown on small screens */
 }
 
 .hamburgerIcon:hover {
     color: #e0e0e0;
 }
 
-
-/* Hero Section */
-.hero {
-    position: relative;
+/* Main Content */
+.main {
     width: 100%;
-    height: 400px;
-    overflow: hidden;
-    border-radius: 12px;
-    margin-bottom: 40px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    flex-grow: 1; /* Allows main content to expand */
+    padding: 30px 0;
 }
 
-.heroImage {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: brightness(0.7);
-    transition: transform 0.3s ease;
-}
-
-.hero:hover .heroImage {
-    transform: scale(1.05);
-}
-
-.heroOverlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    color: white;
-    padding: 20px;
-}
-
-.heroTitle {
-    font-size: 3.5em;
-    margin-bottom: 10px;
-    font-weight: 800;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.heroSubtitle {
-    font-size: 1.5em;
-    margin-bottom: 30px;
-    font-weight: 400;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
-}
-
-.heroButton {
-    background-color: #FFC107; /* Amber button */
-    color: #333;
-    padding: 15px 30px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 1.2em;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.heroButton:hover {
-    background-color: #FFA000; /* Darker amber on hover */
-    transform: translateY(-2px);
-}
-
-/* Section Titles */
+/* Section Styling */
 .sectionTitle {
     text-align: center;
     font-size: 2.5em;
-    margin-top: 40px;
-    margin-bottom: 30px;
-    color: #2e7d32; /* Darker green for section titles */
+    color: #4CAF50;
+    margin-bottom: 40px;
     position: relative;
+    padding-bottom: 10px;
 }
 
 .sectionTitle::after {
     content: '';
     position: absolute;
     left: 50%;
-    bottom: -10px;
+    bottom: 0;
     transform: translateX(-50%);
     width: 80px;
     height: 4px;
-    background-color: #4CAF50;
+    background-color: #FFC107;
     border-radius: 2px;
 }
 
-/* Lemons Products Section */
-.lemonsGrid {
+/* Hero Section */
+.hero {
+    text-align: center;
+    padding: 80px 20px;
+    background-color: #e8f5e9; /* Light green background */
+    border-radius: 15px;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.heroTagline {
+    font-size: 3em;
+    color: #2E7D32; /* Darker green */
+    margin-bottom: 15px;
+    font-weight: 800;
+}
+
+.heroDescription {
+    font-size: 1.5em;
+    color: #555;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Lemon Varieties Section */
+.lemonSection {
+    padding: 40px 0;
+    margin-bottom: 40px;
+}
+
+.lemonGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 30px;
-    padding: 20px 0;
+    justify-content: center;
+    align-items: stretch;
 }
 
 .lemonCard {
     background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 25px;
     text-align: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    padding-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .lemonCard:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-.cardImage {
-    width: 100%;
-    height: 200px; /* Fixed height for consistency */
-    object-fit: cover;
-    display: block; /* Ensures no extra space below image */
+.lemonImage {
+    border-radius: 8px;
     margin-bottom: 15px;
+    max-width: 100%;
+    height: auto;
 }
 
-.cardTitle {
+.lemonCard h3 {
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.lemonCard p {
+    font-size: 1.1em;
+    color: #666;
+    margin-bottom: 15px;
+    flex-grow: 1; /* Allows description to take available space */
+}
+
+.lemonPrice {
     font-size: 1.5em;
     font-weight: 700;
     color: #4CAF50;
     margin-bottom: 10px;
-    padding: 0 15px;
 }
 
-.cardDescription {
-    font-size: 1em;
-    color: #555;
-    line-height: 1.6;
-    padding: 0 15px;
+.inStock {
+    color: #2E7D32;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.outOfStock {
+    color: #D32F2F;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.discountInfo {
+    font-size: 0.9em;
+    color: #FBC02D;
+    font-weight: 600;
+    margin-top: 5px;
 }
 
 /* Order Form Section */
-.formSection {
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    padding: 40px;
+.orderFormSection {
+    padding: 40px 0;
+    background-color: #fdfdfd;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     margin-bottom: 40px;
 }
 
-.form {
-    display: grid;
-    gap: 20px;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid for form fields */
+.orderForm {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 30px;
 }
 
 .formGroup {
-    display: flex;
-    flex-direction: column;
+    margin-bottom: 25px;
 }
 
-.label {
+.formGroup label {
+    display: block;
+    font-size: 1.1em;
+    color: #555;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #333;
-    font-size: 0.95em;
 }
 
-.input, .select {
-    padding: 12px 15px;
+.inputField,
+.textareaField,
+.selectField {
+    width: calc(100% - 20px);
+    padding: 12px;
     border: 1px solid #ddd;
     border-radius: 8px;
     font-size: 1em;
+    color: #333;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    width: 100%; /* Ensure inputs take full width of their grid column */
-    box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 
-.input:focus, .select:focus {
+.inputField:focus,
+.textareaField:focus,
+.selectField:focus {
     border-color: #4CAF50;
     box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
     outline: none;
 }
 
-.select {
-    appearance: none; /* Remove default browser select arrow */
-    background-image: url("data:image/svg+0a;utf8,<svg fill='%234CAF50' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 24px;
+.textareaField {
+    resize: vertical;
+    min-height: 80px;
 }
 
-.button {
-    background-color: #4CAF50;
+.varietiesContainer {
+    margin-top: 30px;
+    padding: 20px;
+    border: 1px dashed #ccc;
+    border-radius: 10px;
+    background-color: #fafafa;
+}
+
+.varietiesContainer h3 {
+    font-size: 1.4em;
+    color: #4CAF50;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.varietyRow {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    align-items: center;
+    flex-wrap: wrap; /* Allows wrapping on smaller screens */
+}
+
+.selectField {
+    flex: 2; /* Takes more space */
+    min-width: 180px; /* Ensure it's not too small */
+}
+
+.quantityInput {
+    flex: 1; /* Takes less space */
+    min-width: 100px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1em;
+    color: #333;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.quantityInput:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+    outline: none;
+}
+
+.removeVarietyBtn {
+    background-color: #f44336;
     color: white;
-    padding: 14px 25px;
     border: none;
+    padding: 10px 12px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 1.1em;
-    font-weight: 600;
+    font-size: 1em;
     transition: background-color 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: auto; /* Allow buttons to size based on content, but can be styled by grid */
-    text-align: center;
-    text-decoration: none; /* For the WhatsApp link */
-    display: flex; /* For WhatsApp icon alignment */
+    display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    min-width: 40px; /* Ensure consistent button size */
 }
 
-.button:hover:not(:disabled) {
-    background-color: #388E3C; /* Darker green on hover */
+.removeVarietyBtn:hover {
+    background-color: #d32f2f;
+    transform: translateY(-1px);
+}
+
+.addVarietyBtn {
+    background-color: #2196F3; /* Blue for add button */
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.addVarietyBtn:hover {
+    background-color: #1976D2;
+    transform: translateY(-1px);
+}
+
+.totalSection {
+    text-align: right;
+    margin-top: 30px;
+    font-size: 1.5em;
+    font-weight: 700;
+    color: #333;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+.totalPrice {
+    color: #4CAF50;
+}
+
+.submitButton {
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1.2em;
+    font-weight: 700;
+    width: 100%;
+    margin-top: 30px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.submitButton:hover:not(:disabled) {
+    background-color: #388E3C;
     transform: translateY(-2px);
 }
 
-.button:disabled {
-    background-color: #a5d6a7;
+.submitButton:disabled {
+    background-color: #A5D6A7;
     cursor: not-allowed;
 }
 
-.whatsappButton {
-    background-color: #25D366; /* WhatsApp green */
+.spinner {
+    animation: spin 1s linear infinite;
 }
 
-.whatsappButton:hover:not(:disabled) {
-    background-color: #1DA851;
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
-.whatsappIcon {
-    font-size: 1.2em;
-}
-
-.orderSummary {
-    grid-column: 1 / -1; /* Span across all columns */
-    text-align: center;
-    margin-top: 20px;
-    font-size: 1.8em;
-    color: #4CAF50;
-    font-weight: 700;
-}
-
-.discountNote {
-    color: #e65100; /* Orange for discount notes */
-    font-size: 0.9em;
-    margin-top: 5px;
-    display: block;
-}
-
-.actions {
-    grid-column: 1 / -1; /* Span all columns */
-    display: flex;
-    flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
-    gap: 15px; /* Space between buttons */
-    justify-content: center;
-    margin-top: 20px;
-}
-
-/* Customer Reviews Section */
-.reviewsSection {
-    margin-top: 60px;
-    margin-bottom: 60px;
+/* Testimonials Section */
+.testimonialsSection {
+    padding: 40px 0;
+    margin-bottom: 40px;
+    background-color: #E0F2F7; /* Light blue background */
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .reviewsGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 25px;
-    padding: 20px 0;
+    gap: 30px;
+    justify-content: center;
 }
 
 .reviewCard {
-    background-color: #e8f5e9; /* Light green background */
-    border-radius: 10px;
+    background-color: white;
     padding: 25px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    transition: transform 0.2s ease;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
-.reviewCard:hover {
-    transform: translateY(-3px);
-}
-
-.reviewerRating {
+.reviewStars {
     color: #FFD700; /* Gold for stars */
     font-size: 1.2em;
     margin-bottom: 10px;
@@ -357,37 +455,57 @@
 
 .reviewText {
     font-style: italic;
-    font-size: 1.1em;
-    color: #444;
-    line-height: 1.5;
+    color: #555;
     margin-bottom: 15px;
+    flex-grow: 1;
 }
 
 .reviewerName {
     font-weight: 600;
-    color: #2e7d32;
-    font-size: 1em;
+    color: #333;
+    text-align: right;
+}
+
+/* Contact Section */
+.contactSection {
+    padding: 40px 0;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.contactDetails {
+    font-size: 1.2em;
+    color: #555;
+}
+
+.contactDetails p {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.contactDetails a {
+    color: #4CAF50;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.contactDetails a:hover {
+    text-decoration: underline;
 }
 
 /* Footer */
 .footer {
+    width: 100%;
+    padding: 25px 0;
+    text-align: center;
     background-color: #333;
     color: white;
-    text-align: center;
-    padding: 20px;
     font-size: 0.9em;
-    margin-top: auto; /* Pushes footer to the bottom */
-}
-
-.footer a {
-    color: #FFC107;
-    text-decoration: none;
-    margin: 0 5px;
-    transition: color 0.3s ease;
-}
-
-.footer a:hover {
-    color: #FFA000;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
 }
 
 /* --- Modals and Overlays --- */
@@ -498,6 +616,11 @@
     transform: translateY(-2px);
 }
 
+.modalButton:disabled {
+    background-color: #A5D6A7;
+    cursor: not-allowed;
+}
+
 .modalButton.cancel {
     background-color: #f44336; /* Red cancel button */
 }
@@ -529,6 +652,9 @@
     margin-bottom: 20px;
     font-weight: 600;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     animation: fadeInOut 5s forwards; /* Basic fade animation */
 }
 
@@ -557,6 +683,7 @@
     border: 1px solid #90caf9;
 }
 
+
 /* --- Account Sidebar Styles --- */
 .accountSidebarOverlay {
     position: fixed;
@@ -566,8 +693,8 @@
     height: 100vh;
     background-color: rgba(0, 0, 0, 0.6);
     display: flex;
-    justify-content: flex-end; /* Push sidebar to the right */
-    z-index: 1500; /* Between modals and general content */
+    justify-content: flex-end; /* Align sidebar to the right */
+    z-index: 1999; /* Below modals, above main content */
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -580,219 +707,326 @@
 
 .accountSidebar {
     background-color: white;
-    width: 100%;
-    max-width: 400px; /* Max width for sidebar */
+    width: 350px; /* Fixed width for sidebar */
+    max-width: 90%; /* Max width for smaller screens */
     height: 100%;
-    box-shadow: -4px 0 15px rgba(0, 0, 0, 0.2);
     transform: translateX(100%); /* Start off-screen to the right */
     transition: transform 0.3s ease;
+    box-shadow: -4px 0 10px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
 }
 
-.accountSidebarOverlay.visible .accountSidebar {
-    transform: translateX(0); /* Slide into view */
+.accountSidebar.open {
+    transform: translateX(0); /* Slide in */
 }
 
 .sidebarHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
+    padding: 20px;
     background-color: #4CAF50;
     color: white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.sidebarTitle {
-    margin: 0;
-    font-size: 1.5em;
-    font-weight: 700;
+    font-size: 1.2em;
+    font-weight: 600;
 }
 
 .sidebarCloseButton {
     background: none;
     border: none;
-    font-size: 2em;
+    font-size: 1.8em;
     color: white;
     cursor: pointer;
     transition: color 0.2s ease;
 }
 
 .sidebarCloseButton:hover {
-    color: #e0e0e0;
+    color: #eee;
 }
 
-.sidebarTabs {
-    display: flex;
+.sidebarNav {
+    padding: 15px 0;
     border-bottom: 1px solid #eee;
 }
 
-.tabButton {
-    flex: 1;
-    padding: 15px 10px;
-    background-color: #f0f0f0;
+.sidebarNavItem {
+    width: 100%;
+    padding: 15px 20px;
+    background: none;
     border: none;
-    border-bottom: 3px solid transparent;
-    cursor: pointer;
+    text-align: left;
     font-size: 1.1em;
-    font-weight: 600;
     color: #555;
-    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.tabButton:hover {
-    background-color: #e0e0e0;
+.sidebarNavItem:hover {
+    background-color: #f0f0f0;
+    color: #333;
 }
 
-.tabButton.active {
-    background-color: white;
-    border-bottom-color: #4CAF50;
+.sidebarNavItem.active {
+    background-color: #e8f5e9;
     color: #4CAF50;
+    font-weight: 600;
 }
 
-.tabContent {
+.sidebarContent {
+    flex-grow: 1; /* Allow content to fill remaining space */
     padding: 20px;
-    flex-grow: 1;
     overflow-y: auto; /* Enable scrolling for content */
 }
 
-.tabContent h3 {
-    color: #2e7d32;
-    font-size: 1.6em;
-    margin-top: 0;
+.tabContent h4 {
+    font-size: 1.5em;
+    color: #4CAF50;
     margin-bottom: 20px;
     text-align: center;
 }
 
-.accountDetailsForm {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+/* Account Details Form */
+.tabContent .form .formGroup {
+    margin-bottom: 15px;
+}
+.tabContent .form .inputField,
+.tabContent .form .textareaField {
+    width: calc(100% - 24px); /* Account for padding in .form-group */
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 0.95em;
+}
+.tabContent .modalButton { /* Reusing modalButton for sidebar */
+    width: 100%;
+    margin-top: 15px;
 }
 
-.accountDetailsForm .input {
-    width: calc(100% - 30px); /* Adjust for padding */
+/* Address List */
+.addressList {
+    margin-top: 20px;
 }
 
-.accountDetailsForm .button.saveButton {
-    background-color: #2196F3; /* Blue for save */
-}
-.accountDetailsForm .button.saveButton:hover {
-    background-color: #1976D2;
-}
-
-
-/* Address List in Sidebar */
-.addressList ul {
-    list-style: none;
-    padding: 0;
-}
-
-.addressItem {
+.addressCard {
     background-color: #f9f9f9;
     border: 1px solid #eee;
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 15px;
     position: relative;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
-.addressItem strong {
-    font-size: 1.1em;
+.addressCard p {
+    margin-bottom: 10px;
+    color: #444;
+}
+
+.defaultBadge {
+    background-color: #FFC107;
     color: #333;
-    display: block;
-    margin-bottom: 5px;
-}
-
-.addressItem p {
-    margin: 0;
-    color: #666;
-    font-size: 0.95em;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: 0.8em;
+    font-weight: 600;
+    position: absolute;
+    top: 10px;
+    right: 10px;
 }
 
 .addressActions {
-    margin-top: 10px;
     display: flex;
     gap: 10px;
-    justify-content: flex-end;
+    margin-top: 10px;
+    flex-wrap: wrap;
 }
 
-.addressActions button {
-    padding: 8px 15px;
+.addressActionButton {
+    background-color: #03A9F4; /* Light blue */
+    color: white;
     border: none;
+    padding: 8px 12px;
     border-radius: 5px;
     cursor: pointer;
     font-size: 0.9em;
-    font-weight: 600;
-    background-color: #f44336; /* Default red for delete */
-    color: white;
+    display: flex;
+    align-items: center;
+    gap: 5px;
     transition: background-color 0.2s ease;
 }
-
-.addressActions button:hover {
-    background-color: #d32f2f;
+.addressActionButton:hover {
+    background-color: #0288D1;
+}
+.addressActionButton:nth-child(2) { /* Targeting delete button */
+    background-color: #F44336; /* Red */
+}
+.addressActionButton:nth-child(2):hover {
+    background-color: #D32F2F;
 }
 
-.addAddressButton {
-    background-color: #008CBA; /* Blue for add address */
-    margin-top: 20px;
-    width: 100%;
-}
-.addAddressButton:hover {
-    background-color: #007bb5;
-}
-
-.addressForm {
-    margin-top: 20px;
-    background-color: #f0f8ff; /* Light blue background for the form */
-    padding: 20px;
-    border-radius: 8px;
-    border: 1px solid #e0f2f7;
-}
-
-.addressForm .formButtons {
+.formGroupCheckbox {
     display: flex;
-    justify-content: center;
+    align-items: center;
     gap: 10px;
+    margin-bottom: 15px;
+}
+
+.checkboxField {
+    width: auto;
+    height: 18px;
+    width: 18px;
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+/* Order History List */
+.orderHistoryList {
     margin-top: 20px;
 }
 
+.orderCard {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
 
-/* Responsive Adjustments */
+.orderHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    border-bottom: 1px dashed #eee;
+    padding-bottom: 10px;
+}
+
+.orderHeader h5 {
+    margin: 0;
+    font-size: 1.1em;
+    color: #4CAF50;
+}
+
+.orderHeader p {
+    margin: 0;
+    font-weight: 600;
+    color: #333;
+}
+
+.orderDeliveryAddress {
+    font-size: 0.95em;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.orderItems {
+    list-style: none;
+    padding: 0;
+}
+
+.orderItems li {
+    font-size: 0.9em;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+
+/* Media Queries for Responsiveness */
 @media (max-width: 768px) {
-    .heroTitle {
-        font-size: 2.5em;
+    .header {
+        padding: 15px;
+        border-radius: 0;
     }
-    .heroSubtitle {
+
+    .title {
+        font-size: 1.8em;
+    }
+
+    .loginButton {
+        display: none; /* Hide text login button on small screens */
+    }
+
+    .hamburgerIcon {
+        display: block; /* Show hamburger icon */
+    }
+
+    .hero {
+        padding: 60px 15px;
+    }
+
+    .heroTagline {
+        font-size: 2.2em;
+    }
+
+    .heroDescription {
         font-size: 1.2em;
     }
+
     .sectionTitle {
         font-size: 2em;
+        margin-bottom: 30px;
     }
-    .formSection {
-        padding: 25px;
+
+    .lemonGrid {
+        grid-template-columns: 1fr; /* Stack cards on small screens */
     }
-    .form {
-        grid-template-columns: 1fr; /* Stack form fields on small screens */
-    }
-    .modalContent {
+
+    .orderForm {
         padding: 20px;
     }
+
+    .varietyRow {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .selectField,
+    .quantityInput {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .removeVarietyBtn {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .modalContent {
+        width: 95%;
+        padding: 20px;
+    }
+
     .modalTitle {
         font-size: 1.8em;
     }
+
     .modalText {
         font-size: 1em;
     }
+
+    .modalButtons {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .modalButton {
+        width: 100%;
+    }
+
     .accountSidebar {
-        max-width: 100%; /* Sidebar can take full width on very small screens */
+        width: 100%; /* Full width on smaller screens */
     }
-    .sidebarTitle {
-        font-size: 1.3em;
+
+    .sidebarHeader {
+        padding: 15px;
     }
-    .tabButton {
+
+    .sidebarNavItem {
+        padding: 12px 15px;
         font-size: 1em;
-        padding: 12px 5px;
     }
 }
