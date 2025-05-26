@@ -342,6 +342,154 @@
   text-decoration: underline;
 }
 
+/* MODAL STYLES */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7); /* Dark semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it's on top of everything */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modalOverlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modalContent {
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  max-width: 500px; /* Max width for modals */
+  width: 90%; /* Responsive width */
+  text-align: center;
+  position: relative; /* For close button positioning */
+  transform: translateY(20px); /* Initial subtle animation */
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.modalOverlay.visible .modalContent {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.modalTitle {
+  color: #00796b; /* Green theme */
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.modalText {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #555;
+  margin-bottom: 25px;
+  text-align: left; /* Align text left for readability in summary */
+}
+
+.modalText strong {
+    color: #004d40;
+}
+
+.modalText ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+.modalText ul li {
+    margin-bottom: 5px;
+}
+
+.modalButtons {
+  display: flex;
+  justify-content: center; /* Center buttons */
+  gap: 15px; /* Space between buttons */
+  margin-top: 30px;
+}
+
+.modalButton {
+  background-color: #00796b; /* Green theme */
+  color: white;
+  padding: 12px 25px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.modalButton:hover {
+  background-color: #005c50;
+  transform: translateY(-1px);
+}
+
+.modalButton.cancel {
+  background-color: #ccc; /* Grey for cancel */
+  color: #333;
+}
+
+.modalButton.cancel:hover {
+  background-color: #b3b3b3;
+}
+
+.modalCloseButton {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #555;
+    transition: color 0.2s ease;
+}
+
+.modalCloseButton:hover {
+    color: #00796b;
+}
+
+/* Specific styles for the success page/modal */
+.successPage {
+    background-color: #e0f7fa; /* Light green theme */
+    padding: 50px 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+    position: relative;
+    /* Center in the viewport if not within modalOverlay */
+    margin: auto; 
+    transform: translateY(0); /* Ensure it's not animated if standalone */
+    opacity: 1;
+}
+
+.successTitle {
+    color: #00796b;
+    font-size: 2.8rem;
+    margin-bottom: 25px;
+    font-weight: 700;
+}
+
+.successMessage {
+    font-size: 1.4rem;
+    color: #004d40;
+    margin-bottom: 30px;
+}
+
+
 /* Responsive Adjustments using Media Queries */
 
 /* For tablets and larger phones (min-width: 768px) */
@@ -363,18 +511,24 @@
   }
 
   /* Buttons in actions container should be inline-block and have space */
+  .actions {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+  }
+
   .actions .button {
     width: auto; /* Allow buttons to shrink */
     display: inline-flex; /* Use inline-flex for side-by-side with icon alignment */
-    margin-right: 15px; /* Space between buttons */
-  }
-
-  .actions .button:last-child {
-      margin-right: 0; /* No margin on the last button */
+    margin-bottom: 0; /* Remove bottom margin for side-by-side */
   }
 
   .form {
     padding: 30px; /* More internal padding for the form */
+  }
+
+  .modalContent {
+      padding: 40px;
   }
 }
 
