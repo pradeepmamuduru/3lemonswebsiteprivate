@@ -7,27 +7,123 @@
    You should reference them in your JSX like `className={styles.className}`.
 */
 
+/* Using CSS variables defined in globals.css */
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  flex-grow: 1; /* Allows main content to grow and push footer down */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* --- Header --- */
+.header {
+    background-color: var(--primary-green);
+    color: var(--text-light);
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px var(--shadow-light);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.headerTitle {
+    margin: 0;
+    font-size: 1.8em;
+    font-weight: 700;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    flex-shrink: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.headerActions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.loggedInUser {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--accent-yellow);
+    white-space: nowrap;
+    margin-right: 10px;
+}
+
+.loginButton {
+    background-color: var(--accent-yellow);
+    color: var(--text-dark);
+    padding: 8px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 4px var(--shadow-light);
+    white-space: nowrap;
+}
+
+.loginButton:hover {
+    background-color: var(--accent-orange);
+    transform: translateY(-1px);
+}
+
+.hamburgerIcon {
+    font-size: 2.5em;
+    cursor: pointer;
+    color: var(--text-light);
+    transition: color 0.3s ease;
+    z-index: 1001;
+    display: block; /* Always show hamburger now for account menu */
+    background: none; /* Ensure no default button styling */
+    border: none;
+    line-height: 1; /* Align icon vertically */
+    padding: 0;
+}
+
+.hamburgerIcon:hover {
+    color: #e0e0e0;
+}
+
+
 /* --- Hero Section --- */
 .hero {
   position: relative;
   width: 100%;
-  height: 450px; /* Increased height for more impact */
+  height: 450px;
   overflow: hidden;
-  border-radius: 12px; /* Slightly rounded corners */
+  border-radius: 12px;
   margin-bottom: 40px;
-  box-shadow: 0 8px 20px var(--shadow-medium); /* Stronger shadow for hero */
+  box-shadow: 0 8px 20px var(--shadow-medium);
 }
 
 .heroImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: brightness(0.75); /* Slightly brighter image */
+  filter: brightness(0.75);
   transition: transform 0.4s ease-in-out;
 }
 
 .hero:hover .heroImage {
-  transform: scale(1.03); /* Subtle zoom on hover */
+  transform: scale(1.03);
 }
 
 .heroOverlay {
@@ -43,51 +139,51 @@
   text-align: center;
   color: var(--text-light);
   padding: 20px;
-  background: rgba(0, 0, 0, 0.3); /* Slightly darker overlay for text readability */
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .heroTitle {
-  font-size: 4.5em; /* Larger title */
+  font-size: 4.5em;
   margin-bottom: 15px;
   font-weight: 800;
-  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.6); /* More prominent shadow */
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.6);
   letter-spacing: -1px;
 }
 
 .heroSubtitle {
-  font-size: 1.8em; /* Larger subtitle */
+  font-size: 1.8em;
   margin-bottom: 40px;
   font-weight: 400;
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
 }
 
 .heroButton {
-  background-color: var(--accent-yellow); /* Bright yellow button */
+  background-color: var(--accent-yellow);
   color: var(--text-dark);
-  padding: 18px 40px; /* Larger padding */
-  border-radius: 10px; /* More rounded */
+  padding: 18px 40px;
+  border-radius: 10px;
   text-decoration: none;
   font-weight: 700;
-  font-size: 1.4em; /* Larger text */
+  font-size: 1.4em;
   transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
   box-shadow: 0 6px 12px var(--shadow-medium);
-  border: none; /* No border for a cleaner look */
+  border: none;
   cursor: pointer;
 }
 
 .heroButton:hover {
-  background-color: var(--accent-orange); /* Orange on hover */
-  transform: translateY(-3px); /* More pronounced lift */
+  background-color: var(--accent-orange);
+  transform: translateY(-3px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
 /* --- Section Titles --- */
 .sectionTitle {
   text-align: center;
-  font-size: 3em; /* Larger section titles */
+  font-size: 3em;
   margin-top: 60px;
   margin-bottom: 40px;
-  color: var(--primary-green); /* Primary green color */
+  color: var(--primary-green);
   position: relative;
   padding-bottom: 15px;
   font-weight: 700;
@@ -100,9 +196,9 @@
   left: 50%;
   bottom: 0px;
   transform: translateX(-50%);
-  width: 100px; /* Wider underline */
-  height: 5px; /* Thicker underline */
-  background-color: var(--secondary-green); /* Secondary green for underline */
+  width: 100px;
+  height: 5px;
+  background-color: var(--secondary-green);
   border-radius: 3px;
 }
 
@@ -113,14 +209,14 @@
 
 .lemonsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Adjusted minmax */
-  gap: 35px; /* Increased gap */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 35px;
 }
 
 .lemonCard {
   background-color: var(--bg-light);
-  border-radius: 15px; /* More rounded corners */
-  box-shadow: 0 6px 15px var(--shadow-light); /* Softer shadow */
+  border-radius: 15px;
+  box-shadow: 0 6px 15px var(--shadow-light);
   overflow: hidden;
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -130,20 +226,20 @@
 }
 
 .lemonCard:hover {
-  transform: translateY(-8px); /* More pronounced lift */
-  box-shadow: 0 12px 25px var(--shadow-medium); /* Stronger shadow on hover */
+  transform: translateY(-8px);
+  box-shadow: 0 12px 25px var(--shadow-medium);
 }
 
 .cardImage {
   width: 100%;
-  height: 220px; /* Taller images */
+  height: 220px;
   object-fit: cover;
   display: block;
   margin-bottom: 18px;
 }
 
 .cardTitle {
-  font-size: 1.8em; /* Larger title */
+  font-size: 1.8em;
   font-weight: 700;
   color: var(--primary-green);
   margin-bottom: 10px;
@@ -151,7 +247,7 @@
 }
 
 .cardDescription {
-  font-size: 1.1em; /* Larger description */
+  font-size: 1.1em;
   color: #555;
   line-height: 1.6;
   padding: 0 20px;
@@ -162,7 +258,7 @@
   text-align: center;
   font-size: 1.2em;
   color: #888;
-  grid-column: 1 / -1; /* Span full width */
+  grid-column: 1 / -1;
   padding: 30px;
   background-color: var(--bg-faded-green);
   border-radius: 10px;
@@ -174,7 +270,7 @@
   background-color: var(--bg-light);
   border-radius: 15px;
   box-shadow: 0 8px 20px var(--shadow-light);
-  padding: 50px; /* More padding */
+  padding: 50px;
   margin-bottom: 60px;
 }
 
@@ -184,7 +280,7 @@
   margin-bottom: 25px;
   font-weight: 600;
   text-align: center;
-  animation: fadeIn 0.5s ease-out; /* Simple fade in */
+  animation: fadeIn 0.5s ease-out;
 }
 
 @keyframes fadeIn {
@@ -193,21 +289,21 @@
 }
 
 .successMessage {
-  background-color: #e8f5e9; /* Light green background */
-  color: #2e7d32; /* Dark green text */
-  border: 1px solid #a5d6a7; /* Green border */
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
 }
 
 .errorMessage {
-  background-color: #ffebee; /* Light red background */
-  color: #c62828; /* Dark red text */
-  border: 1px solid #ef9a9a; /* Red border */
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ef9a9a;
 }
 
 .form {
   display: grid;
-  gap: 25px; /* Increased gap */
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Wider minmax */
+  gap: 25px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
 }
 
 .formGroup {
@@ -223,10 +319,10 @@
 }
 
 .input, .select {
-  padding: 14px 18px; /* Larger padding */
+  padding: 14px 18px;
   border: 1px solid var(--border-color);
-  border-radius: 10px; /* More rounded */
-  font-size: 1.1em; /* Larger font */
+  border-radius: 10px;
+  font-size: 1.1em;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
   width: 100%;
   box-sizing: border-box;
@@ -235,12 +331,18 @@
 
 .input:focus, .select:focus {
   border-color: var(--secondary-green);
-  box-shadow: 0 0 0 4px rgba(107, 203, 119, 0.4); /* Brighter, wider shadow */
+  box-shadow: 0 0 0 4px rgba(107, 203, 119, 0.4);
   outline: none;
 }
 
+.input:disabled {
+    background-color: #f0f0f0;
+    cursor: not-allowed;
+    color: #777;
+}
+
 .select {
-  appearance: none; /* Remove default arrow */
+  appearance: none;
   background-image: url("data:image/svg+xml;utf8,<svg fill='%2337A24A' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
   background-repeat: no-repeat;
   background-position: right 15px center;
@@ -249,31 +351,31 @@
 
 .orderVarietyGroup {
     display: grid;
-    grid-template-columns: 2fr 1fr; /* Two columns for grade and quantity */
+    grid-template-columns: 2fr 1fr;
     gap: 20px;
     align-items: flex-start;
     padding: 15px;
     background-color: var(--bg-faded-green);
     border-radius: 10px;
     border: 1px solid #d0e0d0;
-    margin-bottom: 15px; /* Space between variety groups */
+    margin-bottom: 15px;
 }
 
 .orderVarietyGroup .formGroup {
-    margin-bottom: 0; /* Remove extra margin from formGroup within this container */
+    margin-bottom: 0;
 }
 
 
 .discountNote {
-  color: var(--accent-orange); /* Orange for discount text */
+  color: var(--accent-orange);
   font-size: 0.9em;
   font-weight: 600;
   margin-top: 5px;
-  display: block; /* Ensures it's on a new line below quantity input */
+  display: block;
 }
 
 .removeVarietyButton {
-  background-color: #f44336; /* Red for remove button */
+  background-color: #f44336;
   color: var(--text-light);
   padding: 8px 15px;
   border: none;
@@ -282,11 +384,11 @@
   font-size: 0.9em;
   font-weight: 600;
   transition: background-color 0.3s ease;
-  margin-top: 10px; /* Space from inputs */
-  display: block; /* Ensure it takes full width below its group */
-  width: fit-content; /* Only as wide as content */
-  align-self: flex-end; /* Align to the right in its grid cell */
-  grid-column: span 2; /* Span across both columns in orderVarietyGroup if needed, or place outside */
+  margin-top: 10px;
+  display: block;
+  width: fit-content;
+  align-self: flex-end;
+  grid-column: span 2; /* Ensure it takes full width below its group */
   margin-left: auto; /* Push to right */
 }
 
@@ -297,11 +399,11 @@
 .button {
   background-color: var(--primary-green);
   color: var(--text-light);
-  padding: 16px 30px; /* Larger padding for all buttons */
+  padding: 16px 30px;
   border: none;
-  border-radius: 10px; /* More rounded */
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 1.15em; /* Slightly larger font */
+  font-size: 1.15em;
   font-weight: 600;
   transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
   box-shadow: 0 4px 10px var(--shadow-light);
@@ -311,42 +413,42 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px; /* Space for icons */
+  gap: 10px;
   white-space: nowrap;
 }
 
 .button:hover:not(:disabled) {
-  background-color: #2e8b3b; /* Darker green on hover */
+  background-color: #2e8b3b;
   transform: translateY(-2px);
   box-shadow: 0 6px 12px var(--shadow-medium);
 }
 
 .button:disabled {
-  background-color: #a5d6a7; /* Lighter green when disabled */
+  background-color: #a5d6a7;
   cursor: not-allowed;
   opacity: 0.8;
 }
 
 .whatsappButton {
-  background-color: #25D366; /* WhatsApp brand green */
+  background-color: #25D366;
 }
 
 .whatsappButton:hover:not(:disabled) {
-  background-color: #1DA851; /* Darker WhatsApp green on hover */
+  background-color: #1DA851;
 }
 
 .buttonIcon {
-  font-size: 1.3em; /* Size for react-icons */
+  font-size: 1.3em;
 }
 
 .orderSummary {
-  grid-column: 1 / -1; /* Span full width */
+  grid-column: 1 / -1;
   text-align: center;
   margin-top: 30px;
   padding: 20px;
   background-color: var(--bg-faded-green);
   border-radius: 12px;
-  font-size: 2em; /* Larger total amount */
+  font-size: 2em;
   color: var(--primary-green);
   font-weight: 800;
   border: 1px solid #cfe9d0;
@@ -360,9 +462,30 @@
   grid-column: 1 / -1;
   display: flex;
   flex-wrap: wrap;
-  gap: 20px; /* Increased gap between buttons */
+  gap: 20px;
   justify-content: center;
   margin-top: 30px;
+}
+
+.loginPrompt {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 30px;
+    background-color: var(--bg-faded-green);
+    border-radius: 12px;
+    margin-top: 20px;
+    font-size: 1.2em;
+    color: var(--text-dark);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.loginPrompt p {
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.loginPrompt .button {
+    margin-top: 15px;
 }
 
 /* --- Customer Reviews Section --- */
@@ -374,14 +497,14 @@
 .reviewsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 30px; /* Increased gap */
+  gap: 30px;
   padding: 20px 0;
 }
 
 .reviewCard {
-  background-color: var(--bg-faded-green); /* Light green background */
+  background-color: var(--bg-faded-green);
   border-radius: 15px;
-  padding: 30px; /* More padding */
+  padding: 30px;
   box-shadow: 0 5px 12px var(--shadow-light);
   text-align: center;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -393,18 +516,18 @@
 }
 
 .reviewerRating {
-  color: var(--accent-yellow); /* Gold stars */
-  font-size: 1.5em; /* Larger stars */
+  color: var(--accent-yellow);
+  font-size: 1.5em;
   margin-bottom: 15px;
 }
 
 .emptyStar {
-    opacity: 0.3; /* Dim for empty stars */
+    opacity: 0.3;
 }
 
 .reviewText {
   font-style: italic;
-  font-size: 1.15em; /* Larger text */
+  font-size: 1.15em;
   color: #444;
   line-height: 1.6;
   margin-bottom: 20px;
@@ -418,7 +541,7 @@
 
 /* --- Footer Section --- */
 .footer {
-  background-color: #222; /* Darker footer */
+  background-color: #222;
   color: var(--text-light);
   text-align: center;
   padding: 25px;
@@ -426,7 +549,7 @@
   margin-top: auto;
   width: 100%;
   box-sizing: border-box;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3); /* Top shadow for footer */
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .footer p {
@@ -445,14 +568,14 @@
   text-decoration: underline;
 }
 
-/* --- Modals and Overlays --- */
+/* --- Modals and Overlays (General) --- */
 .modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.8); /* Darker, more prominent overlay */
+  background-color: rgba(0, 0, 0, 0.8);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -469,20 +592,20 @@
 
 .modalContent {
   background-color: var(--bg-light);
-  padding: 40px; /* More padding */
+  padding: 40px;
   border-radius: 15px;
-  box-shadow: 0 10px 30px var(--shadow-medium); /* Stronger shadow */
-  max-width: 550px; /* Slightly wider modal */
+  box-shadow: 0 10px 30px var(--shadow-medium);
+  max-width: 550px;
   width: 90%;
   position: relative;
-  transform: scale(0.95); /* Initial smaller size */
+  transform: scale(0.95);
   opacity: 0;
   transition: transform 0.3s ease-out, opacity 0.3s ease-out;
   box-sizing: border-box;
 }
 
 .modalOverlay.visible .modalContent {
-  transform: scale(1); /* Scale up on visible */
+  transform: scale(1);
   opacity: 1;
 }
 
@@ -492,7 +615,7 @@
     right: 15px;
     background: none;
     border: none;
-    font-size: 2.2em; /* Larger close icon */
+    font-size: 2.2em;
     color: #999;
     cursor: pointer;
     padding: 5px;
@@ -505,7 +628,7 @@
 }
 
 .modalTitle {
-  font-size: 2.5em; /* Larger title */
+  font-size: 2.5em;
   color: var(--primary-green);
   margin-bottom: 25px;
   text-align: center;
@@ -558,7 +681,7 @@
 .modalButton {
   background-color: var(--primary-green);
   color: var(--text-light);
-  padding: 14px 28px; /* Larger padding */
+  padding: 14px 28px;
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -579,7 +702,7 @@
 }
 
 .modalButtonCancel {
-  background-color: #f44336; /* Red cancel button */
+  background-color: #f44336;
 }
 
 .modalButtonCancel:hover:not(:disabled) {
@@ -602,6 +725,264 @@
     margin-bottom: 30px;
     line-height: 1.6;
 }
+
+/* --- Authentication Modal Specific Styles --- */
+.authForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.authSwitch {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.95em;
+    color: #666;
+}
+
+.authLink {
+    color: var(--primary-green);
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+}
+
+.authLink:hover {
+    color: var(--secondary-green);
+}
+
+
+/* --- Account Sidebar Styles --- */
+.accountSidebarOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: flex-end;
+    z-index: 1500;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.accountSidebarOverlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.accountSidebar {
+    background-color: var(--bg-light);
+    width: 100%;
+    max-width: 450px; /* Slightly wider sidebar */
+    height: 100%;
+    box-shadow: -6px 0 20px var(--shadow-medium); /* Stronger shadow */
+    transform: translateX(100%);
+    transition: transform 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
+}
+
+.accountSidebarOverlay.visible .accountSidebar {
+    transform: translateX(0);
+}
+
+.sidebarHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 25px; /* More padding */
+    background-color: var(--primary-green);
+    color: var(--text-light);
+    box-shadow: 0 2px 5px var(--shadow-light);
+}
+
+.sidebarTitle {
+    margin: 0;
+    font-size: 1.8em; /* Larger title */
+    font-weight: 700;
+}
+
+.sidebarCloseButton {
+    background: none;
+    border: none;
+    font-size: 2.5em; /* Larger close icon */
+    color: var(--text-light);
+    cursor: pointer;
+    transition: color 0.2s ease;
+    line-height: 1;
+}
+
+.sidebarCloseButton:hover {
+    color: var(--accent-yellow);
+}
+
+.sidebarTabs {
+    display: flex;
+    border-bottom: 1px solid #eee;
+}
+
+.tabButton {
+    flex: 1;
+    padding: 18px 10px; /* More padding */
+    background-color: #f0f0f0;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #555;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.tabButton:hover {
+    background-color: #e0e0e0;
+}
+
+.tabButton.active {
+    background-color: var(--bg-light);
+    border-bottom-color: var(--primary-green);
+    color: var(--primary-green);
+}
+
+.tabContent {
+    padding: 25px; /* More padding */
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.tabContent h3 {
+    color: var(--primary-green);
+    font-size: 1.8em; /* Larger heading */
+    margin-top: 0;
+    margin-bottom: 25px;
+    text-align: center;
+    font-weight: 700;
+}
+
+.accountDetailsForm {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.accountDetailsForm .input {
+    width: 100%;
+}
+
+.saveButton {
+    background-color: #2196F3; /* Blue for save */
+}
+.saveButton:hover {
+    background-color: #1976D2;
+}
+
+.logoutButton {
+    background-color: #f44336; /* Red for logout */
+    margin-top: 10px;
+}
+.logoutButton:hover {
+    background-color: #d32f2f;
+}
+
+
+/* Address List in Sidebar */
+.addressList ul {
+    list-style: none;
+    padding: 0;
+}
+
+.addressItem {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 15px;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.addressItem strong {
+    font-size: 1.1em;
+    color: var(--primary-green);
+    display: block;
+    margin-bottom: 5px;
+}
+
+.addressItem p {
+    margin: 0;
+    color: #666;
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+
+.addressActions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.deleteAddressButton {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+    background-color: #f44336;
+    color: var(--text-light);
+    transition: background-color 0.2s ease;
+}
+
+.deleteAddressButton:hover {
+    background-color: #d32f2f;
+}
+
+.addAddressButton {
+    background-color: #008CBA;
+    margin-top: 20px;
+    width: 100%;
+}
+.addAddressButton:hover {
+    background-color: #007bb5;
+}
+
+.addressForm {
+    margin-top: 20px;
+    background-color: #f0f8ff;
+    padding: 25px;
+    border-radius: 10px;
+    border: 1px solid #e0f2f7;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.addressForm h4 {
+    color: var(--primary-green);
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.4em;
+}
+
+.addressForm .formButtons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.limitMessage {
+    text-align: center;
+    color: #d32f2f;
+    font-size: 0.9em;
+    margin-top: 10px;
+    font-weight: 600;
+}
+
 
 /* --- Responsive Adjustments --- */
 @media (max-width: 1024px) {
@@ -666,9 +1047,38 @@
     padding: 12px 20px;
     font-size: 1em;
   }
+  .accountSidebar {
+      max-width: 400px;
+  }
+  .sidebarTitle {
+      font-size: 1.6em;
+  }
+  .sidebarCloseButton {
+      font-size: 2.2em;
+  }
+  .tabButton {
+      font-size: 1em;
+      padding: 15px 8px;
+  }
+  .tabContent h3 {
+      font-size: 1.6em;
+  }
 }
 
 @media (max-width: 768px) {
+  .headerTitle {
+      font-size: 1.4em;
+  }
+  .loggedInUser {
+      font-size: 1em;
+  }
+  .loginButton {
+      padding: 6px 12px;
+      font-size: 0.9em;
+  }
+  .hamburgerIcon {
+      font-size: 2em;
+  }
   .hero {
     height: 300px;
     border-radius: 0;
@@ -750,6 +1160,28 @@
       font-size: 2em;
       top: 10px;
       right: 10px;
+  }
+  .accountSidebar {
+      max-width: 100%; /* Full width on small screens */
+  }
+  .sidebarHeader {
+      padding: 15px 20px;
+  }
+  .sidebarTitle {
+      font-size: 1.4em;
+  }
+  .sidebarCloseButton {
+      font-size: 2em;
+  }
+  .tabButton {
+      font-size: 0.9em;
+      padding: 12px 5px;
+  }
+  .tabContent {
+      padding: 20px;
+  }
+  .tabContent h3 {
+      font-size: 1.4em;
   }
 }
 
