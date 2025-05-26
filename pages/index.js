@@ -1,367 +1,458 @@
 // pages/index.js
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, Fragment } from 'react'; // Import Fragment
+import Head from 'next/head';
 import Image from 'next/image';
-import styles from '../styles/styles.module.css'; // Correctly import styles.module.css as a CSS Module
+import { FaWhatsapp, FaStar } from 'react-icons/fa';
+import { IoCloseCircleOutline } from 'react-icons/io5'; // New icon for close button
+import styles from '../styles/styles.module.css';
 
-// Dummy data for products and reviews
-const lemonData = [
-  { id: 1, Grade: 'Grade A Premium', 'Price per kg': 150, 'Image url': 'https://images.pexels.com/photos/4042801/pexels-photo-4042801.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', description: 'Our finest lemons, perfectly ripe and juicy, ideal for all culinary uses.' },
-  { id: 2, Grade: 'Grade B Standard', 'Price per kg': 120, 'Image url': 'https://images.pexels.com/photos/10207386/pexels-photo-10207386.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', description: 'Good quality lemons, excellent for everyday cooking and beverages.' },
-  { id: 3, Grade: 'Grade C Economy', 'Price per kg': 100, 'Image url': 'https://images.pexels.com/photos/3476686/pexels-photo-3476686.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', description: 'Economical option, great for large batches of lemonade or juice.' },
-  { id: 4, Grade: 'Organic Lemons', 'Price per kg': 180, 'Image url': 'https://images.pexels.com/photos/6157053/pexels-photo-6157053.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', description: 'Certified organic, grown without pesticides for a natural taste.' },
-  { id: 5, Grade: 'Meyer Lemons', 'Price per kg': 200, 'Image url': 'https://images.pexels.com/photos/14841793/pexels-photo-14841793/free-photo-of-lemons.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', description: 'Sweet and less acidic, perfect for desserts and gourmet dishes.' },
-  { id: 6, Grade: 'Freshly Picked', 'Price per kg': 160, 'Image url': 'https://images.pexels.com/photos/4971844/pexels-photo-4971844.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', description: 'Hand-picked daily, ensuring maximum freshness and vibrant flavor.' },
-];
+// --- getStaticProps: Fetches Lemon Product Data ---
+export async function getStaticProps() {
+  try {
+    const res = await fetch("https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Lemons"); // *** IMPORTANT: Verify your SheetDB sheet name for lemons here ***
+    if (!res.ok) {
+      throw new Error(`Failed to fetch lemons: ${res.status} ${res.statusText}`);
+    }
+    const allLemons = await res.json();
 
-const customerReviews = [
-  { id: 1, rating: 5, text: 'Amazing quality lemons! Super fresh and juicy. Highly recommend!', name: 'Aisha K.' },
-  { id: 2, rating: 4, text: 'Good service and reliable delivery. The lemons were perfect for my catering needs.', name: 'Ben S.' },
-  { id: 3, rating: 5, text: 'Consistently excellent. Three Lemons is my go-to for all lemon supplies.', name: 'Chloe D.' },
-  { id: 4, rating: 5, text: 'Fresh, tangy, and delivered right to my door. What more could I ask for?', name: 'David L.' },
-  { id: 5, rating: 4, text: 'The organic lemons were a fantastic addition to my recipes. Will order again.', name: 'Eva M.' },
-  { id: 6, rating: 5, text: 'Never disappointed with the quality. Great value for money!', name: 'Frank P.' },
-];
+    if (!Array.isArray(allLemons)) {
+        console.error("Fetched lemons data is not an array:", allLemons);
+        return { props: { lemons: [] }, revalidate: 3600 };
+    }
 
-const grades = lemonData.map(lemon => lemon.Grade);
+    // Filter to include only the first three qualities
+    const lemons = allLemons.slice(0, 3);
 
-export default function Home() {
-  const [orderVarieties, setOrderVarieties] = useState([{ grade: '', quantity: '' }]);
-  const [totalAmount, setTotalAmount] = useState(0);
-  const [showModal, setShowModal] = useState(false);
-  const [modalContent, setModalContent] = useState({}); // { title, text, type, list, buttons }
-  const [showSidebar, setShowSidebar] = useState(false);
-  const [activeSidebarTab, setActiveSidebarTab] = useState('account'); // 'account' or 'addresses'
-  const [feedbackMessage, setFeedbackMessage] = useState(null);
-  const [feedbackType, setFeedbackType] = useState('');
+    return {
+      props: { lemons },
+      revalidate: 3600,
+    };
+  } catch (error) {
+    console.error("Error in getStaticProps:", error);
+    return { props: { lemons: [] }, revalidate: 3600 };
+  }
+}
+
+// --- Home Component ---
+export default function Home({ lemons }) {
+  const [orders, setOrders] = useState([{ grade: '', quantity: '' }]);
+  const [form, setForm] = useState({ name: '', delivery: '', contact: '' });
+  const [total, setTotal] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionMessage, setSubmissionMessage] = useState('');
 
-  // Dummy account details & addresses for sidebar
-  const [accountDetails, setAccountDetails] = useState({
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '123-456-7890'
-  });
-  const [userAddresses, setUserAddresses] = useState([
-    { id: 1, street: '123 Lemon Ave', city: 'Citrusville', state: 'CA', zip: '90210' },
-    { id: 2, street: '456 Zest St', city: 'Tangytown', state: 'FL', zip: '33101' },
-  ]);
-  const [isAddingAddress, setIsAddingAddress] = useState(false);
-  const [newAddress, setNewAddress] = useState({ street: '', city: '', state: '', zip: '' });
-  const [isSavingAccount, setIsSavingAccount] = useState(false);
-  const [isSavingAddress, setIsSavingAddress] = useState(false);
+  // New states for modal visibility
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  // State to store order details for confirmation modal
+  const [confirmedOrderDetails, setConfirmedOrderDetails] = useState(null);
 
+  const ORDERS_SUBMISSION_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=orders'; 
 
-  const calculateTotal = () => {
-    let sum = 0;
-    orderVarieties.forEach(item => {
-      const lemon = lemonData.find(l => l.Grade === item.grade);
-      if (lemon && item.quantity) {
-        sum += lemon['Price per kg'] * parseFloat(item.quantity);
-      }
-    });
-    setTotalAmount(sum);
-  };
+  const customerReviews = [
+    { id: 1, text: "The lemons from 3 Lemons Traders are incredibly fresh and juicy! Perfect for my restaurant.", name: "Chef Rahul S.", rating: 5, },
+    { id: 2, text: "Excellent quality and timely delivery. Their A1 grade lemons are truly the best.", name: "Priya M.", rating: 5, },
+    { id: 3, text: "Great prices for bulk orders. The team is very responsive and helpful.", name: "Kiran R.", rating: 4, },
+    { id: 4, text: "Consistently good quality. My go-to for all lemon needs.", name: "Amit P.", rating: 5, },
+    { id: 5, text: "Freshness guaranteed every time. Highly recommend!", name: "Sunita D.", rating: 5, },
+  ];
 
   useEffect(() => {
     calculateTotal();
-  }, [orderVarieties]);
+  }, [orders, lemons]);
+
+  const handleOrderChange = (index, field, value) => {
+    const updated = [...orders];
+    if (field === 'quantity') {
+      // Ensure quantity is a number and at least 1, or empty string
+      value = value === '' ? '' : String(Math.max(1, parseInt(value) || 1));
+    }
+    updated[index][field] = value;
+    setOrders(updated);
+  };
 
   const handleAddVariety = () => {
-    setOrderVarieties([...orderVarieties, { grade: '', quantity: '' }]);
+    setOrders([...orders, { grade: '', quantity: '' }]);
   };
 
-  const handleRemoveVariety = (index) => {
-    const newVarieties = orderVarieties.filter((_, i) => i !== index);
-    setOrderVarieties(newVarieties);
-  };
+  const calculateTotal = () => {
+    let totalPrice = 0;
+    orders.forEach(order => {
+      const lemon = lemons.find(l => l.Grade === order.grade);
+      if (lemon) {
+        const pricePerKg = parseFloat(lemon['Price Per Kg']);
+        const quantity = parseInt(order.quantity);
 
-  const handleVarietyChange = (index, field, value) => {
-    const newVarieties = [...orderVarieties];
-    newVarieties[index][field] = value;
-    setOrderVarieties(newVarieties);
-  };
-
-  const showFeedback = (message, type = 'info') => {
-    setFeedbackMessage(message);
-    setFeedbackType(type);
-    const timer = setTimeout(() => {
-      setFeedbackMessage(null);
-      setFeedbackType('');
-    }, 5000); // Message disappears after 5 seconds
-    return () => clearTimeout(timer);
-  };
-
-  const handleSubmitOrder = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    // Basic validation
-    const isValid = orderVarieties.every(item => item.grade && item.quantity && parseFloat(item.quantity) > 0);
-    if (!isValid) {
-      showFeedback('Please ensure all selected varieties have a grade and a valid quantity.', 'error');
-      setIsSubmitting(false);
-      return;
-    }
-
-    const orderDetails = orderVarieties.map(item => {
-      const lemon = lemonData.find(l => l.Grade === item.grade);
-      return `${item.grade} (${item.quantity} kg) - ₹${(lemon['Price per kg'] * parseFloat(item.quantity)).toFixed(2)}`;
-    }).join('\n');
-
-    const whatsappMessage = `Hello Three Lemons, I'd like to place an order:\n\n${orderDetails}\n\nTotal: ₹${totalAmount.toFixed(2)}`;
-    const whatsappLink = `https://wa.me/YOUR_WHATSAPP_NUMBER?text=${encodeURIComponent(whatsappMessage)}`; // REPLACE WITH YOUR WHATSAPP NUMBER
-
-    try {
-      // Simulate API call for order submission if needed
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
-
-      window.open(whatsappLink, '_blank'); // Open WhatsApp link in a new tab
-      showFeedback('Order initiated! Please complete your order on WhatsApp.', 'success');
-      setOrderVarieties([{ grade: '', quantity: '' }]); // Reset form
-      setTotalAmount(0);
-    } catch (error) {
-      console.error('Order submission failed:', error);
-      showFeedback('Failed to submit order. Please try again.', 'error');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const openInfoModal = () => {
-    setModalContent({
-      title: 'Our Lemons',
-      text: 'We offer a variety of high-quality lemons sourced directly from our farms. Our commitment to freshness ensures you receive the best produce. Choose from different grades to suit your needs, from premium culinary lemons to economical options for bulk processing.',
-      type: 'info',
-      list: [
-        'Grade A Premium: Perfect, unblemished for presentation.',
-        'Grade B Standard: Great for juice and cooking, minor blemishes.',
-        'Grade C Economy: Best for large-scale juice extraction.',
-        'Organic Lemons: Grown naturally, chemical-free.',
-        'Meyer Lemons: Sweet and less acidic, perfect for desserts.',
-        'Freshly Picked: Hand-picked daily for maximum freshness.',
-      ],
-      buttons: [{ text: 'Got it!', action: closeModal }],
-    });
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setModalContent({});
-  };
-
-  const toggleSidebar = () => {
-    setShowSidebar(!showSidebar);
-  };
-
-  const handleSidebarTabClick = (tab) => {
-    setActiveSidebarTab(tab);
-  };
-
-  const handleAccountDetailChange = (e) => {
-    const { name, value } = e.target;
-    setAccountDetails(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSaveAccountDetails = async (e) => {
-    e.preventDefault();
-    setIsSavingAccount(true);
-    // Simulate API call
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      showFeedback('Account details saved successfully!', 'success');
-    } catch (error) {
-      showFeedback('Failed to save account details.', 'error');
-    } finally {
-      setIsSavingAccount(false);
-      toggleSidebar(); // Close sidebar after saving
-    }
-  };
-
-  const handleNewAddressChange = (e) => {
-    const { name, value } = e.target;
-    setNewAddress(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleAddAddress = async (e) => {
-    e.preventDefault();
-    setIsSavingAddress(true);
-    // Basic validation for new address
-    if (!newAddress.street || !newAddress.city || !newAddress.state || !newAddress.zip) {
-      showFeedback('Please fill all address fields.', 'error');
-      setIsSavingAddress(false);
-      return;
-    }
-
-    // Simulate API call
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setUserAddresses(prev => [...prev, { ...newAddress, id: Date.now() }]);
-      setNewAddress({ street: '', city: '', state: '', zip: '' });
-      setIsAddingAddress(false);
-      showFeedback('Address added successfully!', 'success');
-    } catch (error) {
-      showFeedback('Failed to add address.', 'error');
-    } finally {
-      setIsSavingAddress(false);
-    }
-  };
-
-  const handleDeleteAddress = async (id) => {
-    if (window.confirm('Are you sure you want to delete this address?')) {
-      // Simulate API call
-      try {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        setUserAddresses(prev => prev.filter(addr => addr.id !== id));
-        showFeedback('Address deleted successfully!', 'success');
-      } catch (error) {
-        showFeedback('Failed to delete address.', 'error');
+        if (!isNaN(pricePerKg) && !isNaN(quantity) && quantity > 0) {
+          let itemPrice = pricePerKg * quantity;
+          // Apply 10% discount for quantities over 50 kg
+          if (quantity > 50) {
+            itemPrice *= 0.90; 
+          }
+          totalPrice += itemPrice;
+        }
       }
+    });
+    setTotal(totalPrice);
+  };
+
+  // --- NEW: Function to prepare data and show confirmation modal ---
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmissionMessage(''); // Clear any previous messages
+
+    // --- Client-Side Form Validation ---
+    if (!form.name.trim() || !form.delivery.trim() || !form.contact.trim()) {
+      setSubmissionMessage('Please fill in all your personal details (Name, Delivery Address, Contact).');
+      return;
     }
+    if (!/^\d{10}$/.test(form.contact)) {
+        setSubmissionMessage('Please enter a valid 10-digit contact number.');
+        return;
+    }
+
+    const validOrders = orders.filter(order => order.grade && order.quantity && parseInt(order.quantity) > 0);
+    if (validOrders.length === 0) {
+      setSubmissionMessage('Please add at least one lemon variety with a valid quantity (must be 1 or more).');
+      return;
+    }
+    const hasInvalidQuantity = orders.some(order => {
+        // Check if grade is selected but quantity is invalid
+        return (order.grade && (order.quantity === '' || isNaN(parseInt(order.quantity)) || parseInt(order.quantity) <= 0));
+    });
+    if (hasInvalidQuantity) {
+        setSubmissionMessage('Please ensure all selected varieties have a valid quantity (1 or more).');
+        return;
+    }
+    // --- End Validation ---
+
+    // Prepare data for the confirmation modal
+    const preparedOrderRows = validOrders.map(order => {
+        const lemon = lemons.find(l => l.Grade === order.grade);
+        const pricePerKg = parseFloat(lemon?.['Price Per Kg'] || 0);
+        const quantity = parseInt(order.quantity);
+        let itemCalculatedPrice = pricePerKg * quantity;
+        const discountApplied = quantity > 50 ? '10%' : '0%';
+        
+        if (quantity > 50) {
+            itemCalculatedPrice *= 0.90; 
+        }
+        
+        return {
+            grade: order.grade,
+            quantity: quantity,
+            pricePerKg: pricePerKg.toFixed(2),
+            itemTotalPrice: itemCalculatedPrice.toFixed(2),
+            discount: discountApplied,
+        };
+    });
+
+    setConfirmedOrderDetails({
+        personal: form,
+        items: preparedOrderRows,
+        total: total.toFixed(2),
+    });
+    setShowConfirmModal(true); // Show the confirmation modal
+  };
+
+  // --- NEW: Function to actually submit the order after confirmation ---
+  const confirmAndSubmitOrder = async () => {
+    setShowConfirmModal(false); // Close the confirmation modal immediately
+    setIsSubmitting(true);
+    setSubmissionMessage('');
+
+    if (!confirmedOrderDetails) { // Should not happen if flow is correct
+        setSubmissionMessage('Error: No order details to confirm.');
+        setIsSubmitting(false);
+        return;
+    }
+
+    const { personal, items } = confirmedOrderDetails;
+
+    // Map confirmed items to the format required by SheetDB
+    const rows = items.map(item => ({
+        name: personal.name,
+        quantity: item.quantity,
+        quality: item.grade,
+        'Price Per Kg': item.pricePerKg,
+        'Item Total Price': item.itemTotalPrice,
+        delivery: personal.delivery,
+        contact: personal.contact,
+        discount: item.discount,
+        'Order Date': new Date().toLocaleString(),
+    }));
+
+    try {
+      const response = await fetch(ORDERS_SUBMISSION_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: rows }),
+      });
+
+      if (response.ok) {
+        // Successfully submitted, show success modal
+        setShowSuccessModal(true);
+        // Reset form and orders on main page
+        setOrders([{ grade: '', quantity: '' }]);
+        setForm({ name: '', delivery: '', contact: '' });
+        setTotal(0);
+        setConfirmedOrderDetails(null); // Clear confirmed details
+      } else {
+        const errorData = await response.json();
+        console.error('SheetDB submission error:', response.status, errorData);
+        setSubmissionMessage(`Failed to submit order: ${errorData.message || 'Server error'}. Please try again.`);
+      }
+    } catch (err) {
+      console.error('Network or submission error:', err);
+      setSubmissionMessage('Failed to submit order. Please check your internet connection and try again.');
+    }
+
+    setIsSubmitting(false);
+  };
+
+  // --- NEW: Function to close the success modal and return to main page ---
+  const closeSuccessModal = () => {
+      setShowSuccessModal(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top
+  };
+
+  // --- NEW: Function to cancel confirmation and go back to form ---
+  const cancelConfirmation = () => {
+      setShowConfirmModal(false);
+      setConfirmedOrderDetails(null); // Clear details
+      // You can keep previous submission message or clear it
+  };
+
+  const getWhatsappLink = () => {
+    const validOrders = orders.filter(order => order.grade && order.quantity && parseInt(order.quantity) > 0);
+    // Disable link if no valid contact or no valid orders
+    if (validOrders.length === 0 || !form.contact || !/^\d{10}$/.test(form.contact)) {
+        return '#'; 
+    }
+
+    const orderDetails = validOrders.map(order => {
+        const lemon = lemons.find(l => l.Grade === order.grade);
+        const quantity = parseInt(order.quantity);
+        const pricePerKg = parseFloat(lemon?.['Price Per Kg'] || 0);
+        let itemPrice = pricePerKg * quantity;
+        let discountMsg = '';
+        if (quantity > 50) {
+            itemPrice *= 0.90;
+            discountMsg = ` (10% bulk discount applied)`;
+        }
+        return `${quantity} kg of ${order.grade} (Approx. ₹${itemPrice.toFixed(2)})${discountMsg}`;
+    }).join(', ');
+
+    // Use the specific WhatsApp number +918500130926
+    const whatsappContact = `918500130926`; 
+    const whatsappMessage = `Hi, I'm ${form.name}.\n\nI want to order: ${orderDetails}.\n\nDelivery Address: ${form.delivery}.\nContact: ${form.contact}\n\nTotal estimated price: ₹${total.toFixed(2)}\n\nPlease confirm availability and final amount.`;
+    
+    return `https://wa.me/${whatsappContact}?text=${encodeURIComponent(whatsappMessage)}`;
   };
 
   return (
-    <div className={styles.page}> {/* Apply .page from styles.module.css */}
-      {/* Header */}
-      <header className={styles.header}>
-        <h1 className={styles.headerTitle}>Three Lemons</h1>
-        <div className={styles.headerActions}>
-          <button onClick={toggleSidebar} className={styles.loginButton}>
-            <span className="user-icon">👤</span> {/* User icon */}
-            My Account
-          </button>
-          <div className="hamburger-icon" onClick={toggleSidebar}>☰</div> {/* Hamburger icon */}
-        </div>
-      </header>
+    <div className={styles.page}>
+      <Head>
+        <title>3 Lemons Traders – Buy Fresh Lemons Online</title>
+        <meta name="description" content="Buy premium quality lemons at affordable prices across India. Direct farm to home delivery. Discounts on bulk orders!" />
+        <meta property="og:title" content="Buy Fresh Lemons Online – 3 Lemons Traders" />
+        <meta property="og:description" content="Get premium lemons delivered to your door at unbeatable prices. Farm fresh quality. Offering discounts on bulk purchases!" />
+        <meta property="og:image" content="/lemons-hero.jpg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="canonical" href="https://3lemons.in" />
+        {/* The Inter font is already imported in globals.css */}
+      </Head>
 
-      {/* Hero Section */}
-      <section className={styles.hero}>
-        <Image
-          src="/lemon-hero.jpg" // Ensure this image is in your public folder
-          alt="Fresh Lemons"
-          layout="fill"
-          objectFit="cover"
-          priority
-          className={styles.heroImage}
-        />
-        <div className={styles.heroOverlay}>
-          <h2 className={styles.heroTitle}>Fresh Lemons, Direct to You</h2>
-          <p className={styles.heroSubtitle}>Quality citrus, delivered with care, from our farms to your home or business.</p>
-          <button onClick={() => document.getElementById('order-form').scrollIntoView({ behavior: 'smooth' })} className={styles.heroButton}>
-            Order Now!
-          </button>
-        </div>
-      </section>
-
-      <main className={styles.container}> {/* Apply .container from styles.module.css */}
-        {/* Lemons Products Section */}
-        <section className={styles.lemonsProducts}>
-          <h2 className={styles.sectionTitle}>Our Lemon Varieties</h2>
-          <div className={styles.lemonsSection}>
-            {lemonData.map(lemon => (
-              <div key={lemon.id} className={styles.lemonCard}>
-                <Image
-                  src={lemon['Image url']}
-                  alt={lemon['Grade'] || 'Lemon'}
-                  width={300} // Actual width for the image in the card
-                  height={200} // Actual height for the image in the card
-                  layout="responsive" // Makes image scale within parent (use with width/height)
-                  objectFit="cover"
-                  loading="lazy"
-                  className={styles.cardImage}
-                />
-                <h3 className={styles.cardTitle}>{lemon.Grade}</h3>
-                <p className={styles.cardDescription}>{lemon.description}</p>
-                <p className={styles.cardPrice}>₹{lemon['Price per kg']} / kg</p>
-              </div>
-            ))}
+      <main className={styles.container}>
+        {/* --- Hero Section --- */}
+        <section className={styles.hero}>
+          <img
+            src="/lemons-hero.jpg"
+            alt="Fresh Lemons"
+            className={styles.heroImage}
+          />
+          <div className={styles.heroOverlay}>
+            <h1 className={styles.heroTitle}>3 Lemons Traders</h1>
+            <p className={styles.heroSubtitle}>Buy fresh, farm-direct lemons delivered across India</p>
+            <a href="#buy-now" className={styles.heroButton}>
+              Order Now
+            </a>
           </div>
         </section>
 
-        {/* Order Form Section */}
-        <section id="order-form" className={styles.formSection}>
+        {/* --- Lemons Products Section --- */}
+        <section className={styles.lemonsSection}>
+          <h2 className={styles.sectionTitle}>Our Lemons</h2>
+          <div className={styles.lemonsGrid}>
+            {Array.isArray(lemons) && lemons.length > 0 ? (
+              lemons.map((lemon, index) => (
+                <div key={index} className={styles.lemonCard}>
+                  {lemon['Image url'] && (
+                    <Image
+                      src={lemon['Image url']}
+                      alt={lemon['Grade'] || 'Lemon'}
+                      width={300}
+                      height={200}
+                      layout="responsive" // Changed to responsive for better image handling
+                      objectFit="cover"
+                      loading="lazy"
+                      className={styles.cardImage}
+                    />
+                  )}
+                  <p className={styles.cardTitle}>
+                    {lemon['Grade']} – ₹{parseFloat(lemon['Price Per Kg']).toFixed(2)}/kg
+                  </p>
+                  <p className={styles.cardDescription}>{lemon['Description']}</p>
+                </div>
+              ))
+            ) : (
+              <p className={styles.noDataMessage}>
+                Loading lemons or no lemon data available. Please check your internet connection or SheetDB setup.
+              </p>
+            )}
+          </div>
+        </section>
+
+        {/* --- Order Form Section --- */}
+        <section id="buy-now" className={styles.formSection}>
           <h2 className={styles.sectionTitle}>Place Your Order</h2>
-          {feedbackMessage && (
-            <div className={`${styles.feedbackMessage} ${styles[`feedback${feedbackType.charAt(0).toUpperCase() + feedbackType.slice(1)}`]}`}>
-              {feedbackMessage}
-            </div>
+          {submissionMessage && (
+            <p className={`${styles.statusMessage} ${submissionMessage.includes('successfully') ? styles.successMessage : styles.errorMessage}`}>
+              {submissionMessage}
+            </p>
           )}
-          <form onSubmit={handleSubmitOrder} className={styles.form}>
-            {orderVarieties.map((item, index) => (
-              <div key={index} className={styles.orderVarietyRow}>
-                <div className={styles.formGroup}>
-                  <label htmlFor={`grade-${index}`} className={styles.label}>Lemon Grade</label>
-                  <select
-                    id={`grade-${index}`}
-                    className={styles.select}
-                    value={item.grade}
-                    onChange={(e) => handleVarietyChange(index, 'grade', e.target.value)}
-                    required
-                  >
-                    <option value="">Select a Grade</option>
-                    {grades.map((grade, i) => (
-                      <option key={i} value={grade}>{grade}</option>
-                    ))}
-                  </select>
+          <form onSubmit={handleSubmit} className={styles.form}>
+            {/* Personal Details Inputs */}
+            <div className={styles.formGroup}>
+              <label className={styles.label} htmlFor="name">Your Name</label>
+              <input
+                id="name"
+                className={styles.input}
+                required
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label} htmlFor="delivery">Delivery Address</label>
+              <input
+                id="delivery"
+                className={styles.input}
+                required
+                value={form.delivery}
+                onChange={(e) => setForm({ ...form, delivery: e.target.value })}
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label} htmlFor="contact">Contact Number</label>
+              <input
+                id="contact"
+                type="tel"
+                className={styles.input}
+                required
+                value={form.contact}
+                onChange={(e) => setForm({ ...form, contact: e.target.value })}
+                maxLength={10}
+                pattern="[0-9]{10}"
+                title="Please enter a 10-digit mobile number"
+                placeholder="e.g., 9876543210"
+              />
+            </div>
+
+            {/* Dynamic Order Varieties Inputs */}
+            {orders.map((order, index) => (
+              <Fragment key={index}> {/* Use Fragment to wrap multiple elements for mapping */}
+                <div className={styles.orderVarietyGroup}> {/* Group select and quantity */}
+                  <div className={styles.formGroup}>
+                    <label className={styles.label} htmlFor={`grade-${index}`}>Select Grade</label>
+                    <select
+                      id={`grade-${index}`}
+                      className={styles.select}
+                      value={order.grade}
+                      onChange={(e) => handleOrderChange(index, 'grade', e.target.value)}
+                      required
+                    >
+                      <option value="">-- Select --</option>
+                      {lemons.map((lemon, idx) => (
+                        <option key={idx} value={lemon.Grade}>
+                          {lemon.Grade} – ₹{parseFloat(lemon['Price Per Kg']).toFixed(2)}/kg
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label className={styles.label} htmlFor={`quantity-${index}`}>Quantity (kg)</label>
+                    <input
+                      id={`quantity-${index}`}
+                      type="number"
+                      min="1"
+                      className={styles.input}
+                      value={order.quantity}
+                      onChange={(e) => handleOrderChange(index, 'quantity', e.target.value)}
+                      placeholder="e.g., 10"
+                      required
+                    />
+                    {parseInt(order.quantity) > 50 && (
+                      <span className={styles.discountNote}> (10% bulk discount)</span>
+                    )}
+                  </div>
                 </div>
-                <div className={styles.formGroup}>
-                  <label htmlFor={`quantity-${index}`} className={styles.label}>Quantity (kg)</label>
-                  <input
-                    type="number"
-                    id={`quantity-${index}`}
-                    className={styles.input}
-                    value={item.quantity}
-                    onChange={(e) => handleVarietyChange(index, 'quantity', e.target.value)}
-                    min="0.1"
-                    step="0.1"
-                    required
-                  />
-                </div>
-                {orderVarieties.length > 1 && (
-                  <button type="button" onClick={() => handleRemoveVariety(index)} className={styles.removeVarietyBtn}>
-                    <span className="trash-icon">🗑️</span> {/* Trash icon */}
-                  </button>
+                {/* Add a remove button only if there's more than one variety */}
+                {orders.length > 1 && (
+                    <button
+                        type="button"
+                        onClick={() => setOrders(orders.filter((_, i) => i !== index))}
+                        className={styles.removeVarietyButton}
+                    >
+                        &times; Remove
+                    </button>
                 )}
-              </div>
+              </Fragment>
             ))}
+
             <button type="button" onClick={handleAddVariety} className={styles.button}>
-              <span className="plus-icon">+</span> Add Another Variety
+              ➕ Add Another Variety
             </button>
 
-            <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
-              <label htmlFor="customer-name" className={styles.label}>Your Name</label>
-              <input type="text" id="customer-name" className={styles.input} required />
-            </div>
-            <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
-              <label htmlFor="customer-phone" className={styles.label}>Phone Number</label>
-              <input type="tel" id="customer-phone" className={styles.input} required />
-            </div>
-
             <div className={styles.orderSummary}>
-              Total Amount: ₹{totalAmount.toFixed(2)}
-              {totalAmount >= 500 && <span className={styles.discountNote}> (Eligible for special discount!)</span>}
+              <h3>Total: ₹{total.toFixed(2)}</h3>
             </div>
 
             <div className={styles.actions}>
-              <button type="submit" className={`${styles.button} ${styles.whatsappButton}`} disabled={isSubmitting}>
-                {isSubmitting ? <span className="spinner"></span> : <span className="whatsapp-icon">📞</span>} {/* Spinner or WhatsApp icon */}
-                {isSubmitting ? 'Sending...' : 'Order via WhatsApp'}
-              </button>
-              <button type="button" onClick={openInfoModal} className={styles.button}>
-                Learn More About Our Lemons
-              </button>
+                <button type="submit" disabled={isSubmitting} className={styles.button}>
+                    {isSubmitting ? 'Checking Order...' : '🛒 Place Order on Website'}
+                </button>
+
+                <a
+                    href={getWhatsappLink()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`${styles.button} ${styles.whatsappButton}`}
+                    // Conditional styling to dim/disable if inputs are not valid for WhatsApp
+                    style={{ pointerEvents: (!form.contact || orders.filter(o => o.grade && o.quantity && parseInt(o.quantity) > 0).length === 0) ? 'none' : 'auto', opacity: (!form.contact || orders.filter(o => o.grade && o.quantity && parseInt(o.quantity) > 0).length === 0) ? 0.6 : 1 }}
+                >
+                    <FaWhatsapp className={styles.buttonIcon} /> Place Order on WhatsApp
+                </a>
             </div>
           </form>
         </section>
 
-        {/* Customer Reviews Section */}
+        {/* --- Customer Reviews Section --- */}
         <section className={styles.reviewsSection}>
           <h2 className={styles.sectionTitle}>What Our Customers Say</h2>
           <div className={styles.reviewsGrid}>
             {customerReviews.map(review => (
               <div key={review.id} className={styles.reviewCard}>
-                <div className="star-rating"> {/* Star rating class */}
-                  {/* Stars handled by CSS :before pseudo-element in globals.css */}
+                <div className={styles.reviewerRating}>
+                  {Array.from({ length: review.rating }).map((_, i) => (
+                    <FaStar key={i} />
+                  ))}
+                  {Array.from({ length: 5 - review.rating }).map((_, i) => (
+                    <FaStar key={i + review.rating} className={styles.emptyStar} />
+                  ))}
                 </div>
                 <p className={styles.reviewText}>"{review.text}"</p>
                 <p className={styles.reviewerName}>- {review.name}</p>
@@ -369,176 +460,71 @@ export default function Home() {
             ))}
           </div>
         </section>
+
       </main>
 
-      {/* Footer */}
-      <footer className={styles.footer}>
-        <p>&copy; {new Date().getFullYear()} Three Lemons. All rights reserved.</p>
+      {/* --- Footer Section --- */}
+      <div className={styles.footer}>
+        <p>Developed by Pradeep Mamuduru</p>
         <p>
-          <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
+          📸 <a href="https://www.instagram.com/3Lemons_Traders" target="_blank" rel="noopener noreferrer">3Lemons_Traders</a> | 🌐 <a href="https://3lemons.vercel.app">3lemons.vercel.app</a>
         </p>
-      </footer>
+        <p>&copy; {new Date().getFullYear()} 3 Lemons Traders. All rights reserved.</p>
+      </div>
 
-      {/* Modal Overlay */}
-      <div className={`${styles.modalOverlay} ${showModal ? styles.visible : ''}`} onClick={closeModal}>
-        <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-          <button onClick={closeModal} className="close-button">
-            &times; {/* Close icon */}
-          </button>
-          <h3 className={styles.modalTitle}>{modalContent.title}</h3>
-          <p className={styles.modalText}>{modalContent.text}</p>
-          {modalContent.list && (
-            <ul className={styles.modalText}>
-              {modalContent.list.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          )}
-          {modalContent.buttons && (
-            <div className={styles.modalButtons}>
-              {modalContent.buttons.map((button, index) => (
-                <button
-                  key={index}
-                  onClick={button.action}
-                  className={`${styles.modalButton} ${button.className || ''}`}
-                >
-                  {button.text}
-                </button>
-              ))}
+      {/* --- Order Confirmation Modal --- */}
+      {showConfirmModal && confirmedOrderDetails && (
+        <div className={`${styles.modalOverlay} ${showConfirmModal ? styles.visible : ''}`} onClick={cancelConfirmation}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.modalCloseButton} onClick={cancelConfirmation}>
+                <IoCloseCircleOutline />
+            </button>
+            <h2 className={styles.modalTitle}>Confirm Your Order</h2>
+            <div className={styles.modalText}>
+              <p>Please review your order details before proceeding:</p>
+              <p><strong>Name:</strong> {confirmedOrderDetails.personal.name}</p>
+              <p><strong>Contact:</strong> {confirmedOrderDetails.personal.contact}</p>
+              <p><strong>Delivery Address:</strong> {confirmedOrderDetails.personal.delivery}</p>
+              <p><strong>Order Items:</strong></p>
+              <ul className={styles.orderSummaryList}>
+                {confirmedOrderDetails.items.map((item, index) => (
+                  <li key={index}>
+                    {item.quantity} kg of {item.grade} (₹{item.itemTotalPrice})
+                    {item.discount === '10%' && <span className={styles.discountNote}> ({item.discount} discount applied)</span>}
+                  </li>
+                ))}
+              </ul>
+              <p className={styles.totalPayable}><strong>Total Payable: ₹{confirmedOrderDetails.total}</strong></p>
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* Account Sidebar Overlay */}
-      <div className={`${styles.accountSidebarOverlay} ${showSidebar ? styles.visible : ''}`} onClick={toggleSidebar}>
-        <div className={styles.accountSidebar} onClick={(e) => e.stopPropagation()}>
-          <div className={styles.sidebarHeader}>
-            <h2 className={styles.sidebarTitle}>My Account</h2>
-            <button onClick={toggleSidebar} className="close-button" style={{color: 'white'}}>
-              &times; {/* Close icon */}
-            </button>
-          </div>
-          <div className={styles.sidebarTabs}>
-            <button
-              className={`${styles.tabButton} ${activeSidebarTab === 'account' ? styles.active : ''}`}
-              onClick={() => handleSidebarTabClick('account')}
-            >
-              <span className="user-icon">👤</span> Account Details
-            </button>
-            <button
-              className={`${styles.tabButton} ${activeSidebarTab === 'addresses' ? styles.active : ''}`}
-              onClick={() => handleSidebarTabClick('addresses')}
-            >
-              <span className="map-icon">📍</span> My Addresses
-            </button>
-          </div>
-          <div className={styles.tabContent}>
-            {activeSidebarTab === 'account' && (
-              <div>
-                <h3>Personal Information</h3>
-                <form onSubmit={handleSaveAccountDetails} className={styles.accountDetailsForm}>
-                  <div className={styles.formGroup}>
-                    <label htmlFor="account-name" className={styles.label}>Name</label>
-                    <input
-                      type="text"
-                      id="account-name"
-                      name="name"
-                      className={styles.input}
-                      value={accountDetails.name}
-                      onChange={handleAccountDetailChange}
-                      required
-                    />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label htmlFor="account-email" className={styles.label}>Email</label>
-                    <input
-                      type="email"
-                      id="account-email"
-                      name="email"
-                      className={styles.input}
-                      value={accountDetails.email}
-                      onChange={handleAccountDetailChange}
-                      required
-                    />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label htmlFor="account-phone" className={styles.label}>Phone</label>
-                    <input
-                      type="tel"
-                      id="account-phone"
-                      name="phone"
-                      className={styles.input}
-                      value={accountDetails.phone}
-                      onChange={handleAccountDetailChange}
-                      required
-                    />
-                  </div>
-                  <button type="submit" className={`${styles.button} ${styles.saveButton}`} disabled={isSavingAccount}>
-                    {isSavingAccount ? <span className="spinner"></span> : 'Save Changes'}
-                  </button>
-                </form>
-              </div>
-            )}
-
-            {activeSidebarTab === 'addresses' && (
-              <div>
-                <h3>Your Delivery Addresses</h3>
-                <div className={styles.addressList}>
-                  {userAddresses.length === 0 ? (
-                    <p>No addresses added yet.</p>
-                  ) : (
-                    <ul>
-                      {userAddresses.map(address => (
-                        <li key={address.id} className={styles.addressItem}>
-                          <strong>Address {address.id}:</strong>
-                          <p>{address.street}</p>
-                          <p>{address.city}, {address.state} {address.zip}</p>
-                          <div className={styles.addressActions}>
-                            <button onClick={() => handleDeleteAddress(address.id)}>Delete</button>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-
-                {isAddingAddress ? (
-                  <form onSubmit={handleAddAddress} className={styles.addressForm}>
-                    <h4>Add New Address</h4>
-                    <div className={styles.formGroup}>
-                      <label htmlFor="new-street" className={styles.label}>Street</label>
-                      <input type="text" id="new-street" name="street" className={styles.input} value={newAddress.street} onChange={handleNewAddressChange} required />
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label htmlFor="new-city" className={styles.label}>City</label>
-                      <input type="text" id="new-city" name="city" className={styles.input} value={newAddress.city} onChange={handleNewAddressChange} required />
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label htmlFor="new-state" className={styles.label}>State</label>
-                      <input type="text" id="new-state" name="state" className={styles.input} value={newAddress.state} onChange={handleNewAddressChange} required />
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label htmlFor="new-zip" className={styles.label}>Zip Code</label>
-                      <input type="text" id="new-zip" name="zip" className={styles.input} value={newAddress.zip} onChange={handleNewAddressChange} required />
-                    </div>
-                    <div className={styles.formButtons}>
-                      <button type="submit" className={styles.button} disabled={isSavingAddress}>
-                        {isSavingAddress ? <span className="spinner"></span> : 'Save Address'}
-                      </button>
-                      <button type="button" onClick={() => setIsAddingAddress(false)} className={`${styles.button} ${styles.modalButton.cancel}`}>Cancel</button>
-                    </div>
-                  </form>
-                ) : (
-                  <button onClick={() => setIsAddingAddress(true)} className={`${styles.button} ${styles.addAddressButton}`}>
-                    <span className="plus-icon">+</span> Add New Address
-                  </button>
-                )}
-              </div>
-            )}
+            <div className={styles.modalButtons}>
+              <button className={styles.modalButton} onClick={confirmAndSubmitOrder} disabled={isSubmitting}>
+                {isSubmitting ? 'Submitting...' : 'Proceed'}
+              </button>
+              <button className={`${styles.modalButton} ${styles.modalButtonCancel}`} onClick={cancelConfirmation}>
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* --- Order Submitted Successfully Modal/Page --- */}
+      {showSuccessModal && (
+        <div className={`${styles.modalOverlay} ${showSuccessModal ? styles.visible : ''}`} onClick={closeSuccessModal}>
+            <div className={`${styles.modalContent} ${styles.successPage}`} onClick={(e) => e.stopPropagation()}>
+                <button className={styles.modalCloseButton} onClick={closeSuccessModal}>
+                    <IoCloseCircleOutline />
+                </button>
+                <h2 className={styles.successTitle}>Order Submitted Successfully!</h2>
+                <p className={styles.successMessageText}>
+                    Thank you for your order. We have received your details and will contact you shortly to confirm.
+                </p>
+                <button className={styles.modalButton} onClick={closeSuccessModal}>
+                    Close
+                </button>
+            </div>
+        </div>
+      )}
     </div>
   );
 }
