@@ -1,282 +1,282 @@
 /* General Body and Page Styles */
 .page {
-    background-color: #f8f8f8; /* Light background for the entire page */
-    color: #333; /* Default text color */
-    line-height: 1.6; /* Improved readability */
-    font-family: 'Inter', sans-serif; /* Modern, clean font */
-    padding: 0;
-    margin: 0;
-    overflow-x: hidden; /* Prevents horizontal scroll from responsive elements */
-    display: flex; /* Use flexbox for overall page layout */
-    flex-direction: column; /* Stack content vertically */
-    min-height: 100vh; /* Ensures footer sticks to bottom on short content pages */
-    position: relative; /* Needed for sidebar positioning */
+  background-color: #f8f8f8; /* Light background for the entire page */
+  color: #333; /* Default text color */
+  line-height: 1.6; /* Improved readability */
+  font-family: 'Inter', sans-serif; /* Modern, clean font */
+  padding: 0;
+  margin: 0;
+  overflow-x: hidden; /* Prevents horizontal scroll from responsive elements */
+  display: flex; /* Use flexbox for overall page layout */
+  flex-direction: column; /* Stack content vertically */
+  min-height: 100vh; /* Ensures footer sticks to bottom on short content pages */
+  position: relative; /* Needed for sidebar positioning */
 }
 
 /* Container for main content, centered with max-width */
 .container {
-    max-width: 1200px; /* Wider max-width for modern desktop screens */
-    margin: 0 auto; /* Centers the container horizontally */
-    padding: 20px; /* Internal padding for content */
-    box-sizing: border-box; /* Ensures padding is included in the element's total width/height */
-    flex-grow: 1; /* Allows main content to grow and push footer down */
+  max-width: 1200px; /* Wider max-width for modern desktop screens */
+  margin: 0 auto; /* Centers the container horizontally */
+  padding: 20px; /* Internal padding for content */
+  box-sizing: border-box; /* Ensures padding is included in the element's total width/height */
+  flex-grow: 1; /* Allows main content to grow and push footer down */
 }
 
 /* Section Titles - consistent styling for h2 tags */
 .sectionTitle {
-    text-align: center;
-    color: #00796b; /* Dominant teal color */
-    font-size: 2.5rem; /* Large and prominent */
-    margin-bottom: 40px; /* Space below title */
-    margin-top: 60px; /* Space above title */
-    font-weight: 700; /* Bold font */
+  text-align: center;
+  color: #00796b; /* Dominant teal color */
+  font-size: 2.5rem; /* Large and prominent */
+  margin-bottom: 40px; /* Space below title */
+  margin-top: 60px; /* Space above title */
+  font-weight: 700; /* Bold font */
 }
 
 /* Hero Section Styles */
 .hero {
-    position: relative;
-    width: 100%;
-    height: 400px; /* Fixed height for the hero section */
-    overflow: hidden; /* Hides parts of the image that go beyond bounds */
-    border-radius: 12px; /* Soft rounded corners */
-    display: flex;
-    align-items: center; /* Vertically center content */
-    justify-content: center; /* Horizontally center content */
-    text-align: center;
-    margin-bottom: 40px; /* Space below hero */
+  position: relative;
+  width: 100%;
+  height: 400px; /* Fixed height for the hero section */
+  overflow: hidden; /* Hides parts of the image that go beyond bounds */
+  border-radius: 12px; /* Soft rounded corners */
+  display: flex;
+  align-items: center; /* Vertically center content */
+  justify-content: center; /* Horizontally center content */
+  text-align: center;
+  margin-bottom: 40px; /* Space below hero */
 }
 
 .heroImage {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Ensures the image covers the entire area without distortion */
-    filter: brightness(0.7); /* Darkens the image slightly for better text readability */
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1; /* Places image behind text */
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the image covers the entire area without distortion */
+  filter: brightness(0.7); /* Darkens the image slightly for better text readability */
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1; /* Places image behind text */
 }
 
 .heroOverlay {
-    position: relative;
-    z-index: 2; /* Ensures text is above the image */
-    color: white;
-    padding: 20px;
-    max-width: 800px; /* Limits width of text for readability */
+  position: relative;
+  z-index: 2; /* Ensures text is above the image */
+  color: white;
+  padding: 20px;
+  max-width: 800px; /* Limits width of text for readability */
 }
 
 .heroTitle {
-    font-size: 3.5rem; /* Very large title for impact */
-    margin-bottom: 15px;
-    font-weight: 800; /* Extra bold */
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Adds depth to text */
+  font-size: 3.5rem; /* Very large title for impact */
+  margin-bottom: 15px;
+  font-weight: 800; /* Extra bold */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Adds depth to text */
 }
 
 .heroSubtitle {
-    font-size: 1.5rem;
-    margin-bottom: 30px;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+  font-size: 1.5rem;
+  margin-bottom: 30px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 .heroButton {
-    background-color: #ffc107; /* Bright yellow for a noticeable call-to-action */
-    color: #333;
-    padding: 12px 30px;
-    border-radius: 50px; /* Creates a pill shape */
-    text-decoration: none; /* Removes underline */
-    font-weight: bold;
-    font-size: 1.1rem;
-    transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth hover effects */
-    display: inline-block; /* Allows padding and transformation */
+  background-color: #ffc107; /* Bright yellow for a noticeable call-to-action */
+  color: #333;
+  padding: 12px 30px;
+  border-radius: 50px; /* Creates a pill shape */
+  text-decoration: none; /* Removes underline */
+  font-weight: bold;
+  font-size: 1.1rem;
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth hover effects */
+  display: inline-block; /* Allows padding and transformation */
 }
 
 .heroButton:hover {
-    background-color: #ffb300;
-    transform: translateY(-2px); /* Slight lift on hover */
+  background-color: #ffb300;
+  transform: translateY(-2px); /* Slight lift on hover */
 }
 
 /* Lemon Products Section */
 .lemonsSection {
-    padding: 40px 0; /* Vertical padding */
+  padding: 40px 0; /* Vertical padding */
 }
 
 .lemonsGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid columns */
-    gap: 30px; /* Space between grid items (cards) */
-    padding: 0 20px; /* Horizontal padding for mobile view */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid columns */
+  gap: 30px; /* Space between grid items (cards) */
+  padding: 0 20px; /* Horizontal padding for mobile view */
 }
 
 .lemonCard {
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
-    overflow: hidden; /* Ensures image corners match card corners */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effects */
-    display: flex;
-    flex-direction: column; /* Stacks content vertically */
-    align-items: center; /* Centers content horizontally within the card */
-    text-align: center;
-    padding-bottom: 20px; /* Space below content in card */
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+  overflow: hidden; /* Ensures image corners match card corners */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effects */
+  display: flex;
+  flex-direction: column; /* Stacks content vertically */
+  align-items: center; /* Centers content horizontally within the card */
+  text-align: center;
+  padding-bottom: 20px; /* Space below content in card */
 }
 
 .lemonCard:hover {
-    transform: translateY(-5px); /* Lifts card on hover */
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Enhances shadow on hover */
+  transform: translateY(-5px); /* Lifts card on hover */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Enhances shadow on hover */
 }
 
 .cardImage {
-    width: 100%;
-    height: 200px; /* Fixed height for consistent image sizes */
-    object-fit: cover;
-    border-bottom: 1px solid #eee; /* Separator below image */
-    margin-bottom: 15px;
+  width: 100%;
+  height: 200px; /* Fixed height for consistent image sizes */
+  object-fit: cover;
+  border-bottom: 1px solid #eee; /* Separator below image */
+  margin-bottom: 15px;
 }
 
 .cardTitle {
-    font-size: 1.4rem;
-    font-weight: bold;
-    color: #00796b;
-    margin-bottom: 10px;
-    padding: 0 15px;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #00796b;
+  margin-bottom: 10px;
+  padding: 0 15px;
 }
 
 .cardDescription {
-    font-size: 0.95rem;
-    color: #555;
-    padding: 0 15px;
+  font-size: 0.95rem;
+  color: #555;
+  padding: 0 15px;
 }
 
 /* Form Section */
 .formSection {
-    background-color: #e0f7fa; /* Light teal background for the form area */
-    padding: 50px 20px;
-    border-radius: 12px;
-    margin-top: 60px;
+  background-color: #e0f7fa; /* Light teal background for the form area */
+  padding: 50px 20px;
+  border-radius: 12px;
+  margin-top: 60px;
 }
 
 .form {
-    max-width: 700px; /* Wider form for better multi-column layout */
-    margin: 0 auto; /* Center the form within its section */
+  max-width: 700px; /* Wider form for better multi-column layout */
+  margin: 0 auto; /* Center the form within its section */
 }
 
 /* Grid for grouping personal details inputs */
 .inputGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Two columns on larger screens */
-    gap: 20px; /* Space between inputs */
-    margin-bottom: 30px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Two columns on larger screens */
+  gap: 20px; /* Space between inputs */
+  margin-bottom: 30px;
 }
 
 .formGroup {
-    margin-bottom: 20px; /* Space between each form field group */
+  margin-bottom: 20px; /* Space between each form field group */
 }
 
 .label {
-    display: block; /* Ensures label is on its own line */
-    font-weight: bold;
-    margin-bottom: 8px;
-    color: #004d40; /* Darker teal for labels */
-    font-size: 1.1rem;
+  display: block; /* Ensures label is on its own line */
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #004d40; /* Darker teal for labels */
+  font-size: 1.1rem;
 }
 
 .input,
 .select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #b2dfdb; /* Lighter teal border */
-    border-radius: 8px;
-    font-size: 1rem;
-    box-sizing: border-box; /* Important for consistent width calculation */
-    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth focus effects */
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #b2dfdb; /* Lighter teal border */
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box; /* Important for consistent width calculation */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth focus effects */
 }
 
 .input:focus,
 .select:focus {
-    border-color: #00796b; /* Accent color on focus */
-    box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.2); /* Soft glow on focus */
-    outline: none; /* Removes default outline */
+  border-color: #00796b; /* Accent color on focus */
+  box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.2); /* Soft glow on focus */
+  outline: none; /* Removes default outline */
 }
 
 /* Discount Note specific styling */
 .discountNote {
-    color: #d32f2f; /* Red to draw attention */
-    font-weight: bold;
-    margin-left: 10px;
-    font-size: 0.9em; /* Slightly smaller text */
+  color: #d32f2f; /* Red to draw attention */
+  font-weight: bold;
+  margin-left: 10px;
+  font-size: 0.9em; /* Slightly smaller text */
 }
 
 /* Order Summary (Total Price) */
 .orderSummary {
-    margin: 30px 0;
-    font-weight: bold;
-    font-size: 24px;
-    text-align: right; /* Aligns total to the right */
-    color: #004d40;
+  margin: 30px 0;
+  font-weight: bold;
+  font-size: 24px;
+  text-align: right; /* Aligns total to the right */
+  color: #004d40;
 }
 
 .orderSummary h3 {
-    margin: 0;
+  margin: 0;
 }
 
 /* Common Button Styles */
 .button {
-    display: block; /* Full width on small screens */
-    width: 100%;
-    background-color: #00796b; /* Primary button color */
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-bottom: 15px; /* Space between buttons */
-    font-size: 1.1rem;
-    font-weight: bold;
-    text-decoration: none; /* For anchor buttons */
-    text-align: center;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+  display: block; /* Full width on small screens */
+  width: 100%;
+  background-color: #00796b; /* Primary button color */
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 15px; /* Space between buttons */
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-decoration: none; /* For anchor buttons */
+  text-align: center;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .button:hover {
-    background-color: #005c50;
-    transform: translateY(-2px); /* Slight lift on hover */
+  background-color: #005c50;
+  transform: translateY(-2px); /* Slight lift on hover */
 }
 
 .button:disabled {
-    background-color: #cccccc; /* Greyed out when disabled */
-    cursor: not-allowed;
-    opacity: 0.8; /* Slight fade */
+  background-color: #cccccc; /* Greyed out when disabled */
+  cursor: not-allowed;
+  opacity: 0.8; /* Slight fade */
 }
 
 /* Specific WhatsApp Button Styling */
 .whatsappButton {
-    background-color: #25d366; /* Official WhatsApp green */
-    display: flex; /* Enable flex for icon alignment */
-    align-items: center;
-    justify-content: center;
+  background-color: #25d366; /* Official WhatsApp green */
+  display: flex; /* Enable flex for icon alignment */
+  align-items: center;
+  justify-content: center;
 }
 
 .whatsappButton:hover {
-    background-color: #128c7e; /* Darker WhatsApp green on hover */
+  background-color: #128c7e; /* Darker WhatsApp green on hover */
 }
 
 .whatsappIcon {
-    margin-right: 8px; /* Space between icon and text */
-    font-size: 1.2em; /* Slightly larger icon */
-    vertical-align: middle; /* Aligns icon with text baseline */
+  margin-right: 8px; /* Space between icon and text */
+  font-size: 1.2em; /* Slightly larger icon */
+  vertical-align: middle; /* Aligns icon with text baseline */
 }
 
 /* Status Message (Success/Error) - Now includes styles for general feedback */
 .statusMessage {
-    text-align: center;
-    margin-top: 20px;
-    padding: 10px;
-    border-radius: 8px;
-    font-weight: bold;
-    /* Colors are set inline in JS based on success/error */
+  text-align: center;
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  /* Colors are set inline in JS based on success/error */
 }
 
-/* NEW: Feedback Message Specific Styles */
+/* NEW: Feedback Message Specific Styles (for toast-like messages) */
 .feedbackMessage {
     padding: 10px 15px;
     border-radius: 8px;
@@ -307,124 +307,124 @@
 
 /* Customer Reviews Section */
 .reviewsSection {
-    background-color: #f0f4f7; /* Light gray background */
-    padding: 60px 20px;
-    margin-top: 60px;
-    border-radius: 12px;
+  background-color: #f0f4f7; /* Light gray background */
+  padding: 60px 20px;
+  margin-top: 60px;
+  border-radius: 12px;
 }
 
 .reviewsGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid for reviews */
-    gap: 30px;
-    padding: 0 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid for reviews */
+  gap: 30px;
+  padding: 0 20px;
 }
 
 .reviewCard {
-    background-color: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; /* Pushes content to top/bottom edges */
-    text-align: center;
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Pushes content to top/bottom edges */
+  text-align: center;
 }
 
 .reviewText {
-    font-style: italic;
-    margin-bottom: 20px;
-    color: #555;
-    font-size: 1.05rem;
+  font-style: italic;
+  margin-bottom: 20px;
+  color: #555;
+  font-size: 1.05rem;
 }
 
 .reviewerName {
-    font-weight: bold;
-    color: #00796b;
-    font-size: 1.1rem;
-    margin-top: 10px;
+  font-weight: bold;
+  color: #00796b;
+  font-size: 1.1rem;
+  margin-top: 10px;
 }
 
 .reviewerRating {
-    color: #ffc107; /* Gold stars */
-    font-size: 1.2rem;
-    margin-bottom: 10px;
+  color: #ffc107; /* Gold stars */
+  font-size: 1.2rem;
+  margin-bottom: 10px;
 }
 
 /* Footer Styles */
 .footer {
-    text-align: center;
-    margin-top: 50px;
-    padding: 30px 20px;
-    font-size: 0.9rem;
-    color: #777;
-    background-color: #e0f7fa; /* Matches form section */
-    border-top: 1px solid #b2dfdb;
+  text-align: center;
+  margin-top: 50px;
+  padding: 30px 20px;
+  font-size: 0.9rem;
+  color: #777;
+  background-color: #e0f7fa; /* Matches form section */
+  border-top: 1px solid #b2dfdb;
 }
 
 .footer a {
-    color: #00796b;
-    text-decoration: none;
-    font-weight: bold;
+  color: #00796b;
+  text-decoration: none;
+  font-weight: bold;
 }
 
 .footer a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
-/* MODAL STYLES */
+/* MODAL STYLES (for order confirmation/success, signup prompt/form) */
 .modalOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7); /* Dark semi-transparent background */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000; /* Ensure it's on top of everything */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7); /* Dark semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it's on top of everything */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .modalOverlay.visible {
-    opacity: 1;
-    visibility: visible;
+  opacity: 1;
+  visibility: visible;
 }
 
 .modalContent {
-    background-color: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
-    max-width: 500px; /* Max width for modals */
-    width: 90%; /* Responsive width */
-    text-align: center;
-    position: relative; /* For close button positioning */
-    transform: translateY(20px); /* Initial subtle animation */
-    opacity: 0;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  max-width: 500px; /* Max width for modals */
+  width: 90%; /* Responsive width */
+  text-align: center;
+  position: relative; /* For close button positioning */
+  transform: translateY(20px); /* Initial subtle animation */
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .modalOverlay.visible .modalContent {
-    transform: translateY(0);
-    opacity: 1;
+  transform: translateY(0);
+  opacity: 1;
 }
 
 .modalTitle {
-    color: #00796b; /* Green theme */
-    font-size: 2rem;
-    margin-bottom: 20px;
+  color: #00796b; /* Green theme */
+  font-size: 2rem;
+  margin-bottom: 20px;
 }
 
 .modalText {
-    font-size: 1.1rem;
-    line-height: 1.8;
-    color: #555;
-    margin-bottom: 25px;
-    text-align: left; /* Align text left for readability in summary */
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #555;
+  margin-bottom: 25px;
+  text-align: left; /* Align text left for readability in summary */
 }
 
 .modalText strong {
@@ -442,36 +442,36 @@
 }
 
 .modalButtons {
-    display: flex;
-    justify-content: center; /* Center buttons */
-    gap: 15px; /* Space between buttons */
-    margin-top: 30px;
+  display: flex;
+  justify-content: center; /* Center buttons */
+  gap: 15px; /* Space between buttons */
+  margin-top: 30px;
 }
 
 .modalButton {
-    background-color: #00796b; /* Green theme */
-    color: white;
-    padding: 12px 25px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+  background-color: #00796b; /* Green theme */
+  color: white;
+  padding: 12px 25px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .modalButton:hover {
-    background-color: #005c50;
-    transform: translateY(-1px);
+  background-color: #005c50;
+  transform: translateY(-1px);
 }
 
 .modalButton.cancel {
-    background-color: #ccc; /* Grey for cancel */
-    color: #333;
+  background-color: #ccc; /* Grey for cancel */
+  color: #333;
 }
 
 .modalButton.cancel:hover {
-    background-color: #b3b3b3;
+  background-color: #b3b3b3;
 }
 
 .modalCloseButton {
@@ -519,7 +519,7 @@
     margin-bottom: 30px;
 }
 
-/* --- NEW: Header and Account Sidebar Styles --- */
+/* --- Header and Account Sidebar Styles --- */
 .header {
     width: 100%;
     padding: 15px 20px;
@@ -541,120 +541,216 @@
     color: white; /* Ensure title is white */
 }
 
-.accountIcon {
+.hamburgerIcon { /* Changed from .accountIcon */
     font-size: 2rem;
     cursor: pointer;
+    color: white; /* Hamburger icon should be white in header */
     transition: color 0.3s ease, transform 0.3s ease;
 }
 
-.accountIcon:hover {
+.hamburgerIcon:hover {
     color: #ffc107; /* Yellow on hover */
     transform: scale(1.1);
 }
 
-.accountSidebar {
+/* Account Sidebar Overlay - covers the whole screen when sidebar is open */
+.accountSidebarOverlay {
     position: fixed;
     top: 0;
-    right: -320px; /* Hidden by default */
-    width: 300px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: flex-end; /* Push sidebar to the right */
+    z-index: 1100; /* Above all other content and modals */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.accountSidebarOverlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Account Sidebar - the actual sliding panel */
+.accountSidebar {
+    background-color: #e0f7fa; /* Light green theme */
+    width: 300px; /* Fixed width for sidebar */
+    max-width: 90%; /* Responsive max-width */
     height: 100%;
-    background-color: white;
     box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
-    transition: right 0.3s ease-in-out;
-    z-index: 100; /* Above modal overlay */
-    padding: 20px;
-    box-sizing: border-box;
+    transform: translateX(100%); /* Start off-screen */
+    transition: transform 0.3s ease-in-out;
     display: flex;
     flex-direction: column;
 }
 
-.accountSidebar.open {
-    right: 0; /* Slide in */
+.accountSidebarOverlay.visible .accountSidebar {
+    transform: translateX(0); /* Slide in */
 }
 
 .sidebarHeader {
+    padding: 20px;
+    background-color: #00796b; /* Darker green header */
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #eee;
 }
 
 .sidebarTitle {
     font-size: 1.8rem;
-    color: #00796b;
+    color: white; /* Title inside sidebar header should be white */
     margin: 0;
 }
 
 .sidebarCloseButton {
     background: none;
     border: none;
+    color: white; /* Close button inside sidebar header should be white */
     font-size: 2rem;
     cursor: pointer;
-    color: #555;
-    transition: color 0.2s ease;
+    transition: transform 0.2s ease;
 }
 
 .sidebarCloseButton:hover {
-    color: #d32f2f; /* Red for close */
+    transform: rotate(90deg);
+    color: #ffc107; /* Yellow on hover */
 }
 
-.sidebarForm {
-    flex-grow: 1; /* Allows form to take available space */
+.sidebarTabs {
+    display: flex;
+    border-bottom: 1px solid #b2dfdb;
 }
 
-.sidebarFormGroup {
-    margin-bottom: 20px;
-}
-
-.sidebarLabel {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 8px;
-    color: #004d40;
-    font-size: 1rem;
-}
-
-.sidebarInput {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #b2dfdb;
-    border-radius: 6px;
-    font-size: 0.95rem;
-    box-sizing: border-box;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.sidebarInput:focus {
-    border-color: #00796b;
-    box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.2);
-    outline: none;
-}
-
-.sidebarButton {
-    width: 100%;
-    padding: 12px;
-    background-color: #00796b;
-    color: white;
+.tabButton {
+    flex: 1;
+    padding: 15px 10px;
+    background-color: #e0f7fa;
     border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1.05rem;
+    border-bottom: 3px solid transparent;
+    font-size: 1rem;
     font-weight: bold;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    color: #004d40;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.tabButton:hover {
+    background-color: #c8e6c9; /* Lighter green on hover */
+}
+
+.tabButton.active {
+    background-color: white;
+    border-bottom-color: #00796b; /* Active tab indicator */
+    color: #00796b;
+}
+
+.tabContent {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: white;
+    overflow-y: auto; /* Enable scrolling for content */
+}
+
+.tabContent h3 {
+    color: #00796b;
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+    text-align: center;
+}
+
+/* Account Details Form */
+.accountDetailsForm .formGroup {
+    margin-bottom: 15px;
+}
+.accountDetailsForm .label {
+    font-size: 1rem;
+    color: #004d40;
+}
+.accountDetailsForm .input {
+    padding: 10px;
+    font-size: 0.95rem;
+}
+.accountDetailsForm .saveButton {
+    background-color: #4CAF50; /* Green for save */
+    margin-top: 20px;
+}
+.accountDetailsForm .saveButton:hover {
+    background-color: #45a049;
+}
+.accountDetailsForm .message {
+    text-align: center;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+/* Addresses Tab */
+.addressList ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.addressItem {
+    background-color: #f8f8f8;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    text-align: left;
+    position: relative;
+}
+.addressItem strong {
+    color: #004d40;
+    font-size: 1.1rem;
+}
+.addressItem p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #555;
+}
+.addressActions {
+    display: flex;
+    gap: 10px;
     margin-top: 10px;
 }
-
-.sidebarButton:hover {
-    background-color: #005c50;
-    transform: translateY(-1px);
+.addressActions button {
+    background-color: #f44336; /* Red for delete */
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background-color 0.2s ease;
+}
+.addressActions button:hover {
+    background-color: #da190b;
 }
 
-.sidebarButton:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-    opacity: 0.8;
+.addAddressButton {
+    background-color: #00796b;
+    margin-top: 20px;
+}
+.addAddressButton:hover {
+    background-color: #005c50;
+}
+
+.addressForm .formGroup {
+    margin-bottom: 15px;
+}
+.addressForm .formButtons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
 }
 
 /* Responsive Adjustments using Media Queries */
@@ -708,4 +804,1360 @@
     .heroTitle {
         font-size: 5.5rem;
     }
+}
+```javascript
+import { useState, useEffect, Fragment } from 'react';
+import Head from 'next/head';
+import Image from 'next/image';
+import { FaWhatsapp, FaStar } from 'react-icons/fa';
+import { IoCloseCircleOutline, IoMenu } from 'react-icons/io5'; // IoMenu for hamburger, IoCloseCircleOutline for close buttons
+
+import styles from '../styles/styles.module.css';
+
+// --- getStaticProps: Fetches Lemon Product Data ---
+export async function getStaticProps() {
+    try {
+        const res = await fetch("[https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Lemons](https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Lemons)"); // *** IMPORTANT: Verify your SheetDB sheet name for lemons here ***
+        if (!res.ok) {
+            throw new Error(`Failed to fetch lemons: ${res.status} ${res.statusText}`);
+        }
+        const lemons = await res.json();
+
+        if (!Array.isArray(lemons)) {
+            console.error("Fetched lemons data is not an array:", lemons);
+            return { props: { lemons: [] }, revalidate: 3600 };
+        }
+
+        return {
+            props: { lemons },
+            revalidate: 3600,
+        };
+    } catch (error) {
+        console.error("Error in getStaticProps:", error);
+        return { props: { lemons: [] }, revalidate: 3600 };
+    }
+}
+
+// --- Home Component ---
+export default function Home({ lemons }) {
+    // Order form states
+    const [orders, setOrders] = useState([{ grade: '', quantity: '' }]);
+    const [form, setForm] = useState({ name: '', delivery: '', contact: '' });
+    const [total, setTotal] = useState(0);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Consolidated Feedback State (for all messages: order, signup, login, logout, account)
+    const [feedback, setFeedback] = useState({ message: '', type: '' }); // type: 'success', 'error', 'info'
+
+    // Modal states for order confirmation/success
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [confirmedOrderDetails, setConfirmedOrderDetails] = useState(null);
+
+    // User authentication/account states
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [loggedInUser, setLoggedInUser] = useState(null); // Stores { name, phone, address, pincode }
+    const [showSignUpPromptModal, setShowSignUpPromptModal] = useState(false); // "Please sign up to order" modal
+    const [showSignUpModal, setShowSignUpModal] = useState(false); // Actual signup form modal
+    const [signUpForm, setSignUpForm] = useState({ name: '', phone: '', address: '', pincode: '' });
+    const [isSigningUp, setIsSigningUp] = useState(false);
+
+    // Account Sidebar states
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [activeAccountTab, setActiveAccountTab] = useState('accountDetails'); // 'accountDetails', 'addresses', 'feedback'
+    const [userAddresses, setUserAddresses] = useState([]); // Stores addresses fetched from SheetDB
+    const [accountDetailsForm, setAccountDetailsForm] = useState({ name: '', phone: '', address: '', pincode: '' }); // For editing in sidebar
+    const [isUpdatingAccount, setIsUpdatingAccount] = useState(false); // Loading state for account updates
+    const [addressForm, setAddressForm] = useState({ id: null, addressName: '', fullAddress: '', pincode: '' }); // For adding/editing addresses
+    const [showAddressForm, setShowAddressForm] = useState(false); // To show/hide add/edit address form
+    const [isManagingAddresses, setIsManagingAddresses] = useState(false); // Loading state for address actions
+
+    // SheetDB URLs
+    const ORDERS_SUBMISSION_URL = '[https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=orders](https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=orders)';
+    const SIGNUP_SHEET_URL = '[https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=signup](https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=signup)'; // *** IMPORTANT: This is assumed to be your 'Users' sheet ***
+    const ADDRESSES_SHEET_URL = '[https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Addresses](https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Addresses)'; // *** IMPORTANT: Verify your SheetDB sheet name for addresses here ***
+
+    // Hardcoded customer reviews
+    const customerReviews = [
+        { id: 1, text: "The lemons from 3 Lemons Traders are incredibly fresh and juicy! Perfect for my restaurant.", name: "Chef Rahul S.", rating: 5, },
+        { id: 2, text: "Excellent quality and timely delivery. Their A1 grade lemons are truly the best.", name: "Priya M.", rating: 5, },
+        { id: 3, text: "Great prices for bulk orders. The team is very responsive and helpful.", name: "Kiran R.", rating: 4, },
+        { id: 4, text: "Consistently good quality. My go-to for all lemon needs.", name: "Amit P.", rating: 5, },
+        { id: 5, text: "Freshness guaranteed every time. Highly recommend!", name: "Sunita D.", rating: 5, },
+    ];
+
+    // --- Utility for showing temporary messages ---
+    const showTemporaryFeedback = (message, type = 'info', duration = 5000) => {
+        setFeedback({ message, type });
+        setTimeout(() => setFeedback({ message: '', type: '' }), duration);
+    };
+
+    // --- Effects for loading/saving user data and calculating total ---
+    useEffect(() => {
+        calculateTotal();
+    }, [orders, lemons]);
+
+    // Load account details from local storage on component mount
+    useEffect(() => {
+        try {
+            const storedUser = localStorage.getItem('loggedInUser');
+            if (storedUser) {
+                const user = JSON.parse(storedUser);
+                setLoggedInUser(user);
+                setIsLoggedIn(true);
+                setAccountDetailsForm(user); // Initialize sidebar form with logged in user
+                // Auto-populate form with saved details if available
+                setForm(prevForm => ({
+                    ...prevForm,
+                    name: user.name || prevForm.name,
+                    contact: user.phone || prevForm.contact,
+                    delivery: user.address || prevForm.delivery,
+                }));
+                showTemporaryFeedback(`Welcome back, ${user.name}! 😊`, 'success');
+            }
+        } catch (error) {
+            console.error("Failed to parse loggedInUser from localStorage:", error);
+            localStorage.removeItem('loggedInUser'); // Clear corrupted data
+            setIsLoggedIn(false);
+            setLoggedInUser(null);
+        }
+    }, []);
+
+    // Effect to fetch addresses when user logs in or addresses change
+    useEffect(() => {
+        if (isLoggedIn && loggedInUser?.phone) {
+            fetchUserAddresses(loggedInUser.phone);
+        } else {
+            setUserAddresses([]); // Clear addresses if logged out
+        }
+    }, [isLoggedIn, loggedInUser?.phone]); // Depend on login status and user phone
+
+    // --- Handlers for form and order changes ---
+    const handleOrderChange = (index, field, value) => {
+        const updated = [...orders];
+        if (field === 'quantity') {
+            value = value === '' ? '' : String(Math.max(1, parseInt(value) || 1));
+        }
+        updated[index][field] = value;
+        setOrders(updated);
+    };
+
+    const handleAddVariety = () => {
+        setOrders([...orders, { grade: '', quantity: '' }]);
+    };
+
+    const calculateTotal = () => {
+        let totalPrice = 0;
+        orders.forEach(order => {
+            const lemon = lemons.find(l => l.Grade === order.grade);
+            if (lemon) {
+                const pricePerKg = parseFloat(lemon['Price Per Kg']);
+                const quantity = parseInt(order.quantity);
+
+                if (!isNaN(pricePerKg) && !isNaN(quantity) && quantity > 0) {
+                    let itemPrice = pricePerKg * quantity;
+                    if (quantity > 50) {
+                        itemPrice *= 0.90;
+                    }
+                    totalPrice += itemPrice;
+                }
+            }
+        });
+        setTotal(totalPrice);
+    };
+
+    // --- Main Order Submission Flow (now checks login status) ---
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setFeedback({ message: '', type: '' }); // Clear any previous messages
+
+        // --- Client-Side Form Validation ---
+        if (!form.name.trim() || !form.delivery.trim() || !form.contact.trim()) {
+            showTemporaryFeedback('Please fill in all your personal details (Name, Delivery Address, Contact).', 'error');
+            return;
+        }
+        if (!/^\d{10}$/.test(form.contact)) {
+            showTemporaryFeedback('Please enter a valid 10-digit contact number.', 'error');
+            return;
+        }
+
+        const validOrders = orders.filter(order => order.grade && order.quantity && parseInt(order.quantity) > 0);
+        if (validOrders.length === 0) {
+            showTemporaryFeedback('Please add at least one lemon variety with a valid quantity (must be 1 or more).', 'error');
+            return;
+        }
+        const hasInvalidQuantity = orders.some(order => {
+            return (order.grade && (order.quantity === '' || isNaN(parseInt(order.quantity)) || parseInt(order.quantity) <= 0));
+        });
+        if (hasInvalidQuantity) {
+            showTemporaryFeedback('Please ensure all selected varieties have a valid quantity (1 or more).', 'error');
+            return;
+        }
+        // --- End Validation ---
+
+        // --- Authentication Check ---
+        if (!isLoggedIn) {
+            setIsSubmitting(true); // Show loading state while checking user
+            try {
+                const checkRes = await fetch(`${SIGNUP_SHEET_URL}?searchField=phone&searchValue=${form.contact}`);
+                if (!checkRes.ok) {
+                    throw new Error(`Failed to check existing users: ${checkRes.status} ${checkRes.statusText}`);
+                }
+                const existingUsers = await checkRes.json();
+
+                if (Array.isArray(existingUsers) && existingUsers.length > 0) {
+                    // User exists, "log them in"
+                    const user = existingUsers[0];
+                    localStorage.setItem('loggedInUser', JSON.stringify(user));
+                    setLoggedInUser(user);
+                    setIsLoggedIn(true);
+                    setAccountDetailsForm(user); // Sync sidebar form
+                    showTemporaryFeedback(`Welcome back, ${user.name}! 😊`, 'success');
+                    // Auto-fill order form (already done by useEffect, but ensure consistency)
+                    setForm(prevForm => ({
+                        ...prevForm,
+                        name: user.name || '',
+                        contact: user.phone || '',
+                        delivery: user.address || '',
+                    }));
+                    setIsSubmitting(false);
+                    // Now that user is logged in, proceed to show confirmation modal
+                    // Re-call handleSubmit to trigger the confirmation modal logic
+                    const dummyEvent = { preventDefault: () => { } };
+                    handleSubmit(dummyEvent);
+                    return; // Exit to prevent further execution in this call
+                } else {
+                    // User does not exist, prompt for signup
+                    setIsSubmitting(false);
+                    setShowSignUpPromptModal(true);
+                    return;
+                }
+            } catch (error) {
+                console.error("Error checking user existence:", error);
+                showTemporaryFeedback('Failed to verify user. Please try again.', 'error');
+                setIsSubmitting(false);
+                return;
+            }
+        }
+
+        // If logged in, proceed to show confirmation modal
+        const preparedOrderRows = validOrders.map(order => {
+            const lemon = lemons.find(l => l.Grade === order.grade);
+            const pricePerKg = parseFloat(lemon?.['Price Per Kg'] || 0);
+            const quantity = parseInt(order.quantity);
+            let itemCalculatedPrice = pricePerKg * quantity;
+            const discountApplied = quantity > 50 ? '10%' : '0%';
+
+            if (quantity > 50) {
+                itemCalculatedPrice *= 0.90;
+            }
+
+            return {
+                grade: order.grade,
+                quantity: quantity,
+                pricePerKg: pricePerKg.toFixed(2),
+                itemTotalPrice: itemCalculatedPrice.toFixed(2),
+                discount: discountApplied,
+            };
+        });
+
+        setConfirmedOrderDetails({
+            personal: form,
+            items: preparedOrderRows,
+            total: total.toFixed(2),
+        });
+        setShowConfirmModal(true); // Show the confirmation modal
+    };
+
+    // --- Function to actually submit the order after confirmation ---
+    const confirmAndSubmitOrder = async () => {
+        setShowConfirmModal(false); // Close the confirmation modal immediately
+        setIsSubmitting(true);
+        setFeedback({ message: '', type: '' }); // Clear feedback
+
+        if (!confirmedOrderDetails) {
+            showTemporaryFeedback('Error: No order details to confirm.', 'error');
+            setIsSubmitting(false);
+            return;
+        }
+
+        const { personal, items } = confirmedOrderDetails;
+
+        const rows = items.map(item => ({
+            name: personal.name,
+            quantity: item.quantity,
+            quality: item.grade,
+            'Price Per Kg': item.pricePerKg,
+            'Item Total Price': item.itemTotalPrice,
+            delivery: personal.delivery,
+            contact: personal.contact,
+            discount: item.discount,
+            'Order Date': new Date().toLocaleString(),
+        }));
+
+        try {
+            const response = await fetch(ORDERS_SUBMISSION_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: rows }),
+            });
+
+            if (response.ok) {
+                setShowSuccessModal(true); // Show success modal
+                showTemporaryFeedback('Order submitted successfully!', 'success');
+                // Reset order form items, but keep personal details if logged in
+                setOrders([{ grade: '', quantity: '' }]);
+                setForm(prevForm => ({
+                    ...prevForm,
+                    name: isLoggedIn ? loggedInUser.name : '',
+                    contact: isLoggedIn ? loggedInUser.phone : '',
+                    delivery: isLoggedIn ? loggedInUser.address : '',
+                }));
+                setTotal(0);
+                setConfirmedOrderDetails(null);
+            } else {
+                const errorData = await response.json();
+                console.error('SheetDB submission error:', response.status, errorData);
+                showTemporaryFeedback(`Failed to submit order: ${errorData.message || 'Server error'}. Please try again.`, 'error');
+            }
+        } catch (err) {
+            console.error('Network or submission error:', err);
+            showTemporaryFeedback('Failed to submit order. Please check your internet connection and try again.', 'error');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    // --- Modal Closing Handlers ---
+    const closeSuccessModal = () => {
+        setShowSuccessModal(false);
+        setFeedback({ message: '', type: '' }); // Clear feedback after closing success modal
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const cancelConfirmation = () => {
+        setShowConfirmModal(false);
+        setConfirmedOrderDetails(null);
+        showTemporaryFeedback('Order confirmation cancelled.', 'info');
+    };
+
+    const closeSignUpPromptModal = () => {
+        setShowSignUpPromptModal(false);
+        // If user cancels signup prompt, clear any related feedback
+        setFeedback({ message: '', type: '' });
+    };
+
+    const closeSignUpModal = () => {
+        setShowSignUpModal(false);
+        setFeedback({ message: '', type: '' }); // Clear signup messages
+        setSignUpForm({ name: '', phone: '', address: '', pincode: '' }); // Clear signup form
+    };
+
+    // --- Sign Up Form Handlers ---
+    const handleSignUpFormChange = (e) => {
+        const { name, value } = e.target;
+        // Pincode validation
+        if (name === 'pincode') {
+            if (!/^\d*<span class="math-inline">/\.test\(value\) \|\| value\.length \> 6\) \{
+return;
+\}
+\}
+// Phone number validation for signup form
+if \(name \=\=\= 'phone'\) \{
+if \(\!/^\\d\*</span>/.test(value) || value.length > 10) {
+                return;
+            }
+        }
+        setSignUpForm(prevForm => ({ ...prevForm, [name]: value }));
+    };
+
+    const handleSignUpSubmit = async (e) => {
+        e.preventDefault();
+        setIsSigningUp(true);
+        setFeedback({ message: '', type: '' }); // Clear signup messages
+
+        // Sign up form validation
+        const { name, phone, address, pincode } = signUpForm;
+        if (!name.trim() || !phone.trim() || !address.trim() || !pincode.trim()) {
+            showTemporaryFeedback('Please fill in all signup details.', 'error');
+            setIsSigningUp(false);
+            return;
+        }
+        if (!/^\d{10}<span class="math-inline">/\.test\(phone\)\) \{
+showTemporaryFeedback\('Please enter a valid 10\-digit phone number\.', 'error'\);
+setIsSigningUp\(false\);
+return;
+\}
+if \(\!/^\\d\{6\}</span>/.test(pincode)) {
+            showTemporaryFeedback('Please enter a valid 6-digit pincode.', 'error');
+            setIsSigningUp(false);
+            return;
+        }
+
+        try {
+            // --- Check for existing user (by phone number) before new signup ---
+            const checkRes = await fetch(`${SIGNUP_SHEET_URL}?searchField=phone&searchValue=${phone}`);
+            if (!checkRes.ok) {
+                throw new Error(`Failed to check existing users during signup: ${checkRes.status} ${checkRes.statusText}`);
+            }
+            const existingUsers = await checkRes.json();
+            if (Array.isArray(existingUsers) && existingUsers.length > 0) {
+                showTemporaryFeedback('An account with this phone number already exists. Please login or use a different number.', 'error');
+                setIsSigningUp(false);
+                return;
+            }
+
+            // --- Proceed with new user signup ---
+            const response = await fetch(SIGNUP_SHEET_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    data: {
+                        name: name.trim(),
+                        phone: phone.trim(),
+                        address: address.trim(),
+                        pincode: pincode.trim(),
+                        'Signup Date': new Date().toLocaleString(),
+                    }
+                }),
+            });
+
+            if (response.ok) {
+                const newUser = { name: name.trim(), phone: phone.trim(), address: address.trim(), pincode: pincode.trim() };
+                localStorage.setItem('loggedInUser', JSON.stringify(newUser)); // Store in local storage
+                setLoggedInUser(newUser);
+                setIsLoggedIn(true);
+                setAccountDetailsForm(newUser); // Sync sidebar form
+                showTemporaryFeedback(`Thank you, ${newUser.name}, for signing up. Let's start ordering! 😊`, 'success');
+
+                // Auto-fill order form
+                setForm(prevForm => ({
+                    ...prevForm,
+                    name: newUser.name,
+                    contact: newUser.phone,
+                    delivery: newUser.address,
+                }));
+
+                setShowSignUpModal(false); // Close signup form
+                setShowSignUpPromptModal(false); // Close prompt if it was open
+
+                // Immediately open the order confirmation modal after signup
+                const dummyEvent = { preventDefault: () => { } };
+                handleSubmit(dummyEvent);
+
+            } else {
+                const errorData = await response.json();
+                console.error('SheetDB signup error:', response.status, errorData);
+                showTemporaryFeedback(`Failed to create account: ${errorData.message || 'Server error'}. Please try again.`, 'error');
+            }
+        } catch (err) {
+            console.error('Network or signup error:', err);
+            showTemporaryFeedback('Failed to create account. Please check your internet connection and try again.', 'error');
+        } finally {
+            setIsSigningUp(false);
+        }
+    };
+
+    // --- Logout Function ---
+    const handleLogout = () => {
+        localStorage.removeItem('loggedInUser');
+        setIsLoggedIn(false);
+        setLoggedInUser(null);
+        setUserAddresses([]); // Clear addresses on logout
+        setAccountDetailsForm({ name: '', phone: '', address: '', pincode: '' }); // Clear sidebar form
+        // Clear order form personal details
+        setForm({ name: '', delivery: '', contact: '' });
+        showTemporaryFeedback('You have been logged out.', 'info');
+        setIsSidebarOpen(false); // Close sidebar on logout
+    };
+
+    // --- Account Sidebar Handlers ---
+    const toggleSidebar = () => {
+        setIsSidebarOpen(!isSidebarOpen);
+        if (!isSidebarOpen) { // If opening, reset to default tab and clear messages
+            setActiveAccountTab('accountDetails');
+            setFeedback({ message: '', type: '' }); // Clear any general feedback
+            // Ensure accountDetailsForm is synced with loggedInUser when opening
+            if (loggedInUser) {
+                setAccountDetailsForm(loggedInUser);
+            }
+            setShowAddressForm(false); // Hide address form in case it was open
+            setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' }); // Reset address form
+        }
+    };
+
+    const handleAccountDetailsFormChange = (e) => {
+        const { name, value } = e.target;
+        if (name === 'pincode') {
+            if (!/^\d*<span class="math-inline">/\.test\(value\) \|\| value\.length \> 6\) \{
+return;
+\}
+\}
+setAccountDetailsForm\(prevForm \=\> \(\{ \.\.\.prevForm, \[name\]\: value \}\)\);
+\};
+const saveAccountDetails \= async \(\) \=\> \{
+if \(\!loggedInUser \|\| \!loggedInUser\.phone\) \{
+showTemporaryFeedback\('Please login to save account details\.', 'error'\);
+return;
+\}
+setIsUpdatingAccount\(true\);
+setFeedback\(\{ message\: '', type\: '' \}\);
+// Basic validation for account details before saving
+const \{ name, address, pincode \} \= accountDetailsForm;
+if \(\!name\.trim\(\) \|\| \!address\.trim\(\) \|\| \!pincode\.trim\(\)\) \{
+showTemporaryFeedback\('Please fill in all account details\.', 'error'\);
+setIsUpdatingAccount\(false\);
+return;
+\}
+if \(\!/^\\d\{6\}</span>/.test(pincode)) {
+            showTemporaryFeedback('Please enter a valid 6-digit pincode.', 'error');
+            setIsUpdatingAccount(false);
+            return;
+        }
+
+        try {
+            const response = await fetch(`${SIGNUP_SHEET_URL}?searchField=phone&searchValue=${loggedInUser.phone}`, {
+                method: 'PATCH', // Use PATCH to update existing row
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    data: {
+                        name: name.trim(),
+                        address: address.trim(),
+                        pincode: pincode.trim(),
+                    }
+                }),
+            });
+
+            if (response.ok) {
+                // Update loggedInUser state and localStorage
+                const updatedUser = { ...loggedInUser, name: name.trim(), address: address.trim(), pincode: pincode.trim() };
+                localStorage.setItem('loggedInUser', JSON.stringify(updatedUser));
+                setLoggedInUser(updatedUser);
+                showTemporaryFeedback('Account details updated successfully!', 'success');
+                // Also update the main order form fields if they are currently being edited
+                setForm(prevForm => ({
+                    ...prevForm,
+                    name: updatedUser.name,
+                    delivery: updatedUser.address,
+                }));
+            } else {
+                const errorData = await response.json();
+                console.error('SheetDB account update error:', response.status, errorData);
+                showTemporaryFeedback(`Failed to update: ${errorData.message || 'Server error'}.`, 'error');
+            }
+        } catch (error) {
+            console.error('Network error updating account:', error);
+            showTemporaryFeedback('Network error. Could not update account.', 'error');
+        } finally {
+            setIsUpdatingAccount(false);
+        }
+    };
+
+    // --- Address Management Handlers ---
+    const fetchUserAddresses = async (userPhone) => {
+        if (!userPhone) return;
+        setIsManagingAddresses(true);
+        setUserAddresses([]); // Clear previous addresses
+        try {
+            const res = await fetch(`${ADDRESSES_SHEET_URL}?searchField=userPhone&searchValue=${userPhone}`);
+            if (!res.ok) {
+                throw new Error(`Failed to fetch addresses: ${res.status} ${res.statusText}`);
+            }
+            const addresses = await res.json();
+            if (Array.isArray(addresses)) {
+                // Assign a temporary ID if SheetDB doesn't provide one, for React keys
+                // SheetDB automatically assigns 'id' if you add it to the column headers.
+                // Assuming 'id' is a column in your Addresses sheet for uniqueness.
+                setUserAddresses(addresses.map((addr, idx) => ({ ...addr, id: addr.id || `temp-${idx}` })));
+            } else {
+                setUserAddresses([]);
+            }
+        } catch (error) {
+            console.error("Error fetching user addresses:", error);
+            showTemporaryFeedback('Failed to load addresses.', 'error');
+        } finally {
+            setIsManagingAddresses(false);
+        }
+    };
+
+    const handleAddressFormChange = (e) => {
+        const { name, value } = e.target;
+        if (name === 'pincode') {
+            if (!/^\d*<span class="math-inline">/\.test\(value\) \|\| value\.length \> 6\) \{
+return;
+\}
+\}
+setAddressForm\(prevForm \=\> \(\{ \.\.\.prevForm, \[name\]\: value \}\)\);
+\};
+const handleSaveAddress \= async \(e\) \=\> \{
+e\.preventDefault\(\);
+if \(\!loggedInUser \|\| \!loggedInUser\.phone\) \{
+showTemporaryFeedback\('Please login to save addresses\.', 'error'\);
+return;
+\}
+setIsManagingAddresses\(true\);
+setFeedback\(\{ message\: '', type\: '' \}\);
+const \{ addressName, fullAddress, pincode, id \} \= addressForm;
+if \(\!addressName\.trim\(\) \|\| \!fullAddress\.trim\(\) \|\| \!pincode\.trim\(\)\) \{
+showTemporaryFeedback\('Please fill all address fields\.', 'error'\);
+setIsManagingAddresses\(false\);
+return;
+\}
+if \(\!/^\\d\{6\}</span>/.test(pincode)) {
+            showTemporaryFeedback('Please enter a valid 6-digit pincode.', 'error');
+            setIsManagingAddresses(false);
+            return;
+        }
+
+        // Check address limit for new addresses
+        if (userAddresses.length >= 5 && !id) { // If adding new and limit reached
+            showTemporaryFeedback('You can save a maximum of 5 addresses.', 'error');
+            setIsManagingAddresses(false);
+            return;
+        }
+
+        const addressData = {
+            userPhone: loggedInUser.phone, // Associate address with user's phone
+            addressName: addressName.trim(),
+            fullAddress: fullAddress.trim(),
+            pincode: pincode.trim(),
+        };
+
+        try {
+            let response;
+            if (id && id.startsWith('temp-')) { // This is a new address that hasn't been saved to SheetDB yet
+                response = await fetch(ADDRESSES_SHEET_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: addressData }),
+                });
+            } else if (id) { // Editing existing address (assuming SheetDB 'id' is present)
+                response = await fetch(`${ADDRESSES_SHEET_URL}?searchField=id&searchValue=${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: addressData }),
+                });
+            } else { // Truly new address (no temp ID)
+                response = await fetch(ADDRESSES_SHEET_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: addressData }),
+                });
+            }
+
+            if (response.ok) {
+                showTemporaryFeedback(`Address ${id ? 'updated' : 'added'} successfully!`, 'success');
+                setShowAddressForm(false);
+                setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' }); // Reset form
+                fetchUserAddresses(loggedInUser.phone); // Re-fetch to update list and get actual SheetDB ID
+            } else {
+                const errorData = await response.json();
+                console.error('SheetDB address save error:', response.status, errorData);
+                showTemporaryFeedback(`Failed to save address: ${errorData.message || 'Server error'}.`, 'error');
+            }
+        } catch (error) {
+            console.error('Network error saving address:', error);
+            showTemporaryFeedback('Network error. Could not save address.', 'error');
+        } finally {
+            setIsManagingAddresses(false);
+        }
+    };
+
+    const handleDeleteAddress = async (addressId) => {
+        if (!confirm('Are you sure you want to delete this address?')) return; // Simple confirm for now
+        setIsManagingAddresses(true);
+        setFeedback({ message: '', type: '' });
+        try {
+            const response = await fetch(`${ADDRESSES_SHEET_URL}?searchField=id&searchValue=${addressId}`, {
+                method: 'DELETE',
+            });
+            if (response.ok) {
+                showTemporaryFeedback('Address deleted successfully!', 'success');
+                fetchUserAddresses(loggedInUser.phone); // Re-fetch to update list
+            } else {
+                const errorData = await response.json();
+                console.error('SheetDB address delete error:', response.status, errorData);
+                showTemporaryFeedback(`Failed to delete address: ${errorData.message || 'Server error'}.`, 'error');
+            }
+        } catch (error) {
+            console.error('Network error deleting address:', error);
+            showTemporaryFeedback('Network error. Could not delete address.', 'error');
+        } finally {
+            setIsManagingAddresses(false);
+        }
+    };
+
+    const handleEditAddress = (address) => {
+        setAddressForm({ id: address.id, addressName: address.addressName, fullAddress: address.fullAddress, pincode: address.pincode });
+        setShowAddressForm(true);
+    };
+
+    const getWhatsappLink = () => {
+        const validOrders = orders.filter(order => order.grade && order.quantity && parseInt(order.quantity) > 0);
+        if (validOrders.length === 0 || !form.contact || !/^\d{10}$/.test(form.contact)) {
+            return '#'; // Disable link if essential data is missing or invalid
+        }
+
+        const orderDetails = validOrders.map(order => {
+            const lemon = lemons.find(l => l.Grade === order.grade);
+            const quantity = parseInt(order.quantity);
+            const pricePerKg = parseFloat(lemon?.['Price Per Kg'] || 0);
+            let itemPrice = pricePerKg * quantity;
+            let discountMsg = '';
+            if (quantity > 50) {
+                itemPrice *= 0.90;
+                discountMsg = ` (10% bulk discount applied)`;
+            }
+            return `${quantity} kg of ${order.grade} (Approx. ₹${itemPrice.toFixed(2)})${discountMsg}`;
+        }).join(', ');
+
+        const whatsappContact = `91${form.contact}`; // Assuming Indian numbers for WhatsApp
+        const whatsappMessage = `Hi, I'm ${form.name}.\n\nI want to order: ${orderDetails}.\n\nDelivery Address: ${form.delivery}.\nContact: ${form.contact}\n\nTotal estimated price: ₹${total.toFixed(2)}\n\nPlease confirm availability and final amount.`;
+
+        return `https://wa.me/${whatsappContact}?text=${encodeURIComponent(whatsappMessage)}`;
+    };
+
+    return (
+        <div className={styles.page}>
+            <Head>
+                <title>3 Lemons Traders – Buy Fresh Lemons Online</title>
+                <meta name="description" content="Buy premium quality lemons at affordable prices across India. Direct farm to home delivery. Discounts on bulk orders!" />
+                <meta property="og:title" content="Buy Fresh Lemons Online – 3 Lemons Traders" />
+                <meta property="og:description" content="Get premium lemons delivered to your door at unbeatable prices. Farm fresh quality. Offering discounts on bulk purchases!" />
+                <meta property="og:image" content="/lemons-hero.jpg" />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <link rel="canonical" href="[https://3lemons.in](https://3lemons.in)" />
+                <link href="[https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap)" rel="stylesheet" />
+            </Head>
+
+            {/* --- NEW: Header with Hamburger Menu --- */}
+            <header className={styles.header}>
+                <h1 className={styles.headerTitle}>3 Lemons Traders</h1>
+                <IoMenu className={styles.hamburgerIcon} onClick={toggleSidebar} />
+            </header>
+
+            <main className={styles.container}>
+                {/* --- Hero Section --- */}
+                <section className={styles.hero}>
+                    <img
+                        src="/lemons-hero.jpg"
+                        alt="Fresh Lemons"
+                        width={1200} // Set explicit width for Image component (can be larger than actual display)
+                        height={400} // Set explicit height for Image component
+                        loading="eager" // Load eagerly for LCP
+                        className={styles.heroImage}
+                    />
+                    <div className={styles.heroOverlay}>
+                        <h1 className={styles.heroTitle}>3 Lemons Traders</h1>
+                        <p className={styles.heroSubtitle}>Buy fresh, farm-direct lemons delivered across India</p>
+                        <a href="#buy-now" className={styles.heroButton}>
+                            Order Now
+                        </a>
+                    </div>
+                </section>
+
+                {/* --- Lemons Products Section --- */}
+                <section className={styles.lemonsSection}>
+                    <h2 className={styles.sectionTitle}>Our Lemons</h2>
+                    <div className={styles.lemonsGrid}>
+                        {Array.isArray(lemons) && lemons.length > 0 ? (
+                            lemons.map((lemon, index) => (
+                                <div key={index} className={styles.lemonCard}>
+                                    {lemon['Image url'] && (
+                                        <Image
+                                            src={lemon['Image url']}
+                                            alt={lemon['Grade'] || 'Lemon'}
+                                            width={300}
+                                            height={200}
+                                            loading="lazy"
+                                            className={styles.cardImage}
+                                        />
+                                    )}
+                                    <p className={styles.cardTitle}>
+                                        {lemon['Grade']} – ₹{parseFloat(lemon['Price Per Kg']).toFixed(2)}/kg
+                                    </p>
+                                    <p className={styles.cardDescription}>{lemon['Description']}</p>
+                                </div>
+                            ))
+                        ) : (
+                            <p style={{ textAlign: 'center', width: '100%', gridColumn: '1 / -1' }}>
+                                Loading lemons or no lemon data available. Please check your internet connection or SheetDB setup.
+                            </p>
+                        )}
+                    </div>
+                </section>
+
+                {/* --- Order Form Section --- */}
+                <section id="buy-now" className={styles.formSection}>
+                    <h2 className={styles.sectionTitle}>Place Your Order</h2>
+                    {/* Feedback Message Display */}
+                    {feedback.message && (
+                        <div className={`${styles.feedbackMessage} ${styles[`feedback${feedback.type.charAt(0).toUpperCase() + feedback.type.slice(1)}`]}`}>
+                            {feedback.message}
+                        </div>
+                    )}
+                    <form onSubmit={handleSubmit} className={styles.form}>
+                        {/* Personal Details Inputs */}
+                        <div className={styles.formGroup}>
+                            <label className={styles.label} htmlFor="name">Your Name</label>
+                            <input
+                                id="name"
+                                className={styles.input}
+                                required
+                                value={form.name}
+                                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                                readOnly={isLoggedIn} // Make read-only if logged in
+                                style={isLoggedIn ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                            />
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label className={styles.label} htmlFor="delivery">Delivery Address</label>
+                            {isLoggedIn && userAddresses.length > 0 ? (
+                                <select
+                                    id="delivery"
+                                    className={styles.select}
+                                    required
+                                    value={form.delivery}
+                                    onChange={(e) => setForm({ ...form, delivery: e.target.value })}
+                                >
+                                    <option value="">-- Select Saved Address or Enter New --</option>
+                                    {userAddresses.map((addr) => (
+                                        <option key={addr.id} value={addr.fullAddress}>
+                                            {addr.addressName} - {addr.fullAddress}
+                                        </option>
+                                    ))}
+                                    <option value="custom">-- Enter New Address --</option>
+                                </select>
+                            ) : (
+                                <input
+                                    id="delivery"
+                                    className={styles.input}
+                                    required
+                                    value={form.delivery}
+                                    onChange={(e) => setForm({ ...form, delivery: e.target.value })}
+                                    placeholder="Enter your full delivery address"
+                                    readOnly={isLoggedIn && form.delivery !== 'custom'} // Read-only if logged in and not custom
+                                    style={isLoggedIn && form.delivery !== 'custom' ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                                />
+                            )}
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label className={styles.label} htmlFor="contact">Contact Number</label>
+                            <input
+                                id="contact"
+                                type="tel"
+                                className={styles.input}
+                                required
+                                value={form.contact}
+                                onChange={(e) => setForm({ ...form, contact: e.target.value })}
+                                maxLength={10}
+                                pattern="[0-9]{10}"
+                                title="Please enter a 10-digit mobile number"
+                                placeholder="e.g., 9876543210"
+                                readOnly={isLoggedIn} // Make read-only if logged in
+                                style={isLoggedIn ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                            />
+                        </div>
+
+                        {/* Dynamic Order Varieties Inputs */}
+                        {orders.map((order, index) => (
+                            <Fragment key={index}> {/* Use Fragment here */}
+                                <div className={styles.formGroup}>
+                                    <label className={styles.label} htmlFor={`grade-${index}`}>Select Grade</label>
+                                    <select
+                                        id={`grade-${index}`}
+                                        className={styles.select}
+                                        value={order.grade}
+                                        onChange={(e) => handleOrderChange(index, 'grade', e.target.value)}
+                                        required
+                                    >
+                                        <option value="">-- Select --</option>
+                                        {lemons.map((lemon, idx) => (
+                                            <option key={idx} value={lemon.Grade}>
+                                                {lemon.Grade} – ₹{parseFloat(lemon['Price Per Kg']).toFixed(2)}/kg
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className={styles.formGroup}>
+                                    <label className={styles.label} htmlFor={`quantity-${index}`}>Quantity (kg)</label>
+                                    <input
+                                        id={`quantity-${index}`}
+                                        type="number"
+                                        min="1"
+                                        className={styles.input}
+                                        value={order.quantity}
+                                        onChange={(e) => handleOrderChange(index, 'quantity', e.target.value)}
+                                        placeholder="e.g., 10"
+                                        required
+                                    />
+                                    {parseInt(order.quantity) > 50 && (
+                                        <span className={styles.discountNote}> (10% bulk discount)</span>
+                                    )}
+                                </div>
+                            </Fragment>
+                        ))}
+
+                        <button type="button" onClick={handleAddVariety} className={styles.button}>
+                            ➕ Add Another Variety
+                        </button>
+
+                        <div className={styles.orderSummary}>
+                            <h3>Total: ₹{total.toFixed(2)}</h3>
+                        </div>
+
+                        <div className={styles.actions}>
+                            <button type="submit" disabled={isSubmitting} className={styles.button}>
+                                {isSubmitting ? 'Checking Order...' : '🛒 Place Order on Website'}
+                            </button>
+
+                            <a
+                                href={getWhatsappLink()}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`${styles.button} ${styles.whatsappButton}`}
+                                style={{ pointerEvents: (!form.contact || orders.filter(o => o.grade && o.quantity && parseInt(o.quantity) > 0).length === 0) ? 'none' : 'auto', opacity: (!form.contact || orders.filter(o => o.grade && o.quantity && parseInt(o.quantity) > 0).length === 0) ? 0.6 : 1 }}
+                            >
+                                <FaWhatsapp className={styles.whatsappIcon} /> Place Order on WhatsApp
+                            </a>
+                        </div>
+                    </form>
+                </section>
+
+                {/* --- Customer Reviews Section --- */}
+                <section className={styles.reviewsSection}>
+                    <h2 className={styles.sectionTitle}>What Our Customers Say</h2>
+                    <div className={styles.reviewsGrid}>
+                        {customerReviews.map(review => (
+                            <div key={review.id} className={styles.reviewCard}>
+                                <div className={styles.reviewerRating}>
+                                    {Array.from({ length: review.rating }).map((_, i) => (
+                                        <FaStar key={i} />
+                                    ))}
+                                    {Array.from({ length: 5 - review.rating }).map((_, i) => (
+                                        <FaStar key={i + review.rating} style={{ opacity: 0.3 }} />
+                                    ))}
+                                </div>
+                                <p className={styles.reviewText}>"{review.text}"</p>
+                                <p className={styles.reviewerName}>- {review.name}</p>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+
+            </main>
+
+            {/* --- Footer Section --- */}
+            <div className={styles.footer}>
+                <p>Developed by Pradeep Mamuduru</p>
+                <p>
+                    📸 <a href="[https://www.instagram.com/3Lemons_Traders](https://www.instagram.com/3Lemons_Traders)" target="_blank" rel="noopener noreferrer">3Lemons_Traders</a> | 🌐 <a href="[https://3lemons.vercel.app](https://3lemons.vercel.app)">3lemons.vercel.app</a>
+                </p>
+                <p>&copy; {new Date().getFullYear()} 3 Lemons Traders. All rights reserved.</p>
+            </div>
+
+            {/* --- Order Confirmation Modal --- */}
+            {showConfirmModal && confirmedOrderDetails && (
+                <div className={`${styles.modalOverlay} ${showConfirmModal ? styles.visible : ''}`}>
+                    <div className={styles.modalContent}>
+                        <button className={styles.modalCloseButton} onClick={cancelConfirmation}>
+                            <IoCloseCircleOutline />
+                        </button>
+                        <h2 className={styles.modalTitle}>Confirm Your Order</h2>
+                        <div className={styles.modalText}>
+                            <p>Please review your order details before proceeding:</p>
+                            <p><strong>Name:</strong> {confirmedOrderDetails.personal.name}</p>
+                            <p><strong>Contact:</strong> {confirmedOrderDetails.personal.contact}</p>
+                            <p><strong>Delivery Address:</strong> {confirmedOrderDetails.personal.delivery}</p>
+                            <p><strong>Order Items:</strong></p>
+                            <ul>
+                                {confirmedOrderDetails.items.map((item, index) => (
+                                    <li key={index}>
+                                        {item.quantity} kg of {item.grade} (₹{item.itemTotalPrice})
+                                        {item.discount === '10%' && <span className={styles.discountNote}> ({item.discount} discount applied)</span>}
+                                    </li>
+                                ))}
+                            </ul>
+                            <p><strong>Total Payable: ₹{confirmedOrderDetails.total}</strong></p>
+                        </div>
+                        <div className={styles.modalButtons}>
+                            <button className={styles.modalButton} onClick={confirmAndSubmitOrder} disabled={isSubmitting}>
+                                {isSubmitting ? 'Submitting...' : 'Proceed'}
+                            </button>
+                            <button className={`${styles.modalButton} ${styles.cancel}`} onClick={cancelConfirmation}>
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* --- Order Submitted Successfully Modal/Page --- */}
+            {showSuccessModal && (
+                <div className={`${styles.modalOverlay} ${showSuccessModal ? styles.visible : ''}`}>
+                    <div className={`${styles.modalContent} ${styles.successPage}`}>
+                        <button className={styles.modalCloseButton} onClick={closeSuccessModal}>
+                            <IoCloseCircleOutline />
+                        </button>
+                        <h2 className={styles.successTitle}>Order Submitted Successfully!</h2>
+                        <p className={styles.successMessage}>
+                            Thank you for your order. We have received your details and will contact you shortly to confirm.
+                        </p>
+                        <button className={styles.modalButton} onClick={closeSuccessModal}>
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* --- Sign Up Prompt Modal --- */}
+            {showSignUpPromptModal && (
+                <div className={`${styles.modalOverlay} ${showSignUpPromptModal ? styles.visible : ''}`}>
+                    <div className={styles.modalContent}>
+                        <button className={styles.modalCloseButton} onClick={closeSignUpPromptModal}>
+                            <IoCloseCircleOutline />
+                        </button>
+                        <h2 className={styles.modalTitle}>Please Sign Up to Order</h2>
+                        <p className={styles.modalText}>
+                            To place an order for fresh lemons, please sign up for an account. It's quick and easy!
+                        </p>
+                        <div className={styles.modalButtons}>
+                            <button
+                                className={styles.modalButton}
+                                onClick={() => {
+                                    setShowSignUpPromptModal(false);
+                                    setShowSignUpModal(true);
+                                }}
+                            >
+                                Sign Up Now
+                            </button>
+                            <button className={`${styles.modalButton} ${styles.cancel}`} onClick={closeSignUpPromptModal}>
+                                Maybe Later
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* --- Sign Up Form Modal --- */}
+            {showSignUpModal && (
+                <div className={`${styles.modalOverlay} ${showSignUpModal ? styles.visible : ''}`}>
+                    <div className={styles.modalContent}>
+                        <button className={styles.modalCloseButton} onClick={closeSignUpModal}>
+                            <IoCloseCircleOutline />
+                        </button>
+                        <h2 className={styles.modalTitle}>Create Your Account</h2>
+                        {feedback.message && feedback.type === 'error' && (
+                            <p className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
+                                {feedback.message}
+                            </p>
+                        )}
+                        <form onSubmit={handleSignUpSubmit}>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label} htmlFor="signup-name">Your Name</label>
+                                <input
+                                    id="signup-name"
+                                    className={styles.input}
+                                    name="name"
+                                    required
+                                    value={signUpForm.name}
+                                    onChange={handleSignUpFormChange}
+                                />
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label} htmlFor="signup-phone">Phone Number</label>
+                                <input
+                                    id="signup-phone"
+                                    type="tel"
+                                    className={styles.input}
+                                    name="phone"
+                                    required
+                                    value={signUpForm.phone}
+                                    onChange={handleSignUpFormChange}
+                                    maxLength={10}
+                                    pattern="[0-9]{10}"
+                                    title="Please enter a 10-digit phone number"
+                                    placeholder="e.g., 9876543210"
+                                />
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label} htmlFor="signup-address">Delivery Address</label>
+                                <input
+                                    id="signup-address"
+                                    className={styles.input}
+                                    name="address"
+                                    required
+                                    value={signUpForm.address}
+                                    onChange={handleSignUpFormChange}
+                                />
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label} htmlFor="signup-pincode">Pincode</label>
+                                <input
+                                    id="signup-pincode"
+                                    type="text" // Use text to allow partial input without number validation issues
+                                    className={styles.input}
+                                    name="pincode"
+                                    required
+                                    value={signUpForm.pincode}
+                                    onChange={handleSignUpFormChange}
+                                    maxLength={6}
+                                    pattern="[0-9]{6}"
+                                    title="Please enter a 6-digit pincode"
+                                    placeholder="e.g., 123456"
+                                />
+                            </div>
+                            <div className={styles.modalButtons}>
+                                <button type="submit" className={styles.modalButton} disabled={isSigningUp}>
+                                    {isSigningUp ? 'Creating Account...' : 'Sign Up'}
+                                </button>
+                                <button type="button" className={`${styles.modalButton} ${styles.cancel}`} onClick={closeSignUpModal}>
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* --- Account Sidebar (New) --- */}
+            {isSidebarOpen && (
+                <div className={`${styles.accountSidebarOverlay} ${isSidebarOpen ? styles.visible : ''}`}>
+                    <div className={styles.accountSidebar}>
+                        <div className={styles.sidebarHeader}>
+                            <h3 className={styles.sidebarTitle}>My Account</h3>
+                            <button className={styles.sidebarCloseButton} onClick={toggleSidebar}>
+                                <IoCloseCircleOutline />
+                            </button>
+                        </div>
+                        <div className={styles.sidebarTabs}>
+                            <button
+                                className={`${styles.tabButton} ${activeAccountTab === 'accountDetails' ? styles.active : ''}`}
+                                onClick={() => setActiveAccountTab('accountDetails')}
+                            >
+                                Account Details
+                            </button>
+                            <button
+                                className={`${styles.tabButton} ${activeAccountTab === 'addresses' ? styles.active : ''}`}
+                                onClick={() => setActiveAccountTab('addresses')}
+                            >
+                                Addresses
+                            </button>
+                            <button
+                                className={`${styles.tabButton} ${activeAccountTab === 'feedback' ? styles.active : ''}`}
+                                onClick={() => setActiveAccountTab('feedback')}
+                            >
+                                Feedback
+                            </button>
+                        </div>
+
+                        <div className={styles.tabContent}>
+                            {activeAccountTab === 'accountDetails' && (
+                                <Fragment>
+                                    <h3>Your Profile</h3>
+                                    {feedback.message && (feedback.type === 'success' || feedback.type === 'error') && (
+                                        <p className={`${styles.feedbackMessage} ${styles[`feedback${feedback.type.charAt(0).toUpperCase() + feedback.type.slice(1)}`]}`}>
+                                            {feedback.message}
+                                        </p>
+                                    )}
+                                    {loggedInUser ? (
+                                        <form className={styles.accountDetailsForm} onSubmit={(e) => { e.preventDefault(); saveAccountDetails(); }}>
+                                            <div className={styles.formGroup}>
+                                                <label className={styles.label} htmlFor="acc-name">Name</label>
+                                                <input
+                                                    id="acc-name"
+                                                    className={styles.input}
+                                                    name="name"
+                                                    value={accountDetailsForm.name || ''}
+                                                    onChange={handleAccountDetailsFormChange}
+                                                    required
+                                                />
+                                            </div>
+                                            <div className={styles.formGroup}>
+                                                <label className={styles.label} htmlFor="acc-phone">Phone Number</label>
+                                                <input
+                                                    id="acc-phone"
+                                                    className={styles.input}
+                                                    name="phone"
+                                                    value={accountDetailsForm.phone || ''}
+                                                    readOnly // Phone number should not be editable after signup (as it's the identifier)
+                                                    style={{ backgroundColor: '#f0f0f0', cursor: 'not-allowed' }}
+                                                />
+                                            </div>
+                                            <div className={styles.formGroup}>
+                                                <label className={styles.label} htmlFor="acc-address">Address</label>
+                                                <input
+                                                    id="acc-address"
+                                                    className={styles.input}
+                                                    name="address"
+                                                    value={accountDetailsForm.address || ''}
+                                                    onChange={handleAccountDetailsFormChange}
+                                                    required
+                                                />
+                                            </div>
+                                            <div className={styles.formGroup}>
+                                                <label className={styles.label} htmlFor="acc-pincode">Pincode</label>
+                                                <input
+                                                    id="acc-pincode"
+                                                    className={styles.input}
+                                                    name="pincode"
+                                                    value={accountDetailsForm.pincode || ''}
+                                                    onChange={handleAccountDetailsFormChange}
+                                                    maxLength={6}
+                                                    pattern="[0-9]{6}"
+                                                    title="Please enter a 6-digit pincode"
+                                                    required
+                                                />
+                                            </div>
+                                            <button
+                                                type="submit"
+                                                className={`${styles.button} ${styles.saveButton}`}
+                                                disabled={isUpdatingAccount}
+                                            >
+                                                {isUpdatingAccount ? 'Saving...' : 'Save Changes'}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={`${styles.button} ${styles.cancel}`}
+                                                onClick={handleLogout} // Use logout for clearing session
+                                                style={{ marginTop: '10px' }}
+                                            >
+                                                Logout
+                                            </button>
+                                        </form>
+                                    ) : (
+                                        <p style={{ textAlign: 'center', marginTop: '20px' }}>Please log in to view and manage your account details.</p>
+                                    )}
+                                </Fragment>
+                            )}
+
+                            {activeAccountTab === 'addresses' && (
+                                <Fragment>
+                                    <h3>Your Saved Addresses ({userAddresses.length}/5)</h3>
+                                    {feedback.message && (feedback.type === 'success' || feedback.type === 'error') && (
+                                        <p className={`${styles.feedbackMessage} ${styles[`feedback${feedback.type.charAt(0).toUpperCase() + feedback.type.slice(1)}`]}`}>
+                                            {feedback.message}
+                                        </p>
+                                    )}
+                                    {isManagingAddresses && <p style={{ textAlign: 'center' }}>Loading addresses...</p>}
+
+                                    {loggedInUser ? (
+                                        <Fragment>
+                                            <div className={styles.addressList}>
+                                                {userAddresses.length > 0 ? (
+                                                    <ul>
+                                                        {userAddresses.map(addr => (
+                                                            <li key={addr.id} className={styles.addressItem}>
+                                                                <strong>{addr.addressName}</strong>
+                                                                <p>{addr.fullAddress}</p>
+                                                                <p>Pincode: {addr.pincode}</p>
+                                                                <div className={styles.addressActions}>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => handleEditAddress(addr)}
+                                                                        style={{ backgroundColor: '#00796b' }} // Green edit button
+                                                                    >
+                                                                        Edit
+                                                                    </button>
+                                                                    <button type="button" onClick={() => handleDeleteAddress(addr.id)}>
+                                                                        Delete
+                                                                    </button>
+                                                                </div>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                ) : (
+                                                    <p style={{ textAlign: 'center' }}>No addresses saved yet.</p>
+                                                )}
+                                            </div>
+
+                                            {userAddresses.length < 5 && !showAddressForm && (
+                                                <button
+                                                    type="button"
+                                                    className={`${styles.button} ${styles.addAddressButton}`}
+                                                    onClick={() => {
+                                                        setShowAddressForm(true);
+                                                        setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' }); // Reset form for new address
+                                                    }}
+                                                >
+                                                    ➕ Add New Address
+                                                </button>
+                                            )}
+
+                                            {showAddressForm && (
+                                                <form onSubmit={handleSaveAddress} className={styles.addressForm}>
+                                                    <h3>{addressForm.id ? 'Edit Address' : 'Add New Address'}</h3>
+                                                    <div className={styles.formGroup}>
+                                                        <label className={styles.label} htmlFor="addr-name">Address Name (e.g., Home, Work)</label>
+                                                        <input
+                                                            id="addr-name"
+                                                            className={styles.input}
+                                                            name="addressName"
+                                                            required
+                                                            value={addressForm.addressName}
+                                                            onChange={handleAddressFormChange}
+                                                        />
+                                                    </div>
+                                                    <div className={styles.formGroup}>
+                                                        <label className={styles.label} htmlFor="addr-full">Full Address</label>
+                                                        <input
+                                                            id="addr-full"
+                                                            className={styles.input}
+                                                            name="fullAddress"
+                                                            required
+                                                            value={addressForm.fullAddress}
+                                                            onChange={handleAddressFormChange}
+                                                        />
+                                                    </div>
+                                                    <div className={styles.formGroup}>
+                                                        <label className={styles.label} htmlFor="addr-pincode">Pincode</label>
+                                                        <input
+                                                            id="addr-pincode"
+                                                            type="text"
+                                                            className={styles.input}
+                                                            name="pincode"
+                                                            required
+                                                            value={addressForm.pincode}
+                                                            onChange={handleAddressFormChange}
+                                                            maxLength={6}
+                                                            pattern="[0-9]{6}"
+                                                            title="Please enter a 6-digit pincode"
+                                                        />
+                                                    </div>
+                                                    <div className={styles.formButtons}>
+                                                        <button type="submit" className={styles.modalButton} disabled={isManagingAddresses}>
+                                                            {isManagingAddresses ? 'Saving...' : 'Save Address'}
+                                                        </button>
+                                                        <button type="button" className={`${styles.modalButton} ${styles.cancel}`} onClick={() => {
+                                                            setShowAddressForm(false);
+                                                            setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' }); // Clear form
+                                                        }}>
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            )}
+                                        </Fragment>
+                                    ) : (
+                                        <p style={{ textAlign: 'center', marginTop: '20px' }}>Please log in to manage your addresses.</p>
+                                    )}
+                                </Fragment>
+                            )}
+
+                            {activeAccountTab === 'feedback' && (
+                                <Fragment>
+                                    <h3>Send Us Your Feedback</h3>
+                                    <p style={{ textAlign: 'center', marginTop: '20px' }}>This section is under construction. Please check back later to submit your valuable feedback!</p>
+                                    {/* You can add a simple form here later if needed */}
+                                </Fragment>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
 }
