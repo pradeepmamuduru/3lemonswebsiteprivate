@@ -1,8 +1,8 @@
-import { useState, useEffect, Fragment } from 'react'; // Import Fragment
+import { useState, useEffect, Fragment } from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
-import { FaWhatsapp, FaStar } from 'react-icons/fa';
-import { IoCloseCircleOutline } from 'react-icons/io5'; // New icon for close button
+import { FaWhatsapp, FaStar, FaUserCircle } from 'react-icons/fa'; // Added FaUserCircle for account icon
+import { IoCloseCircleOutline } from 'react-icons/io5'; // Close icon
 import styles from '../styles/styles.module.css';
 
 // --- getStaticProps: Fetches Lemon Product Data ---
@@ -31,20 +31,32 @@ export async function getStaticProps() {
 
 // --- Home Component ---
 export default function Home({ lemons }) {
+  // Order form states
   const [orders, setOrders] = useState([{ grade: '', quantity: '' }]);
   const [form, setForm] = useState({ name: '', delivery: '', contact: '' });
   const [total, setTotal] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionMessage, setSubmissionMessage] = useState('');
 
-  // New states for modal visibility
+  // Modal states for order confirmation/success
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  // State to store order details for confirmation modal
   const [confirmedOrderDetails, setConfirmedOrderDetails] = useState(null);
 
-  const ORDERS_SUBMISSION_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=orders'; 
+  // New states for user registration/login
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loggedInUser, setLoggedInUser] = useState(null); // Stores { name, phone, address, pincode }
+  const [showSignUpPromptModal, setShowSignUpPromptModal] = useState(false); // "Please sign up to order" modal
+  const [showSignUpModal, setShowSignUpModal] = useState(false); // Actual signup form modal
+  const [signUpForm, setSignUpForm] = useState({ name: '', phone: '', address: '', pincode: '' });
+  const [isSigningUp, setIsSigningUp] = useState(false);
+  const [signUpMessage, setSignUpMessage] = useState('');
 
+  // SheetDB URLs
+  const ORDERS_SUBMISSION_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=orders'; 
+  const SIGNUP_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=signup'; // *** IMPORTANT: Verify your SheetDB sheet name for signup here ***
+
+  // Hardcoded customer reviews
   const customerReviews = [
     { id: 1, text: "The lemons from 3 Lemons Traders are incredibly fresh and juicy! Perfect for my restaurant.", name: "Chef Rahul S.", rating: 5, },
     { id: 2, text: "Excellent quality and timely delivery. Their A1 grade lemons are truly the best.", name: "Priya M.", rating: 5, },
@@ -53,10 +65,34 @@ export default function Home({ lemons }) {
     { id: 5, text: "Freshness guaranteed every time. Highly recommend!", name: "Sunita D.", rating: 5, },
   ];
 
+  // --- useEffect to check localStorage for logged-in user on component mount ---
+  useEffect(() => {
+    try {
+      const storedUser = localStorage.getItem('loggedInUser');
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        setLoggedInUser(user);
+        setIsLoggedIn(true);
+        // Pre-fill the order form with logged-in user's details
+        setForm(prevForm => ({
+          ...prevForm,
+          name: user.name || '',
+          contact: user.phone || '',
+          delivery: user.address || '',
+        }));
+      }
+    } catch (error) {
+      console.error("Failed to parse loggedInUser from localStorage:", error);
+      localStorage.removeItem('loggedInUser'); // Clear corrupted data
+    }
+  }, []); // Run only once on mount
+
+  // Effect to recalculate total whenever 'orders' or 'lemons' data changes
   useEffect(() => {
     calculateTotal();
   }, [orders, lemons]);
 
+  // --- Order Form Handlers ---
   const handleOrderChange = (index, field, value) => {
     const updated = [...orders];
     if (field === 'quantity') {
@@ -90,7 +126,7 @@ export default function Home({ lemons }) {
     setTotal(totalPrice);
   };
 
-  // --- NEW: Function to prepare data and show confirmation modal ---
+  // --- Main Order Submission Flow (now checks login status) ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmissionMessage(''); // Clear any previous messages
@@ -119,7 +155,13 @@ export default function Home({ lemons }) {
     }
     // --- End Validation ---
 
-    // Prepare data for the confirmation modal
+    // If not logged in, show signup prompt
+    if (!isLoggedIn) {
+        setShowSignUpPromptModal(true);
+        return;
+    }
+
+    // If logged in, proceed to show confirmation modal
     const preparedOrderRows = validOrders.map(order => {
         const lemon = lemons.find(l => l.Grade === order.grade);
         const pricePerKg = parseFloat(lemon?.['Price Per Kg'] || 0);
@@ -148,13 +190,13 @@ export default function Home({ lemons }) {
     setShowConfirmModal(true); // Show the confirmation modal
   };
 
-  // --- NEW: Function to actually submit the order after confirmation ---
+  // --- Function to actually submit the order after confirmation ---
   const confirmAndSubmitOrder = async () => {
     setShowConfirmModal(false); // Close the confirmation modal immediately
     setIsSubmitting(true);
     setSubmissionMessage('');
 
-    if (!confirmedOrderDetails) { // Should not happen if flow is correct
+    if (!confirmedOrderDetails) {
         setSubmissionMessage('Error: No order details to confirm.');
         setIsSubmitting(false);
         return;
@@ -162,7 +204,6 @@ export default function Home({ lemons }) {
 
     const { personal, items } = confirmedOrderDetails;
 
-    // Map confirmed items to the format required by SheetDB
     const rows = items.map(item => ({
         name: personal.name,
         quantity: item.quantity,
@@ -183,13 +224,17 @@ export default function Home({ lemons }) {
       });
 
       if (response.ok) {
-        // Successfully submitted, show success modal
-        setShowSuccessModal(true);
+        setShowSuccessModal(true); // Show success modal
         // Reset form and orders on main page
         setOrders([{ grade: '', quantity: '' }]);
-        setForm({ name: '', delivery: '', contact: '' });
+        setForm(prevForm => ({
+          ...prevForm, // Keep pre-filled name/contact/address if logged in
+          name: isLoggedIn ? loggedInUser.name : '',
+          contact: isLoggedIn ? loggedInUser.phone : '',
+          delivery: isLoggedIn ? loggedInUser.address : '',
+        }));
         setTotal(0);
-        setConfirmedOrderDetails(null); // Clear confirmed details
+        setConfirmedOrderDetails(null);
       } else {
         const errorData = await response.json();
         console.error('SheetDB submission error:', response.status, errorData);
@@ -203,17 +248,139 @@ export default function Home({ lemons }) {
     setIsSubmitting(false);
   };
 
-  // --- NEW: Function to close the success modal and return to main page ---
+  // --- Modal Closing Handlers ---
   const closeSuccessModal = () => {
       setShowSuccessModal(false);
-      window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // --- NEW: Function to cancel confirmation and go back to form ---
   const cancelConfirmation = () => {
       setShowConfirmModal(false);
-      setConfirmedOrderDetails(null); // Clear details
-      // You can keep previous submission message or clear it
+      setConfirmedOrderDetails(null);
+  };
+
+  const closeSignUpPromptModal = () => {
+      setShowSignUpPromptModal(false);
+  };
+
+  const closeSignUpModal = () => {
+      setShowSignUpModal(false);
+      setSignUpMessage(''); // Clear signup messages
+      setSignUpForm({ name: '', phone: '', address: '', pincode: '' }); // Clear signup form
+  };
+
+  // --- Sign Up Form Handlers ---
+  const handleSignUpFormChange = (e) => {
+    const { name, value } = e.target;
+    // Pincode validation
+    if (name === 'pincode') {
+      if (!/^\d*$/.test(value) || value.length > 6) { // Only digits, max 6
+        return;
+      }
+    }
+    // Phone number validation for signup form
+    if (name === 'phone') {
+        if (!/^\d*$/.test(value) || value.length > 10) { // Only digits, max 10
+            return;
+        }
+    }
+    setSignUpForm(prevForm => ({ ...prevForm, [name]: value }));
+  };
+
+  const handleSignUpSubmit = async (e) => {
+    e.preventDefault();
+    setIsSigningUp(true);
+    setSignUpMessage('');
+
+    // Sign up form validation
+    const { name, phone, address, pincode } = signUpForm;
+    if (!name.trim() || !phone.trim() || !address.trim() || !pincode.trim()) {
+      setSignUpMessage('Please fill in all signup details.');
+      setIsSigningUp(false);
+      return;
+    }
+    if (!/^\d{10}$/.test(phone)) {
+        setSignUpMessage('Please enter a valid 10-digit phone number.');
+        setIsSigningUp(false);
+        return;
+    }
+    if (!/^\d{6}$/.test(pincode)) {
+        setSignUpMessage('Please enter a valid 6-digit pincode.');
+        setIsSigningUp(false);
+        return;
+    }
+
+    try {
+        // --- Check for existing user (by phone number) ---
+        const checkRes = await fetch(SIGNUP_SHEET_URL);
+        if (!checkRes.ok) {
+            throw new Error(`Failed to check existing users: ${checkRes.status} ${checkRes.statusText}`);
+        }
+        const existingUsers = await checkRes.json();
+        if (Array.isArray(existingUsers) && existingUsers.some(user => user.phone === phone)) {
+            setSignUpMessage('An account with this phone number already exists. Please use a different number or proceed to order.');
+            setIsSigningUp(false);
+            return;
+        }
+
+        // --- Proceed with new user signup ---
+        const response = await fetch(SIGNUP_SHEET_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data: {
+                name: name.trim(),
+                phone: phone.trim(),
+                address: address.trim(),
+                pincode: pincode.trim(),
+                'Signup Date': new Date().toLocaleString(),
+            }}),
+        });
+
+        if (response.ok) {
+            const newUser = { name: name.trim(), phone: phone.trim(), address: address.trim(), pincode: pincode.trim() };
+            localStorage.setItem('loggedInUser', JSON.stringify(newUser)); // Store in local storage
+            setLoggedInUser(newUser);
+            setIsLoggedIn(true);
+            setSignUpMessage('Account created successfully! You can now place your order.');
+            
+            // Auto-fill order form
+            setForm(prevForm => ({
+              ...prevForm,
+              name: newUser.name,
+              contact: newUser.phone,
+              delivery: newUser.address,
+            }));
+
+            setShowSignUpModal(false); // Close signup form
+            setShowSignUpPromptModal(false); // Close prompt if it was open
+            
+            // Immediately open the order confirmation modal after signup
+            // Re-run handleSubmit to trigger the confirmation modal now that user is logged in
+            // Create a dummy event object for handleSubmit
+            const dummyEvent = { preventDefault: () => {} };
+            handleSubmit(dummyEvent); 
+
+        } else {
+            const errorData = await response.json();
+            console.error('SheetDB signup error:', response.status, errorData);
+            setSignUpMessage(`Failed to create account: ${errorData.message || 'Server error'}. Please try again.`);
+        }
+    } catch (err) {
+        console.error('Network or signup error:', err);
+        setSignUpMessage('Failed to create account. Please check your internet connection and try again.');
+    }
+
+    setIsSigningUp(false);
+  };
+
+  // --- Logout Function ---
+  const handleLogout = () => {
+    localStorage.removeItem('loggedInUser');
+    setIsLoggedIn(false);
+    setLoggedInUser(null);
+    // Clear order form personal details
+    setForm({ name: '', delivery: '', contact: '' });
+    setSubmissionMessage('You have been logged out.');
   };
 
   const getWhatsappLink = () => {
@@ -238,7 +405,7 @@ export default function Home({ lemons }) {
     const whatsappContact = `91${form.contact}`;
     const whatsappMessage = `Hi, I'm ${form.name}.\n\nI want to order: ${orderDetails}.\n\nDelivery Address: ${form.delivery}.\nContact: ${form.contact}\n\nTotal estimated price: ₹${total.toFixed(2)}\n\nPlease confirm availability and final amount.`;
     
-    return `https://wa.me/${whatsappContact}?text=${encodeURIComponent(whatsappMessage)}`;
+    return `https://wa.wa.me/${whatsappContact}?text=${encodeURIComponent(whatsappMessage)}`;
   };
 
   return (
@@ -253,6 +420,19 @@ export default function Home({ lemons }) {
         <link rel="canonical" href="https://3lemons.in" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
       </Head>
+
+      {/* --- Account Display Area --- */}
+      <div className={styles.accountDisplay}>
+        {isLoggedIn && loggedInUser ? (
+          <Fragment>
+            <FaUserCircle style={{ fontSize: '1.2rem', color: '#00796b' }} />
+            <span>Hi, {loggedInUser.name}</span>
+            <button onClick={handleLogout}>Logout</button>
+          </Fragment>
+        ) : (
+          <span>Guest User</span>
+        )}
+      </div>
 
       <main className={styles.container}>
         {/* --- Hero Section --- */}
@@ -320,6 +500,8 @@ export default function Home({ lemons }) {
                 required
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
+                readOnly={isLoggedIn} // Make read-only if logged in
+                style={isLoggedIn ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
               />
             </div>
 
@@ -331,6 +513,8 @@ export default function Home({ lemons }) {
                 required
                 value={form.delivery}
                 onChange={(e) => setForm({ ...form, delivery: e.target.value })}
+                readOnly={isLoggedIn} // Make read-only if logged in
+                style={isLoggedIn ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
               />
             </div>
 
@@ -347,6 +531,8 @@ export default function Home({ lemons }) {
                 pattern="[0-9]{10}"
                 title="Please enter a 10-digit mobile number"
                 placeholder="e.g., 9876543210"
+                readOnly={isLoggedIn} // Make read-only if logged in
+                style={isLoggedIn ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
               />
             </div>
 
@@ -495,6 +681,116 @@ export default function Home({ lemons }) {
                     Close
                 </button>
             </div>
+        </div>
+      )}
+
+      {/* --- Sign Up Prompt Modal (New) --- */}
+      {showSignUpPromptModal && (
+        <div className={`${styles.modalOverlay} ${showSignUpPromptModal ? styles.visible : ''}`}>
+          <div className={styles.modalContent}>
+            <button className={styles.modalCloseButton} onClick={closeSignUpPromptModal}>
+                <IoCloseCircleOutline />
+            </button>
+            <h2 className={styles.modalTitle}>Please Sign Up to Order</h2>
+            <p className={styles.modalText}>
+              To place an order for fresh lemons, please sign up for an account. It's quick and easy!
+            </p>
+            <div className={styles.modalButtons}>
+              <button 
+                className={styles.modalButton} 
+                onClick={() => { 
+                    setShowSignUpPromptModal(false); 
+                    setShowSignUpModal(true); 
+                }}
+              >
+                Sign Up Now
+              </button>
+              <button className={`${styles.modalButton} ${styles.cancel}`} onClick={closeSignUpPromptModal}>
+                Maybe Later
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- Sign Up Form Modal (New) --- */}
+      {showSignUpModal && (
+        <div className={`${styles.modalOverlay} ${showSignUpModal ? styles.visible : ''}`}>
+          <div className={styles.modalContent}>
+            <button className={styles.modalCloseButton} onClick={closeSignUpModal}>
+                <IoCloseCircleOutline />
+            </button>
+            <h2 className={styles.modalTitle}>Create Your Account</h2>
+            {signUpMessage && (
+              <p className={styles.statusMessage} style={{ color: signUpMessage.includes('successfully') ? 'green' : 'red' }}>
+                {signUpMessage}
+              </p>
+            )}
+            <form onSubmit={handleSignUpSubmit}>
+              <div className={styles.formGroup}>
+                <label className={styles.label} htmlFor="signup-name">Your Name</label>
+                <input
+                  id="signup-name"
+                  className={styles.input}
+                  name="name"
+                  required
+                  value={signUpForm.name}
+                  onChange={handleSignUpFormChange}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label} htmlFor="signup-phone">Phone Number</label>
+                <input
+                  id="signup-phone"
+                  type="tel"
+                  className={styles.input}
+                  name="phone"
+                  required
+                  value={signUpForm.phone}
+                  onChange={handleSignUpFormChange}
+                  maxLength={10}
+                  pattern="[0-9]{10}"
+                  title="Please enter a 10-digit phone number"
+                  placeholder="e.g., 9876543210"
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label} htmlFor="signup-address">Delivery Address</label>
+                <input
+                  id="signup-address"
+                  className={styles.input}
+                  name="address"
+                  required
+                  value={signUpForm.address}
+                  onChange={handleSignUpFormChange}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label} htmlFor="signup-pincode">Pincode</label>
+                <input
+                  id="signup-pincode"
+                  type="text" // Use text to allow partial input without number validation issues
+                  className={styles.input}
+                  name="pincode"
+                  required
+                  value={signUpForm.pincode}
+                  onChange={handleSignUpFormChange}
+                  maxLength={6}
+                  pattern="[0-9]{6}"
+                  title="Please enter a 6-digit pincode"
+                  placeholder="e.g., 123456"
+                />
+              </div>
+              <div className={styles.modalButtons}>
+                <button type="submit" className={styles.modalButton} disabled={isSigningUp}>
+                  {isSigningUp ? 'Creating Account...' : 'Sign Up'}
+                </button>
+                <button type="button" className={`${styles.modalButton} ${styles.cancel}`} onClick={closeSignUpModal}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
