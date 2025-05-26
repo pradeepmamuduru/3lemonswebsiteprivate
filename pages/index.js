@@ -54,6 +54,12 @@ export default function Home({ lemons }) {
     const [signUpForm, setSignUpForm] = useState({ name: '', phone: '', address: '', pincode: '' });
     const [isSigningUp, setIsSigningUp] = useState(false);
 
+    // NEW: Login Modal states
+    const [showLoginModal, setShowLoginModal] = useState(false);
+    const [loginForm, setLoginForm] = useState({ name: '', phone: '' });
+    const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+
     // Account Sidebar states
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [activeAccountTab, setActiveAccountTab] = useState('accountDetails'); // 'accountDetails', 'addresses', 'feedback'
@@ -187,25 +193,23 @@ export default function Home({ lemons }) {
         }
         // --- End Validation ---
 
-        // --- Authentication Check ---
+        // --- Authentication Check (when ordering) ---
+        // This is the existing flow for users who are not explicitly logged in via the login button,
+        // but are attempting to order.
         if (!isLoggedIn) {
             setIsSubmitting(true); // Show loading state while checking user
             try {
                 const checkRes = await fetch(`${SIGNUP_SHEET_URL}?searchField=phone&searchValue=${form.contact}`);
 
-                // Check if response is explicitly not OK or if it's a 404 (SheetDB returns 404 for no data)
                 if (!checkRes.ok && checkRes.status !== 404) {
                      throw new Error(`Failed to check existing users: ${checkRes.status} ${checkRes.statusText}`);
                 }
 
                 let existingUsers = [];
-                // SheetDB returns 404 and 'Not Found' if no data, or an empty array [] if search found nothing but data is present.
-                // We need to parse JSON only if status is not 204 (No Content) or 404 (Not Found)
                 if (checkRes.status !== 204 && checkRes.status !== 404) {
                     existingUsers = await checkRes.json();
                 }
 
-                // Ensure existingUsers is always an array
                 if (!Array.isArray(existingUsers)) {
                     existingUsers = [];
                 }
@@ -238,8 +242,8 @@ export default function Home({ lemons }) {
                     return;
                 }
             } catch (error) {
-                console.error("Error checking user existence:", error);
-                showTemporaryFeedback('Failed to verify user. Please try again.', 'error'); // This might be the message you're seeing
+                console.error("Error checking user existence during order attempt:", error);
+                showTemporaryFeedback('Failed to verify user. Please try again.', 'error');
                 setIsSubmitting(false);
                 return;
             }
@@ -363,7 +367,7 @@ export default function Home({ lemons }) {
         const { name, value } = e.target;
         // Pincode validation
         if (name === 'pincode') {
-            if (!/^\d*$/.test(value) || value.length > 6) { // Corrected regex here
+            if (!/^\d*$/.test(value) || value.length > 6) {
                 return;
             }
         }
@@ -402,8 +406,7 @@ export default function Home({ lemons }) {
         try {
             // --- Check for existing user (by phone number) before new signup ---
             const checkRes = await fetch(`${SIGNUP_SHEET_URL}?searchField=phone&searchValue=${phone}`);
-            
-            // Check if response is explicitly not OK or if it's a 404 (SheetDB returns 404 for no data)
+
             if (!checkRes.ok && checkRes.status !== 404) {
                  throw new Error(`Failed to check existing users during signup: ${checkRes.status} ${checkRes.statusText}`);
             }
@@ -457,10 +460,14 @@ export default function Home({ lemons }) {
 
                 setShowSignUpModal(false); // Close signup form
                 setShowSignUpPromptModal(false); // Close prompt if it was open
+                setShowLoginModal(false); // Ensure login modal is closed if it was open before signup
 
-                // Immediately open the order confirmation modal after signup
-                const dummyEvent = { preventDefault: () => { } };
-                handleSubmit(dummyEvent);
+                // Immediately open the order confirmation modal after signup if there was an order pending
+                if (orders.filter(o => o.grade && o.quantity && parseInt(o.quantity) > 0).length > 0) {
+                    const dummyEvent = { preventDefault: () => { } };
+                    handleSubmit(dummyEvent);
+                }
+
 
             } else {
                 const errorData = await response.json();
@@ -474,6 +481,98 @@ export default function Home({ lemons }) {
             setIsSigningUp(false);
         }
     };
+
+
+    // --- NEW: Login Modal Handlers ---
+    const openLoginModal = () => {
+        setShowLoginModal(true);
+        setLoginForm({ name: '', phone: '' }); // Clear login form
+        setFeedback({ message: '', type: '' }); // Clear any general feedback
+    };
+
+    const closeLoginModal = () => {
+        setShowLoginModal(false);
+        setLoginForm({ name: '', phone: '' });
+        setFeedback({ message: '', type: '' }); // Clear login messages
+    };
+
+    const handleLoginFormChange = (e) => {
+        const { name, value } = e.target;
+        if (name === 'phone') {
+            if (!/^\d*$/.test(value) || value.length > 10) {
+                return;
+            }
+        }
+        setLoginForm(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleLoginSubmit = async (e) => {
+        e.preventDefault();
+        setIsLoggingIn(true);
+        setFeedback({ message: '', type: '' }); // Clear any previous login messages
+
+        const { name, phone } = loginForm;
+
+        // Basic validation
+        if (!name.trim() || !phone.trim()) {
+            showTemporaryFeedback('Please enter both name and phone number.', 'error');
+            setIsLoggingIn(false);
+            return;
+        }
+        if (!/^\d{10}$/.test(phone)) {
+            showTemporaryFeedback('Please enter a valid 10-digit phone number.', 'error');
+            setIsLoggingIn(false);
+            return;
+        }
+
+        try {
+            const checkRes = await fetch(`${SIGNUP_SHEET_URL}?searchField=phone&searchValue=${phone}`);
+
+            if (!checkRes.ok && checkRes.status !== 404) {
+                 throw new Error(`Failed to check existing users during login: ${checkRes.status} ${checkRes.statusText}`);
+            }
+
+            let existingUsers = [];
+            if (checkRes.status !== 204 && checkRes.status !== 404) {
+                existingUsers = await checkRes.json();
+            }
+
+            if (!Array.isArray(existingUsers)) {
+                existingUsers = [];
+            }
+
+            const foundUser = existingUsers.find(user => user.phone === phone && user.name.toLowerCase() === name.toLowerCase());
+
+            if (foundUser) {
+                localStorage.setItem('loggedInUser', JSON.stringify(foundUser));
+                setLoggedInUser(foundUser);
+                setIsLoggedIn(true);
+                setAccountDetailsForm(foundUser); // Sync sidebar form
+                showTemporaryFeedback(`Welcome back, ${foundUser.name}! 😊`, 'success');
+
+                // Auto-fill order form
+                setForm(prevForm => ({
+                    ...prevForm,
+                    name: foundUser.name,
+                    contact: foundUser.phone,
+                    delivery: foundUser.address,
+                }));
+
+                closeLoginModal(); // Close the login modal
+            } else {
+                showTemporaryFeedback('Account not found with provided name and phone number. Please try again or sign up.', 'error');
+                // Option to lead to signup:
+                // setShowSignUpModal(true); // Open signup modal directly
+                // closeLoginModal();
+            }
+        } catch (error) {
+            console.error("Error during login:", error);
+            showTemporaryFeedback('Failed to log in. Please try again later.', 'error');
+        } finally {
+            setIsLoggingIn(false);
+        }
+    };
+
 
     // --- Logout Function ---
     const handleLogout = () => {
@@ -490,16 +589,22 @@ export default function Home({ lemons }) {
 
     // --- Account Sidebar Handlers ---
     const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-        if (!isSidebarOpen) { // If opening, reset to default tab and clear messages
-            setActiveAccountTab('accountDetails');
-            setFeedback({ message: '', type: '' }); // Clear any general feedback
-            // Ensure accountDetailsForm is synced with loggedInUser when opening
-            if (loggedInUser) {
-                setAccountDetailsForm(loggedInUser);
+        if (isLoggedIn) { // Only open sidebar if logged in
+            setIsSidebarOpen(!isSidebarOpen);
+            if (!isSidebarOpen) { // If opening, reset to default tab and clear messages
+                setActiveAccountTab('accountDetails');
+                setFeedback({ message: '', type: '' }); // Clear any general feedback
+                // Ensure accountDetailsForm is synced with loggedInUser when opening
+                if (loggedInUser) {
+                    setAccountDetailsForm(loggedInUser);
+                }
+                setShowAddressForm(false); // Hide address form in case it was open
+                setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' }); // Reset address form
             }
-            setShowAddressForm(false); // Hide address form in case it was open
-            setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' }); // Reset address form
+        } else {
+            // If user tries to open sidebar without being logged in, prompt login
+            openLoginModal();
+            showTemporaryFeedback('Please log in to access your account.', 'info');
         }
     };
 
@@ -602,7 +707,7 @@ export default function Home({ lemons }) {
     const handleAddressFormChange = (e) => {
         const { name, value } = e.target;
         if (name === 'pincode') {
-            if (!/^\d*$/.test(value) || value.length > 6) { // Corrected regex here
+            if (!/^\d*$/.test(value) || value.length > 6) {
                 return;
             }
         }
@@ -751,10 +856,16 @@ export default function Home({ lemons }) {
                 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
             </Head>
 
-            {/* --- NEW: Header with Hamburger Menu --- */}
+            {/* --- NEW: Header with Login Button / Account Icon --- */}
             <header className={styles.header}>
                 <h1 className={styles.headerTitle}>3 Lemons Traders</h1>
-                <IoMenu className={styles.hamburgerIcon} onClick={toggleSidebar} />
+                {isLoggedIn ? (
+                    <IoMenu className={styles.hamburgerIcon} onClick={toggleSidebar} />
+                ) : (
+                    <button className={styles.loginButton} onClick={openLoginModal}>
+                        Login
+                    </button>
+                )}
             </header>
 
             <main className={styles.container}>
@@ -960,7 +1071,7 @@ export default function Home({ lemons }) {
                                     ))}
                                     {Array.from({ length: 5 - review.rating }).map((_, i) => (
                                         <FaStar key={i + review.rating} style={{ opacity: 0.3 }} />
-                                    ))}
+                                    )}
                                 </div>
                                 <p className={styles.reviewText}>"{review.text}"</p>
                                 <p className={styles.reviewerName}>- {review.name}</p>
@@ -1100,7 +1211,7 @@ export default function Home({ lemons }) {
                                     onChange={handleSignUpFormChange}
                                     maxLength={10}
                                     pattern="[0-9]{10}"
-                                    title="Please enter a 10-digit phone number"
+                                    title="Please enter a 10-digit mobile number"
                                     placeholder="e.g., 9876543210"
                                 />
                             </div>
@@ -1137,6 +1248,63 @@ export default function Home({ lemons }) {
                                 </button>
                                 <button type="button" className={`${styles.modalButton} ${styles.cancel}`} onClick={closeSignUpModal}>
                                     Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* --- NEW: Login Modal --- */}
+            {showLoginModal && (
+                <div className={`${styles.modalOverlay} ${showLoginModal ? styles.visible : ''}`}>
+                    <div className={styles.modalContent}>
+                        <button className={styles.modalCloseButton} onClick={closeLoginModal}>
+                            <IoCloseCircleOutline />
+                        </button>
+                        <h2 className={styles.modalTitle}>Login to Your Account</h2>
+                        {feedback.message && feedback.type === 'error' && (
+                            <p className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
+                                {feedback.message}
+                            </p>
+                        )}
+                        <form onSubmit={handleLoginSubmit}>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label} htmlFor="login-name">Your Name</label>
+                                <input
+                                    id="login-name"
+                                    className={styles.input}
+                                    name="name"
+                                    required
+                                    value={loginForm.name}
+                                    onChange={handleLoginFormChange}
+                                />
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label} htmlFor="login-phone">Phone Number</label>
+                                <input
+                                    id="login-phone"
+                                    type="tel"
+                                    className={styles.input}
+                                    name="phone"
+                                    required
+                                    value={loginForm.phone}
+                                    onChange={handleLoginFormChange}
+                                    maxLength={10}
+                                    pattern="[0-9]{10}"
+                                    title="Please enter a 10-digit mobile number"
+                                    placeholder="e.g., 9876543210"
+                                />
+                            </div>
+                            <div className={styles.modalButtons}>
+                                <button type="submit" className={styles.modalButton} disabled={isLoggingIn}>
+                                    {isLoggingIn ? 'Logging In...' : 'Login'}
+                                </button>
+                                <button type="button" className={`${styles.modalButton} ${styles.cancel}`} onClick={() => {
+                                    closeLoginModal();
+                                    setShowSignUpModal(true); // Offer signup if login fails
+                                }}>
+                                    New User? Sign Up
                                 </button>
                             </div>
                         </form>
