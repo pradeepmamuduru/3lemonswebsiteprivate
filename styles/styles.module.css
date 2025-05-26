@@ -12,6 +12,37 @@
   min-height: 100vh; /* Ensures footer sticks to bottom on short content pages */
 }
 
+/* Account Display at the top */
+.accountDisplay {
+    text-align: right;
+    padding: 10px 20px;
+    background-color: #f0f4f7; /* Light grey background */
+    border-bottom: 1px solid #e0e0e0;
+    color: #004d40; /* Dark teal text */
+    font-weight: bold;
+    font-size: 0.95rem;
+    display: flex;
+    justify-content: flex-end; /* Align content to the right */
+    align-items: center;
+    gap: 10px; /* Space between name and button */
+}
+
+.accountDisplay button {
+    background: none;
+    border: none;
+    color: #00796b; /* Teal link color */
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 0.9rem;
+    padding: 0; /* Remove default button padding */
+}
+
+.accountDisplay button:hover {
+    color: #005c50; /* Darker teal on hover */
+}
+
+
 /* Container for main content, centered with max-width */
 .container {
   max-width: 1200px; /* Wider max-width for modern desktop screens */
@@ -488,7 +519,6 @@
     color: #004d40;
     margin-bottom: 30px;
 }
-
 
 /* Responsive Adjustments using Media Queries */
 
