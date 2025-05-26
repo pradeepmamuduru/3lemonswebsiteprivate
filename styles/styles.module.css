@@ -1,31 +1,24 @@
-/* General Body and Container Styles */
-html, body {
-    padding: 0;
-    margin: 0;
-    font-family: 'Inter', sans-serif;
-    background-color: #f8f8f8;
-    color: #333;
-    scroll-behavior: smooth;
-}
+/* styles/styles.module.css */
 
+/* General Page Layout Styles (not global HTML/BODY) */
 .page {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    flex-grow: 1; /* Allows main content to grow and push footer down */
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  flex-grow: 1; /* Allows main content to grow and push footer down */
 }
 
 /* Header Styles */
 .header {
     background-color: #4CAF50; /* Green header */
     color: white;
-    padding: 15px 20px;
+    padding: 15px 25px; /* Increased right padding for better spacing */
     display: flex;
     justify-content: space-between; /* Puts title and hamburger on opposite ends */
     align-items: center;
@@ -47,12 +40,9 @@ html, body {
     cursor: pointer;
     color: white;
     transition: color 0.3s ease;
-    /* Adjusting position for visibility */
-    position: absolute; /* Allows precise positioning relative to header */
-    right: 20px; /* Move it 20px from the right edge */
-    top: 50%;
-    transform: translateY(-50%); /* Vertically center it */
-    z-index: 1001; /* Ensure it's above header elements if any overlap */
+    /* Removed absolute positioning to rely on flexbox and header padding */
+    z-index: 1001; /* Still keep high z-index */
+    /* No explicit margin-left needed, flexbox handles spacing */
 }
 
 .hamburgerIcon:hover {
