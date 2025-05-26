@@ -161,7 +161,7 @@ export default function Home({ lemons }) {
     // --- Main Order Submission Flow (now checks login status) ---
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setFeedback({ message: '', type: '' }); // Clear any previous messages
+        setFeedback({ message: '', type: '' }); // Clear any previous messages immediately
 
         // --- Client-Side Form Validation ---
         if (!form.name.trim() || !form.delivery.trim() || !form.contact.trim()) {
@@ -192,12 +192,25 @@ export default function Home({ lemons }) {
             setIsSubmitting(true); // Show loading state while checking user
             try {
                 const checkRes = await fetch(`${SIGNUP_SHEET_URL}?searchField=phone&searchValue=${form.contact}`);
-                if (!checkRes.ok) {
-                    throw new Error(`Failed to check existing users: ${checkRes.status} ${checkRes.statusText}`);
-                }
-                const existingUsers = await checkRes.json();
 
-                if (Array.isArray(existingUsers) && existingUsers.length > 0) {
+                // Check if response is explicitly not OK or if it's a 404 (SheetDB returns 404 for no data)
+                if (!checkRes.ok && checkRes.status !== 404) {
+                     throw new Error(`Failed to check existing users: ${checkRes.status} ${checkRes.statusText}`);
+                }
+
+                let existingUsers = [];
+                // SheetDB returns 404 and 'Not Found' if no data, or an empty array [] if search found nothing but data is present.
+                // We need to parse JSON only if status is not 204 (No Content) or 404 (Not Found)
+                if (checkRes.status !== 204 && checkRes.status !== 404) {
+                    existingUsers = await checkRes.json();
+                }
+
+                // Ensure existingUsers is always an array
+                if (!Array.isArray(existingUsers)) {
+                    existingUsers = [];
+                }
+
+                if (existingUsers.length > 0) {
                     // User exists, "log them in"
                     const user = existingUsers[0];
                     localStorage.setItem('loggedInUser', JSON.stringify(user));
@@ -216,23 +229,23 @@ export default function Home({ lemons }) {
                     // Now that user is logged in, proceed to show confirmation modal
                     // Re-call handleSubmit to trigger the confirmation modal logic
                     const dummyEvent = { preventDefault: () => { } };
-                    handleSubmit(dummyEvent);
+                    handleSubmit(dummyEvent); // <--- Recursive call to proceed after login
                     return; // Exit to prevent further execution in this call
                 } else {
                     // User does not exist, prompt for signup
                     setIsSubmitting(false);
-                    setShowSignUpPromptModal(true);
+                    setShowSignUpPromptModal(true); // <--- This should trigger the popup
                     return;
                 }
             } catch (error) {
                 console.error("Error checking user existence:", error);
-                showTemporaryFeedback('Failed to verify user. Please try again.', 'error');
+                showTemporaryFeedback('Failed to verify user. Please try again.', 'error'); // This might be the message you're seeing
                 setIsSubmitting(false);
                 return;
             }
         }
 
-        // If logged in, proceed to show confirmation modal
+        // If logged in (or just logged in via the above block), proceed to show confirmation modal
         const preparedOrderRows = validOrders.map(order => {
             const lemon = lemons.find(l => l.Grade === order.grade);
             const pricePerKg = parseFloat(lemon?.['Price Per Kg'] || 0);
@@ -389,11 +402,23 @@ export default function Home({ lemons }) {
         try {
             // --- Check for existing user (by phone number) before new signup ---
             const checkRes = await fetch(`${SIGNUP_SHEET_URL}?searchField=phone&searchValue=${phone}`);
-            if (!checkRes.ok) {
-                throw new Error(`Failed to check existing users during signup: ${checkRes.status} ${checkRes.statusText}`);
+            
+            // Check if response is explicitly not OK or if it's a 404 (SheetDB returns 404 for no data)
+            if (!checkRes.ok && checkRes.status !== 404) {
+                 throw new Error(`Failed to check existing users during signup: ${checkRes.status} ${checkRes.statusText}`);
             }
-            const existingUsers = await checkRes.json();
-            if (Array.isArray(existingUsers) && existingUsers.length > 0) {
+
+            let existingUsers = [];
+            if (checkRes.status !== 204 && checkRes.status !== 404) {
+                existingUsers = await checkRes.json();
+            }
+
+            if (!Array.isArray(existingUsers)) {
+                existingUsers = [];
+            }
+
+
+            if (existingUsers.length > 0) {
                 showTemporaryFeedback('An account with this phone number already exists. Please login or use a different number.', 'error');
                 setIsSigningUp(false);
                 return;
