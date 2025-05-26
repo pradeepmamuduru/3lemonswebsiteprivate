@@ -1,60 +1,390 @@
-.container { 
-  max-width: 600px;
-  margin: auto;
-  padding: 20px;
-  font-family: sans-serif;
-  background-color: #e0f7fa;
-  border-radius: 12px;
+/* General Body and Page Styles */
+.page {
+  background-color: #f8f8f8; /* Light background for the entire page */
+  color: #333; /* Default text color */
+  line-height: 1.6; /* Improved readability */
+  font-family: 'Inter', sans-serif; /* Modern, clean font */
+  padding: 0;
+  margin: 0;
+  overflow-x: hidden; /* Prevents horizontal scroll from responsive elements */
+  display: flex; /* Use flexbox for overall page layout */
+  flex-direction: column; /* Stack content vertically */
+  min-height: 100vh; /* Ensures footer sticks to bottom on short content pages */
 }
 
-.title {
+/* Container for main content, centered with max-width */
+.container {
+  max-width: 1200px; /* Wider max-width for modern desktop screens */
+  margin: 0 auto; /* Centers the container horizontally */
+  padding: 20px; /* Internal padding for content */
+  box-sizing: border-box; /* Ensures padding is included in the element's total width/height */
+  flex-grow: 1; /* Allows main content to grow and push footer down */
+}
+
+/* Section Titles - consistent styling for h2 tags */
+.sectionTitle {
   text-align: center;
-  color: #00796b;
+  color: #00796b; /* Dominant teal color */
+  font-size: 2.5rem; /* Large and prominent */
+  margin-bottom: 40px; /* Space below title */
+  margin-top: 60px; /* Space above title */
+  font-weight: 700; /* Bold font */
 }
 
-.formGroup {
+/* Hero Section Styles */
+.hero {
+  position: relative;
+  width: 100%;
+  height: 400px; /* Fixed height for the hero section */
+  overflow: hidden; /* Hides parts of the image that go beyond bounds */
+  border-radius: 12px; /* Soft rounded corners */
+  display: flex;
+  align-items: center; /* Vertically center content */
+  justify-content: center; /* Horizontally center content */
+  text-align: center;
+  margin-bottom: 40px; /* Space below hero */
+}
+
+.heroImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the image covers the entire area without distortion */
+  filter: brightness(0.7); /* Darkens the image slightly for better text readability */
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1; /* Places image behind text */
+}
+
+.heroOverlay {
+  position: relative;
+  z-index: 2; /* Ensures text is above the image */
+  color: white;
+  padding: 20px;
+  max-width: 800px; /* Limits width of text for readability */
+}
+
+.heroTitle {
+  font-size: 3.5rem; /* Very large title for impact */
+  margin-bottom: 15px;
+  font-weight: 800; /* Extra bold */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Adds depth to text */
+}
+
+.heroSubtitle {
+  font-size: 1.5rem;
+  margin-bottom: 30px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.heroButton {
+  background-color: #ffc107; /* Bright yellow for a noticeable call-to-action */
+  color: #333;
+  padding: 12px 30px;
+  border-radius: 50px; /* Creates a pill shape */
+  text-decoration: none; /* Removes underline */
+  font-weight: bold;
+  font-size: 1.1rem;
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth hover effects */
+  display: inline-block; /* Allows padding and transformation */
+}
+
+.heroButton:hover {
+  background-color: #ffb300;
+  transform: translateY(-2px); /* Slight lift on hover */
+}
+
+/* Lemon Products Section */
+.lemonsSection {
+  padding: 40px 0; /* Vertical padding */
+}
+
+.lemonsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid columns */
+  gap: 30px; /* Space between grid items (cards) */
+  padding: 0 20px; /* Horizontal padding for mobile view */
+}
+
+.lemonCard {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+  overflow: hidden; /* Ensures image corners match card corners */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effects */
+  display: flex;
+  flex-direction: column; /* Stacks content vertically */
+  align-items: center; /* Centers content horizontally within the card */
+  text-align: center;
+  padding-bottom: 20px; /* Space below content in card */
+}
+
+.lemonCard:hover {
+  transform: translateY(-5px); /* Lifts card on hover */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Enhances shadow on hover */
+}
+
+.cardImage {
+  width: 100%;
+  height: 200px; /* Fixed height for consistent image sizes */
+  object-fit: cover;
+  border-bottom: 1px solid #eee; /* Separator below image */
   margin-bottom: 15px;
 }
 
-.label {
-  display: block;
+.cardTitle {
+  font-size: 1.4rem;
   font-weight: bold;
-  margin-bottom: 5px;
+  color: #00796b;
+  margin-bottom: 10px;
+  padding: 0 15px;
+}
+
+.cardDescription {
+  font-size: 0.95rem;
+  color: #555;
+  padding: 0 15px;
+}
+
+/* Form Section */
+.formSection {
+  background-color: #e0f7fa; /* Light teal background for the form area */
+  padding: 50px 20px;
+  border-radius: 12px;
+  margin-top: 60px;
+}
+
+.form {
+  max-width: 700px; /* Wider form for better multi-column layout */
+  margin: 0 auto; /* Center the form within its section */
+}
+
+/* Grid for grouping personal details inputs */
+.inputGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Two columns on larger screens */
+  gap: 20px; /* Space between inputs */
+  margin-bottom: 30px;
+}
+
+.formGroup {
+  margin-bottom: 20px; /* Space between each form field group */
+}
+
+.label {
+  display: block; /* Ensures label is on its own line */
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #004d40; /* Darker teal for labels */
+  font-size: 1.1rem;
 }
 
 .input,
 .select {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
+  padding: 12px;
+  border: 1px solid #b2dfdb; /* Lighter teal border */
   border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box; /* Important for consistent width calculation */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth focus effects */
 }
 
+.input:focus,
+.select:focus {
+  border-color: #00796b; /* Accent color on focus */
+  box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.2); /* Soft glow on focus */
+  outline: none; /* Removes default outline */
+}
+
+/* Discount Note specific styling */
+.discountNote {
+  color: #d32f2f; /* Red to draw attention */
+  font-weight: bold;
+  margin-left: 10px;
+  font-size: 0.9em; /* Slightly smaller text */
+}
+
+/* Order Summary (Total Price) */
+.orderSummary {
+  margin: 30px 0;
+  font-weight: bold;
+  font-size: 24px;
+  text-align: right; /* Aligns total to the right */
+  color: #004d40;
+}
+
+.orderSummary h3 {
+  margin: 0;
+}
+
+/* Common Button Styles */
 .button {
-  display: inline-block;
-  background-color: #00796b;
+  display: block; /* Full width on small screens */
+  width: 100%;
+  background-color: #00796b; /* Primary button color */
   color: white;
   border: none;
-  padding: 10px 16px;
+  padding: 12px 20px;
   border-radius: 8px;
   cursor: pointer;
-  margin: 10px 0;
-  text-decoration: none;
+  margin-bottom: 15px; /* Space between buttons */
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-decoration: none; /* For anchor buttons */
   text-align: center;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .button:hover {
   background-color: #005c50;
+  transform: translateY(-2px); /* Slight lift on hover */
 }
 
-.orderSummary {
-  margin: 20px 0;
+.button:disabled {
+  background-color: #cccccc; /* Greyed out when disabled */
+  cursor: not-allowed;
+  opacity: 0.8; /* Slight fade */
+}
+
+/* Specific WhatsApp Button Styling */
+.whatsappButton {
+  background-color: #25d366; /* Official WhatsApp green */
+  display: flex; /* Enable flex for icon alignment */
+  align-items: center;
+  justify-content: center;
+}
+
+.whatsappButton:hover {
+  background-color: #128c7e; /* Darker WhatsApp green on hover */
+}
+
+.whatsappIcon {
+  margin-right: 8px; /* Space between icon and text */
+  font-size: 1.2em; /* Slightly larger icon */
+  vertical-align: middle; /* Aligns icon with text baseline */
+}
+
+/* Status Message (Success/Error) */
+.statusMessage {
+  text-align: center;
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 8px;
   font-weight: bold;
-  font-size: 18px;
+  /* Colors are set inline in JS based on success/error */
 }
 
+/* Customer Reviews Section */
+.reviewsSection {
+  background-color: #f0f4f7; /* Light gray background */
+  padding: 60px 20px;
+  margin-top: 60px;
+  border-radius: 12px;
+}
+
+.reviewsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid for reviews */
+  gap: 30px;
+  padding: 0 20px;
+}
+
+.reviewCard {
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Pushes content to top/bottom edges */
+  text-align: center;
+}
+
+.reviewText {
+  font-style: italic;
+  margin-bottom: 20px;
+  color: #555;
+  font-size: 1.05rem;
+}
+
+.reviewerName {
+  font-weight: bold;
+  color: #00796b;
+  font-size: 1.1rem;
+  margin-top: 10px;
+}
+
+.reviewerRating {
+  color: #ffc107; /* Gold stars */
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+/* Footer Styles */
 .footer {
   text-align: center;
-  margin-top: 30px;
-  font-size: 14px;
+  margin-top: 50px;
+  padding: 30px 20px;
+  font-size: 0.9rem;
+  color: #777;
+  background-color: #e0f7fa; /* Matches form section */
+  border-top: 1px solid #b2dfdb;
+}
+
+.footer a {
+  color: #00796b;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Adjustments using Media Queries */
+
+/* For tablets and larger phones (min-width: 768px) */
+@media (min-width: 768px) {
+  .hero {
+    height: 500px; /* Taller hero on tablets/desktops */
+  }
+
+  .heroTitle {
+    font-size: 4.5rem;
+  }
+
+  .heroSubtitle {
+    font-size: 1.8rem;
+  }
+
+  .lemonsGrid, .reviewsGrid {
+    grid-template-columns: repeat(3, 1fr); /* 3 columns on larger screens */
+  }
+
+  /* Buttons in actions container should be inline-block and have space */
+  .actions .button {
+    width: auto; /* Allow buttons to shrink */
+    display: inline-flex; /* Use inline-flex for side-by-side with icon alignment */
+    margin-right: 15px; /* Space between buttons */
+  }
+
+  .actions .button:last-child {
+      margin-right: 0; /* No margin on the last button */
+  }
+
+  .form {
+    padding: 30px; /* More internal padding for the form */
+  }
+}
+
+/* For large desktops (min-width: 1024px) */
+@media (min-width: 1024px) {
+  .hero {
+    height: 600px; /* Even taller hero on large desktops */
+  }
+
+  .heroTitle {
+    font-size: 5.5rem;
+  }
 }
