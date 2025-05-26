@@ -1,4 +1,3 @@
-
 import { useState, useEffect, Fragment } from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -10,7 +9,7 @@ import styles from '../styles/styles.module.css';
 // --- getStaticProps: Fetches Lemon Product Data ---
 export async function getStaticProps() {
     try {
-        const res = await fetch("[https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Lemons](https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Lemons)"); // *** IMPORTANT: Verify your SheetDB sheet name for lemons here ***
+        const res = await fetch("https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Lemons"); // *** IMPORTANT: Verify your SheetDB sheet name for lemons here ***
         if (!res.ok) {
             throw new Error(`Failed to fetch lemons: ${res.status} ${res.statusText}`);
         }
@@ -66,9 +65,9 @@ export default function Home({ lemons }) {
     const [isManagingAddresses, setIsManagingAddresses] = useState(false); // Loading state for address actions
 
     // SheetDB URLs
-    const ORDERS_SUBMISSION_URL = '[https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=orders](https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=orders)';
-    const SIGNUP_SHEET_URL = '[https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=signup](https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=signup)'; // *** IMPORTANT: This is assumed to be your 'Users' sheet ***
-    const ADDRESSES_SHEET_URL = '[https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Addresses](https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Addresses)'; // *** IMPORTANT: Verify your SheetDB sheet name for addresses here ***
+    const ORDERS_SUBMISSION_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=orders';
+    const SIGNUP_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=signup'; // *** IMPORTANT: This is assumed to be your 'Users' sheet ***
+    const ADDRESSES_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Addresses'; // *** IMPORTANT: Verify your SheetDB sheet name for addresses here ***
 
     // Hardcoded customer reviews
     const customerReviews = [
@@ -351,13 +350,13 @@ export default function Home({ lemons }) {
         const { name, value } = e.target;
         // Pincode validation
         if (name === 'pincode') {
-            if (!/^\d*<span class="math-inline">/\.test\(value\) \|\| value\.length \> 6\) \{
-return;
-\}
-\}
-// Phone number validation for signup form
-if \(name \=\=\= 'phone'\) \{
-if \(\!/^\\d\*</span>/.test(value) || value.length > 10) {
+            if (!/^\d*$/.test(value) || value.length > 6) { // Corrected regex here
+                return;
+            }
+        }
+        // Phone number validation for signup form
+        if (name === 'phone') {
+            if (!/^\d*$/.test(value) || value.length > 10) {
                 return;
             }
         }
@@ -376,12 +375,12 @@ if \(\!/^\\d\*</span>/.test(value) || value.length > 10) {
             setIsSigningUp(false);
             return;
         }
-        if (!/^\d{10}<span class="math-inline">/\.test\(phone\)\) \{
-showTemporaryFeedback\('Please enter a valid 10\-digit phone number\.', 'error'\);
-setIsSigningUp\(false\);
-return;
-\}
-if \(\!/^\\d\{6\}</span>/.test(pincode)) {
+        if (!/^\d{10}$/.test(phone)) {
+            showTemporaryFeedback('Please enter a valid 10-digit phone number.', 'error');
+            setIsSigningUp(false);
+            return;
+        }
+        if (!/^\d{6}$/.test(pincode)) {
             showTemporaryFeedback('Please enter a valid 6-digit pincode.', 'error');
             setIsSigningUp(false);
             return;
@@ -482,27 +481,29 @@ if \(\!/^\\d\{6\}</span>/.test(pincode)) {
     const handleAccountDetailsFormChange = (e) => {
         const { name, value } = e.target;
         if (name === 'pincode') {
-            if (!/^\d*<span class="math-inline">/\.test\(value\) \|\| value\.length \> 6\) \{
-return;
-\}
-\}
-setAccountDetailsForm\(prevForm \=\> \(\{ \.\.\.prevForm, \[name\]\: value \}\)\);
-\};
-const saveAccountDetails \= async \(\) \=\> \{
-if \(\!loggedInUser \|\| \!loggedInUser\.phone\) \{
-showTemporaryFeedback\('Please login to save account details\.', 'error'\);
-return;
-\}
-setIsUpdatingAccount\(true\);
-setFeedback\(\{ message\: '', type\: '' \}\);
-// Basic validation for account details before saving
-const \{ name, address, pincode \} \= accountDetailsForm;
-if \(\!name\.trim\(\) \|\| \!address\.trim\(\) \|\| \!pincode\.trim\(\)\) \{
-showTemporaryFeedback\('Please fill in all account details\.', 'error'\);
-setIsUpdatingAccount\(false\);
-return;
-\}
-if \(\!/^\\d\{6\}</span>/.test(pincode)) {
+            if (!/^\d*$/.test(value) || value.length > 6) { // Corrected regex here
+                return;
+            }
+        }
+        setAccountDetailsForm(prevForm => ({ ...prevForm, [name]: value }));
+    };
+
+    const saveAccountDetails = async () => {
+        if (!loggedInUser || !loggedInUser.phone) {
+            showTemporaryFeedback('Please login to save account details.', 'error');
+            return;
+        }
+        setIsUpdatingAccount(true);
+        setFeedback({ message: '', type: '' });
+
+        // Basic validation for account details before saving
+        const { name, address, pincode } = accountDetailsForm;
+        if (!name.trim() || !address.trim() || !pincode.trim()) {
+            showTemporaryFeedback('Please fill in all account details.', 'error');
+            setIsUpdatingAccount(false);
+            return;
+        }
+        if (!/^\d{6}$/.test(pincode)) {
             showTemporaryFeedback('Please enter a valid 6-digit pincode.', 'error');
             setIsUpdatingAccount(false);
             return;
@@ -576,27 +577,29 @@ if \(\!/^\\d\{6\}</span>/.test(pincode)) {
     const handleAddressFormChange = (e) => {
         const { name, value } = e.target;
         if (name === 'pincode') {
-            if (!/^\d*<span class="math-inline">/\.test\(value\) \|\| value\.length \> 6\) \{
-return;
-\}
-\}
-setAddressForm\(prevForm \=\> \(\{ \.\.\.prevForm, \[name\]\: value \}\)\);
-\};
-const handleSaveAddress \= async \(e\) \=\> \{
-e\.preventDefault\(\);
-if \(\!loggedInUser \|\| \!loggedInUser\.phone\) \{
-showTemporaryFeedback\('Please login to save addresses\.', 'error'\);
-return;
-\}
-setIsManagingAddresses\(true\);
-setFeedback\(\{ message\: '', type\: '' \}\);
-const \{ addressName, fullAddress, pincode, id \} \= addressForm;
-if \(\!addressName\.trim\(\) \|\| \!fullAddress\.trim\(\) \|\| \!pincode\.trim\(\)\) \{
-showTemporaryFeedback\('Please fill all address fields\.', 'error'\);
-setIsManagingAddresses\(false\);
-return;
-\}
-if \(\!/^\\d\{6\}</span>/.test(pincode)) {
+            if (!/^\d*$/.test(value) || value.length > 6) { // Corrected regex here
+                return;
+            }
+        }
+        setAddressForm(prevForm => ({ ...prevForm, [name]: value }));
+    };
+
+    const handleSaveAddress = async (e) => {
+        e.preventDefault();
+        if (!loggedInUser || !loggedInUser.phone) {
+            showTemporaryFeedback('Please login to save addresses.', 'error');
+            return;
+        }
+        setIsManagingAddresses(true);
+        setFeedback({ message: '', type: '' });
+
+        const { addressName, fullAddress, pincode, id } = addressForm;
+        if (!addressName.trim() || !fullAddress.trim() || !pincode.trim()) {
+            showTemporaryFeedback('Please fill all address fields.', 'error');
+            setIsManagingAddresses(false);
+            return;
+        }
+        if (!/^\d{6}$/.test(pincode)) {
             showTemporaryFeedback('Please enter a valid 6-digit pincode.', 'error');
             setIsManagingAddresses(false);
             return;
@@ -719,8 +722,8 @@ if \(\!/^\\d\{6\}</span>/.test(pincode)) {
                 <meta property="og:description" content="Get premium lemons delivered to your door at unbeatable prices. Farm fresh quality. Offering discounts on bulk purchases!" />
                 <meta property="og:image" content="/lemons-hero.jpg" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
-                <link rel="canonical" href="[https://3lemons.in](https://3lemons.in)" />
-                <link href="[https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap)" rel="stylesheet" />
+                <link rel="canonical" href="https://3lemons.in" />
+                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
             </Head>
 
             {/* --- NEW: Header with Hamburger Menu --- */}
@@ -947,7 +950,7 @@ if \(\!/^\\d\{6\}</span>/.test(pincode)) {
             <div className={styles.footer}>
                 <p>Developed by Pradeep Mamuduru</p>
                 <p>
-                    📸 <a href="[https://www.instagram.com/3Lemons_Traders](https://www.instagram.com/3Lemons_Traders)" target="_blank" rel="noopener noreferrer">3Lemons_Traders</a> | 🌐 <a href="[https://3lemons.vercel.app](https://3lemons.vercel.app)">3lemons.vercel.app</a>
+                    📸 <a href="https://www.instagram.com/3Lemons_Traders" target="_blank" rel="noopener noreferrer">3Lemons_Traders</a> | 🌐 <a href="https://3lemons.vercel.app">3lemons.vercel.app</a>
                 </p>
                 <p>&copy; {new Date().getFullYear()} 3 Lemons Traders. All rights reserved.</p>
             </div>
@@ -1263,7 +1266,7 @@ if \(\!/^\\d\{6\}</span>/.test(pincode)) {
                                                         ))}
                                                     </ul>
                                                 ) : (
-                                                    <p style={{ textAlign: 'center' }}>No addresses saved yet.</p>
+                                                    <p style={{ textAlign: 'center', marginBottom: '20px' }}>No addresses saved yet.</p>
                                                 )}
                                             </div>
 
