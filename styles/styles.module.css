@@ -1,1289 +1,711 @@
 /* General Body and Page Styles */
 .page {
-  background-color: #f8f8f8; /* Light background for the entire page */
-  color: #333; /* Default text color */
-  line-height: 1.6; /* Improved readability */
-  font-family: 'Inter', sans-serif; /* Modern, clean font */
-  padding: 0;
-  margin: 0;
-  overflow-x: hidden; /* Prevents horizontal scroll from responsive elements */
-  display: flex; /* Use flexbox for overall page layout */
-  flex-direction: column; /* Stack content vertically */
-  min-height: 100vh; /* Ensures footer sticks to bottom on short content pages */
+    background-color: #f8f8f8; /* Light background for the entire page */
+    color: #333; /* Default text color */
+    line-height: 1.6; /* Improved readability */
+    font-family: 'Inter', sans-serif; /* Modern, clean font */
+    padding: 0;
+    margin: 0;
+    overflow-x: hidden; /* Prevents horizontal scroll from responsive elements */
+    display: flex; /* Use flexbox for overall page layout */
+    flex-direction: column; /* Stack content vertically */
+    min-height: 100vh; /* Ensures footer sticks to bottom on short content pages */
+    position: relative; /* Needed for sidebar positioning */
 }
 
-/* Account Display at the top */
-.accountDisplay {
-    text-align: right;
-    padding: 10px 20px;
-    background-color: #f0f4f7; /* Light grey background */
-    border-bottom: 1px solid #e0e0e0;
-    color: #004d40; /* Dark teal text */
-    font-weight: bold;
-    font-size: 0.95rem;
+/* Container for main content, centered with max-width */
+.container {
+    max-width: 1200px; /* Wider max-width for modern desktop screens */
+    margin: 0 auto; /* Centers the container horizontally */
+    padding: 20px; /* Internal padding for content */
+    box-sizing: border-box; /* Ensures padding is included in the element's total width/height */
+    flex-grow: 1; /* Allows main content to grow and push footer down */
+}
+
+/* Section Titles - consistent styling for h2 tags */
+.sectionTitle {
+    text-align: center;
+    color: #00796b; /* Dominant teal color */
+    font-size: 2.5rem; /* Large and prominent */
+    margin-bottom: 40px; /* Space below title */
+    margin-top: 60px; /* Space above title */
+    font-weight: 700; /* Bold font */
+}
+
+/* Hero Section Styles */
+.hero {
+    position: relative;
+    width: 100%;
+    height: 400px; /* Fixed height for the hero section */
+    overflow: hidden; /* Hides parts of the image that go beyond bounds */
+    border-radius: 12px; /* Soft rounded corners */
     display: flex;
-    justify-content: flex-end; /* Align content to the right */
-    align-items: center;
-    gap: 10px; /* Space between name and button */
-    position: relative; /* For hamburger menu positioning */
-    z-index: 10; /* Ensure it's above other content but below modals */
+    align-items: center; /* Vertically center content */
+    justify-content: center; /* Horizontally center content */
+    text-align: center;
+    margin-bottom: 40px; /* Space below hero */
 }
 
-.accountDisplay button {
-    background: none;
-    border: none;
-    color: #00796b; /* Teal link color */
+.heroImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures the image covers the entire area without distortion */
+    filter: brightness(0.7); /* Darkens the image slightly for better text readability */
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1; /* Places image behind text */
+}
+
+.heroOverlay {
+    position: relative;
+    z-index: 2; /* Ensures text is above the image */
+    color: white;
+    padding: 20px;
+    max-width: 800px; /* Limits width of text for readability */
+}
+
+.heroTitle {
+    font-size: 3.5rem; /* Very large title for impact */
+    margin-bottom: 15px;
+    font-weight: 800; /* Extra bold */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Adds depth to text */
+}
+
+.heroSubtitle {
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.heroButton {
+    background-color: #ffc107; /* Bright yellow for a noticeable call-to-action */
+    color: #333;
+    padding: 12px 30px;
+    border-radius: 50px; /* Creates a pill shape */
+    text-decoration: none; /* Removes underline */
     font-weight: bold;
-    cursor: pointer;
-    text-decoration: underline;
-    font-size: 0.9rem;
-    padding: 0; /* Remove default button padding */
+    font-size: 1.1rem;
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth hover effects */
+    display: inline-block; /* Allows padding and transformation */
 }
 
-.accountDisplay button:hover {
-    color: #005c50; /* Darker teal on hover */
+.heroButton:hover {
+    background-color: #ffb300;
+    transform: translateY(-2px); /* Slight lift on hover */
 }
 
-/* Hamburger Menu Icon */
-.hamburgerIcon {
-    font-size: 1.8rem;
+/* Lemon Products Section */
+.lemonsSection {
+    padding: 40px 0; /* Vertical padding */
+}
+
+.lemonsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid columns */
+    gap: 30px; /* Space between grid items (cards) */
+    padding: 0 20px; /* Horizontal padding for mobile view */
+}
+
+.lemonCard {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    overflow: hidden; /* Ensures image corners match card corners */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effects */
+    display: flex;
+    flex-direction: column; /* Stacks content vertically */
+    align-items: center; /* Centers content horizontally within the card */
+    text-align: center;
+    padding-bottom: 20px; /* Space below content in card */
+}
+
+.lemonCard:hover {
+    transform: translateY(-5px); /* Lifts card on hover */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Enhances shadow on hover */
+}
+
+.cardImage {
+    width: 100%;
+    height: 200px; /* Fixed height for consistent image sizes */
+    object-fit: cover;
+    border-bottom: 1px solid #eee; /* Separator below image */
+    margin-bottom: 15px;
+}
+
+.cardTitle {
+    font-size: 1.4rem;
+    font-weight: bold;
     color: #00796b;
+    margin-bottom: 10px;
+    padding: 0 15px;
+}
+
+.cardDescription {
+    font-size: 0.95rem;
+    color: #555;
+    padding: 0 15px;
+}
+
+/* Form Section */
+.formSection {
+    background-color: #e0f7fa; /* Light teal background for the form area */
+    padding: 50px 20px;
+    border-radius: 12px;
+    margin-top: 60px;
+}
+
+.form {
+    max-width: 700px; /* Wider form for better multi-column layout */
+    margin: 0 auto; /* Center the form within its section */
+}
+
+/* Grid for grouping personal details inputs */
+.inputGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Two columns on larger screens */
+    gap: 20px; /* Space between inputs */
+    margin-bottom: 30px;
+}
+
+.formGroup {
+    margin-bottom: 20px; /* Space between each form field group */
+}
+
+.label {
+    display: block; /* Ensures label is on its own line */
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #004d40; /* Darker teal for labels */
+    font-size: 1.1rem;
+}
+
+.input,
+.select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #b2dfdb; /* Lighter teal border */
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box; /* Important for consistent width calculation */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth focus effects */
+}
+
+.input:focus,
+.select:focus {
+    border-color: #00796b; /* Accent color on focus */
+    box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.2); /* Soft glow on focus */
+    outline: none; /* Removes default outline */
+}
+
+/* Discount Note specific styling */
+.discountNote {
+    color: #d32f2f; /* Red to draw attention */
+    font-weight: bold;
+    margin-left: 10px;
+    font-size: 0.9em; /* Slightly smaller text */
+}
+
+/* Order Summary (Total Price) */
+.orderSummary {
+    margin: 30px 0;
+    font-weight: bold;
+    font-size: 24px;
+    text-align: right; /* Aligns total to the right */
+    color: #004d40;
+}
+
+.orderSummary h3 {
+    margin: 0;
+}
+
+/* Common Button Styles */
+.button {
+    display: block; /* Full width on small screens */
+    width: 100%;
+    background-color: #00796b; /* Primary button color */
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
     cursor: pointer;
-    margin-left: 15px;
-    transition: color 0.2s ease;
+    margin-bottom: 15px; /* Space between buttons */
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-decoration: none; /* For anchor buttons */
+    text-align: center;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.hamburgerIcon:hover {
-    color: #005c50;
+.button:hover {
+    background-color: #005c50;
+    transform: translateY(-2px); /* Slight lift on hover */
 }
 
-/* Account Sidebar */
-.accountSidebarOverlay {
+.button:disabled {
+    background-color: #cccccc; /* Greyed out when disabled */
+    cursor: not-allowed;
+    opacity: 0.8; /* Slight fade */
+}
+
+/* Specific WhatsApp Button Styling */
+.whatsappButton {
+    background-color: #25d366; /* Official WhatsApp green */
+    display: flex; /* Enable flex for icon alignment */
+    align-items: center;
+    justify-content: center;
+}
+
+.whatsappButton:hover {
+    background-color: #128c7e; /* Darker WhatsApp green on hover */
+}
+
+.whatsappIcon {
+    margin-right: 8px; /* Space between icon and text */
+    font-size: 1.2em; /* Slightly larger icon */
+    vertical-align: middle; /* Aligns icon with text baseline */
+}
+
+/* Status Message (Success/Error) - Now includes styles for general feedback */
+.statusMessage {
+    text-align: center;
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    /* Colors are set inline in JS based on success/error */
+}
+
+/* NEW: Feedback Message Specific Styles */
+.feedbackMessage {
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.feedbackSuccess {
+    background-color: #e6ffed; /* Light green */
+    color: #1a7d32; /* Dark green text */
+    border: 1px solid #7bc991;
+}
+
+.feedbackError {
+    background-color: #ffe6e6; /* Light red */
+    color: #d32f2f; /* Dark red text */
+    border: 1px solid #e57373;
+}
+
+.feedbackInfo {
+    background-color: #e0f7fa; /* Light blue/teal */
+    color: #00796b; /* Dark teal text */
+    border: 1px solid #80deea;
+}
+
+/* Customer Reviews Section */
+.reviewsSection {
+    background-color: #f0f4f7; /* Light gray background */
+    padding: 60px 20px;
+    margin-top: 60px;
+    border-radius: 12px;
+}
+
+.reviewsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid for reviews */
+    gap: 30px;
+    padding: 0 20px;
+}
+
+.reviewCard {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Pushes content to top/bottom edges */
+    text-align: center;
+}
+
+.reviewText {
+    font-style: italic;
+    margin-bottom: 20px;
+    color: #555;
+    font-size: 1.05rem;
+}
+
+.reviewerName {
+    font-weight: bold;
+    color: #00796b;
+    font-size: 1.1rem;
+    margin-top: 10px;
+}
+
+.reviewerRating {
+    color: #ffc107; /* Gold stars */
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+/* Footer Styles */
+.footer {
+    text-align: center;
+    margin-top: 50px;
+    padding: 30px 20px;
+    font-size: 0.9rem;
+    color: #777;
+    background-color: #e0f7fa; /* Matches form section */
+    border-top: 1px solid #b2dfdb;
+}
+
+.footer a {
+    color: #00796b;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+/* MODAL STYLES */
+.modalOverlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: flex-end; /* Push sidebar to the right */
-    z-index: 1100; /* Above all other content and modals */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.accountSidebarOverlay.visible {
-    opacity: 1;
-    visibility: visible;
-}
-
-.accountSidebar {
-    background-color: #e0f7fa; /* Light green theme */
-    width: 300px; /* Fixed width for sidebar */
-    max-width: 90%; /* Responsive max-width */
-    height: 100%;
-    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
-    transform: translateX(100%); /* Start off-screen */
-    transition: transform 0.3s ease;
-    display: flex;
-    flex-direction: column;
-}
-
-.accountSidebarOverlay.visible .accountSidebar {
-    transform: translateX(0); /* Slide in */
-}
-
-.sidebarHeader {
-    padding: 20px;
-    background-color: #00796b; /* Darker green header */
-    color: white;
-    font-size: 1.5rem;
-    font-weight: bold;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.sidebarCloseButton {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 2rem;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
-
-.sidebarCloseButton:hover {
-    transform: rotate(90deg);
-}
-
-.sidebarTabs {
-    display: flex;
-    border-bottom: 1px solid #b2dfdb;
-}
-
-.tabButton {
-    flex: 1;
-    padding: 15px 10px;
-    background-color: #e0f7fa;
-    border: none;
-    border-bottom: 3px solid transparent;
-    font-size: 1rem;
-    font-weight: bold;
-    color: #004d40;
-    cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-.tabButton:hover {
-    background-color: #c8e6c9; /* Lighter green on hover */
-}
-
-.tabButton.active {
-    background-color: white;
-    border-bottom-color: #00796b; /* Active tab indicator */
-    color: #00796b;
-}
-
-.tabContent {
-    flex-grow: 1;
-    padding: 20px;
-    background-color: white;
-    overflow-y: auto; /* Enable scrolling for content */
-}
-
-.tabContent h3 {
-    color: #00796b;
-    margin-bottom: 20px;
-    font-size: 1.4rem;
-    text-align: center;
-}
-
-/* Account Details Form */
-.accountDetailsForm .formGroup {
-    margin-bottom: 15px;
-}
-.accountDetailsForm .label {
-    font-size: 1rem;
-    color: #004d40;
-}
-.accountDetailsForm .input {
-    padding: 10px;
-    font-size: 0.95rem;
-}
-.accountDetailsForm .saveButton {
-    background-color: #4CAF50; /* Green for save */
-    margin-top: 20px;
-}
-.accountDetailsForm .saveButton:hover {
-    background-color: #45a049;
-}
-.accountDetailsForm .message {
-    text-align: center;
-    margin-top: 15px;
-    font-weight: bold;
-}
-
-/* Addresses Tab */
-.addressList ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-.addressItem {
-    background-color: #f8f8f8;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    text-align: left;
-    position: relative;
-}
-.addressItem strong {
-    color: #004d40;
-    font-size: 1.1rem;
-}
-.addressItem p {
-    margin: 0;
-    font-size: 0.95rem;
-    color: #555;
-}
-.addressActions {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-}
-.addressActions button {
-    background-color: #f44336; /* Red for delete */
-    color: white;
-    padding: 8px 12px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    font-size: 0.85rem;
-    transition: background-color 0.2s ease;
-}
-.addressActions button:hover {
-    background-color: #da190b;
-}
-
-.addAddressButton {
-    background-color: #00796b;
-    margin-top: 20px;
-}
-.addAddressButton:hover {
-    background-color: #005c50;
-}
-
-.addressForm .formGroup {
-    margin-bottom: 15px;
-}
-
-/* General Body and Page Styles */
-.page {
-  background-color: #f8f8f8; /* Light background for the entire page */
-  color: #333; /* Default text text color */
-  line-height: 1.6; /* Improved readability */
-  font-family: 'Inter', sans-serif; /* Modern, clean font */
-  padding: 0;
-  margin: 0;
-  overflow-x: hidden; /* Prevents horizontal scroll from responsive elements */
-  display: flex; /* Use flexbox for overall page layout */
-  flex-direction: column; /* Stack content vertically */
-  min-height: 100vh; /* Ensures footer sticks to bottom on short content pages */
-}
-
-/* Account Display at the top */
-.accountDisplay {
-    text-align: right;
-    padding: 10px 20px;
-    background-color: #f0f4f7; /* Light grey background */
-    border-bottom: 1px solid #e0e0e0;
-    color: #004d40; /* Dark teal text */
-    font-weight: bold;
-    font-size: 0.95rem;
-    display: flex;
-    justify-content: flex-end; /* Align content to the right */
-    align-items: center;
-    gap: 10px; /* Space between name and button */
-    position: relative; /* For hamburger menu positioning */
-    z-index: 10; /* Ensure it's above other content but below modals */
-}
-
-.accountDisplay button {
-    background: none;
-    border: none;
-    color: #00796b; /* Teal link color */
-    font-weight: bold;
-    cursor: pointer;
-    text-decoration: underline;
-    font-size: 0.9rem;
-    padding: 0; /* Remove default button padding */
-}
-
-.accountDisplay button:hover {
-    color: #005c50; /* Darker teal on hover */
-}
-
-/* Hamburger Menu Icon */
-.hamburgerIcon {
-    font-size: 1.8rem;
-    color: #00796b;
-    cursor: pointer;
-    margin-left: 15px;
-    transition: color 0.2s ease;
-}
-
-.hamburgerIcon:hover {
-    color: #005c50;
-}
-
-/* Account Sidebar */
-.accountSidebarOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: flex-end; /* Push sidebar to the right */
-    z-index: 1100; /* Above all other content and modals */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.accountSidebarOverlay.visible {
-    opacity: 1;
-    visibility: visible;
-}
-
-.accountSidebar {
-    background-color: #e0f7fa; /* Light green theme */
-    width: 300px; /* Fixed width for sidebar */
-    max-width: 90%; /* Responsive max-width */
-    height: 100%;
-    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
-    transform: translateX(100%); /* Start off-screen */
-    transition: transform 0.3s ease;
-    display: flex;
-    flex-direction: column;
-}
-
-.accountSidebarOverlay.visible .accountSidebar {
-    transform: translateX(0); /* Slide in */
-}
-
-.sidebarHeader {
-    padding: 20px;
-    background-color: #00796b; /* Darker green header */
-    color: white;
-    font-size: 1.5rem;
-    font-weight: bold;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.sidebarCloseButton {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 2rem;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
-
-.sidebarCloseButton:hover {
-    transform: rotate(90deg);
-}
-
-.sidebarTabs {
-    display: flex;
-    border-bottom: 1px solid #b2dfdb;
-}
-
-.tabButton {
-    flex: 1;
-    padding: 15px 10px;
-    background-color: #e0f7fa;
-    border: none;
-    border-bottom: 3px solid transparent;
-    font-size: 1rem;
-    font-weight: bold;
-    color: #004d40;
-    cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-.tabButton:hover {
-    background-color: #c8e6c9; /* Lighter green on hover */
-}
-
-.tabButton.active {
-    background-color: white;
-    border-bottom-color: #00796b; /* Active tab indicator */
-    color: #00796b;
-}
-
-.tabContent {
-    flex-grow: 1;
-    padding: 20px;
-    background-color: white;
-    overflow-y: auto; /* Enable scrolling for content */
-}
-
-.tabContent h3 {
-    color: #00796b;
-    margin-bottom: 20px;
-    font-size: 1.4rem;
-    text-align: center;
-}
-
-/* Account Details Form */
-.accountDetailsForm .formGroup {
-    margin-bottom: 15px;
-}
-.accountDetailsForm .label {
-    font-size: 1rem;
-    color: #004d40;
-}
-.accountDetailsForm .input {
-    padding: 10px;
-    font-size: 0.95rem;
-}
-.accountDetailsForm .saveButton {
-    background-color: #4CAF50; /* Green for save */
-    margin-top: 20px;
-}
-.accountDetailsForm .saveButton:hover {
-    background-color: #45a049;
-}
-.accountDetailsForm .message {
-    text-align: center;
-    margin-top: 15px;
-    font-weight: bold;
-}
-
-/* Addresses Tab */
-.addressList ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-.addressItem {
-    background-color: #f8f8f8;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    text-align: left;
-    position: relative;
-}
-.addressItem strong {
-    color: #004d40;
-    font-size: 1.1rem;
-}
-.addressItem p {
-    margin: 0;
-    font-size: 0.95rem;
-    color: #555;
-}
-.addressActions {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-}
-.addressActions button {
-    background-color: #f44336; /* Red for delete */
-    color: white;
-    padding: 8px 12px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    font-size: 0.85rem;
-    transition: background-color 0.2s ease;
-}
-.addressActions button:hover {
-    background-color: #da190b;
-}
-
-.addAddressButton {
-    background-color: #00796b;
-    margin-top: 20px;
-}
-.addAddressButton:hover {
-    background-color: #005c50;
-}
-
-.addressForm .formGroup {
-    margin-bottom: 15px;
-}
-
-/* General Body and Page Styles */
-.page {
-  background-color: #f8f8f8; /* Light background for the entire page */
-  color: #333; /* Default text color */
-  line-height: 1.6; /* Improved readability */
-  font-family: 'Inter', sans-serif; /* Modern, clean font */
-  padding: 0;
-  margin: 0;
-  overflow-x: hidden; /* Prevents horizontal scroll from responsive elements */
-  display: flex; /* Use flexbox for overall page layout */
-  flex-direction: column; /* Stack content vertically */
-  min-height: 100vh; /* Ensures footer sticks to bottom on short content pages */
-}
-
-/* Account Display at the top */
-.accountDisplay {
-    text-align: right;
-    padding: 10px 20px;
-    background-color: #f0f4f7; /* Light grey background */
-    border-bottom: 1px solid #e0e0e0;
-    color: #004d40; /* Dark teal text */
-    font-weight: bold;
-    font-size: 0.95rem;
-    display: flex;
-    justify-content: flex-end; /* Align content to the right */
-    align-items: center;
-    gap: 10px; /* Space between name and button */
-    position: relative; /* For hamburger menu positioning */
-    z-index: 10; /* Ensure it's above other content but below modals */
-}
-
-.accountDisplay button {
-    background: none;
-    border: none;
-    color: #00796b; /* Teal link color */
-    font-weight: bold;
-    cursor: pointer;
-    text-decoration: underline;
-    font-size: 0.9rem;
-    padding: 0; /* Remove default button padding */
-}
-
-.accountDisplay button:hover {
-    color: #005c50; /* Darker teal on hover */
-}
-
-/* Hamburger Menu Icon */
-.hamburgerIcon {
-    font-size: 1.8rem;
-    color: #00796b;
-    cursor: pointer;
-    margin-left: 15px;
-    transition: color 0.2s ease;
-}
-
-.hamburgerIcon:hover {
-    color: #005c50;
-}
-
-/* Account Sidebar */
-.accountSidebarOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: flex-end; /* Push sidebar to the right */
-    z-index: 1100; /* Above all other content and modals */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.accountSidebarOverlay.visible {
-    opacity: 1;
-    visibility: visible;
-}
-
-.accountSidebar {
-    background-color: #e0f7fa; /* Light green theme */
-    width: 300px; /* Fixed width for sidebar */
-    max-width: 90%; /* Responsive max-width */
-    height: 100%;
-    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
-    transform: translateX(100%); /* Start off-screen */
-    transition: transform 0.3s ease;
-    display: flex;
-    flex-direction: column;
-}
-
-.accountSidebarOverlay.visible .accountSidebar {
-    transform: translateX(0); /* Slide in */
-}
-
-.sidebarHeader {
-    padding: 20px;
-    background-color: #00796b; /* Darker green header */
-    color: white;
-    font-size: 1.5rem;
-    font-weight: bold;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.sidebarCloseButton {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 2rem;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
-
-.sidebarCloseButton:hover {
-    transform: rotate(90deg);
-}
-
-.sidebarTabs {
-    display: flex;
-    border-bottom: 1px solid #b2dfdb;
-}
-
-.tabButton {
-    flex: 1;
-    padding: 15px 10px;
-    background-color: #e0f7fa;
-    border: none;
-    border-bottom: 3px solid transparent;
-    font-size: 1rem;
-    font-weight: bold;
-    color: #004d40;
-    cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-.tabButton:hover {
-    background-color: #c8e6c9; /* Lighter green on hover */
-}
-
-.tabButton.active {
-    background-color: white;
-    border-bottom-color: #00796b; /* Active tab indicator */
-    color: #00796b;
-}
-
-.tabContent {
-    flex-grow: 1;
-    padding: 20px;
-    background-color: white;
-    overflow-y: auto; /* Enable scrolling for content */
-}
-
-.tabContent h3 {
-    color: #00796b;
-    margin-bottom: 20px;
-    font-size: 1.4rem;
-    text-align: center;
-}
-
-/* Account Details Form */
-.accountDetailsForm .formGroup {
-    margin-bottom: 15px;
-}
-.accountDetailsForm .label {
-    font-size: 1rem;
-    color: #004d40;
-}
-.accountDetailsForm .input {
-    padding: 10px;
-    font-size: 0.95rem;
-}
-.accountDetailsForm .saveButton {
-    background-color: #4CAF50; /* Green for save */
-    margin-top: 20px;
-}
-.accountDetailsForm .saveButton:hover {
-    background-color: #45a049;
-}
-.accountDetailsForm .message {
-    text-align: center;
-    margin-top: 15px;
-    font-weight: bold;
-}
-
-/* Addresses Tab */
-.addressList ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-.addressItem {
-    background-color: #f8f8f8;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    text-align: left;
-    position: relative;
-}
-.addressItem strong {
-    color: #004d40;
-    font-size: 1.1rem;
-}
-.addressItem p {
-    margin: 0;
-    font-size: 0.95rem;
-    color: #555;
-}
-.addressActions {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-}
-.addressActions button {
-    background-color: #f44336; /* Red for delete */
-    color: white;
-    padding: 8px 12px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    font-size: 0.85rem;
-    transition: background-color 0.2s ease;
-}
-.addressActions button:hover {
-    background-color: #da190b;
-}
-
-.addAddressButton {
-    background-color: #00796b;
-    margin-top: 20px;
-}
-.addAddressButton:hover {
-    background-color: #005c50;
-}
-
-.addressForm .formGroup {
-    margin-bottom: 15px;
-}
-
-/* General Body and Page Styles */
-.page {
-  background-color: #f8f8f8; /* Light background for the entire page */
-  color: #333; /* Default text color */
-  line-height: 1.6; /* Improved readability */
-  font-family: 'Inter', sans-serif; /* Modern, clean font */
-  padding: 0;
-  margin: 0;
-  overflow-x: hidden; /* Prevents horizontal scroll from responsive elements */
-  display: flex; /* Use flexbox for overall page layout */
-  flex-direction: column; /* Stack content vertically */
-  min-height: 100vh; /* Ensures footer sticks to bottom on short content pages */
-}
-
-/* Account Display at the top */
-.accountDisplay {
-    text-align: right;
-    padding: 10px 20px;
-    background-color: #f0f4f7; /* Light grey background */
-    border-bottom: 1px solid #e0e0e0;
-    color: #004d40; /* Dark teal text */
-    font-weight: bold;
-    font-size: 0.95rem;
-    display: flex;
-    justify-content: flex-end; /* Align content to the right */
-    align-items: center;
-    gap: 10px; /* Space between name and button */
-    position: relative; /* For hamburger menu positioning */
-    z-index: 10; /* Ensure it's above other content but below modals */
-}
-
-.accountDisplay button {
-    background: none;
-    border: none;
-    color: #00796b; /* Teal link color */
-    font-weight: bold;
-    cursor: pointer;
-    text-decoration: underline;
-    font-size: 0.9rem;
-    padding: 0; /* Remove default button padding */
-}
-
-.accountDisplay button:hover {
-    color: #005c50; /* Darker teal on hover */
-}
-
-/* Hamburger Menu Icon */
-.hamburgerIcon {
-    font-size: 1.8rem;
-    color: #00796b;
-    cursor: pointer;
-    margin-left: 15px;
-    transition: color 0.2s ease;
-}
-
-.hamburgerIcon:hover {
-    color: #005c50;
-}
-
-/* Account Sidebar */
-.accountSidebarOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: flex-end; /* Push sidebar to the right */
-    z-index: 1100; /* Above all other content and modals */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.accountSidebarOverlay.visible {
-    opacity: 1;
-    visibility: visible;
-}
-
-.accountSidebar {
-    background-color: #e0f7fa; /* Light green theme */
-    width: 300px; /* Fixed width for sidebar */
-    max-width: 90%; /* Responsive max-width */
-    height: 100%;
-    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
-    transform: translateX(100%); /* Start off-screen */
-    transition: transform 0.3s ease;
-    display: flex;
-    flex-direction: column;
-}
-
-.accountSidebarOverlay.visible .accountSidebar {
-    transform: translateX(0); /* Slide in */
-}
-
-.sidebarHeader {
-    padding: 20px;
-    background-color: #00796b; /* Darker green header */
-    color: white;
-    font-size: 1.5rem;
-    font-weight: bold;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.sidebarCloseButton {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 2rem;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
-
-.sidebarCloseButton:hover {
-    transform: rotate(90deg);
-}
-
-.sidebarTabs {
-    display: flex;
-    border-bottom: 1px solid #b2dfdb;
-}
-
-.tabButton {
-    flex: 1;
-    padding: 15px 10px;
-    background-color: #e0f7fa;
-    border: none;
-    border-bottom: 3px solid transparent;
-    font-size: 1rem;
-    font-weight: bold;
-    color: #004d40;
-    cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-.tabButton:hover {
-    background-color: #c8e6c9; /* Lighter green on hover */
-}
-
-.tabButton.active {
-    background-color: white;
-    border-bottom-color: #00796b; /* Active tab indicator */
-    color: #00796b;
-}
-
-.tabContent {
-    flex-grow: 1;
-    padding: 20px;
-    background-color: white;
-    overflow-y: auto; /* Enable scrolling for content */
-}
-
-.tabContent h3 {
-    color: #00796b;
-    margin-bottom: 20px;
-    font-size: 1.4rem;
-    text-align: center;
-}
-
-/* Account Details Form */
-.accountDetailsForm .formGroup {
-    margin-bottom: 15px;
-}
-.accountDetailsForm .label {
-    font-size: 1rem;
-    color: #004d40;
-}
-.accountDetailsForm .input {
-    padding: 10px;
-    font-size: 0.95rem;
-}
-.accountDetailsForm .saveButton {
-    background-color: #4CAF50; /* Green for save */
-    margin-top: 20px;
-}
-.accountDetailsForm .saveButton:hover {
-    background-color: #45a049;
-}
-.accountDetailsForm .message {
-    text-align: center;
-    margin-top: 15px;
-    font-weight: bold;
-}
-
-/* Addresses Tab */
-.addressList ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-.addressItem {
-    background-color: #f8f8f8;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    text-align: left;
-    position: relative;
-}
-.addressItem strong {
-    color: #004d40;
-    font-size: 1.1rem;
-}
-.addressItem p {
-    margin: 0;
-    font-size: 0.95rem;
-    color: #555;
-}
-.addressActions {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-}
-.addressActions button {
-    background-color: #f44336; /* Red for delete */
-    color: white;
-    padding: 8px 12px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    font-size: 0.85rem;
-    transition: background-color 0.2s ease;
-}
-.addressActions button:hover {
-    background-color: #da190b;
-}
-
-.addAddressButton {
-    background-color: #00796b;
-    margin-top: 20px;
-}
-.addAddressButton:hover {
-    background-color: #005c50;
-}
-
-.addressForm .formGroup {
-    margin-bottom: 15px;
-}
-.addressForm .formButtons {
+    background-color: rgba(0, 0, 0, 0.7); /* Dark semi-transparent background */
     display: flex;
     justify-content: center;
-    gap: 15px;
-    margin-top: 20px;
-}
-
-/* General Body and Page Styles */
-.page {
-  background-color: #f8f8f8; /* Light background for the entire page */
-  color: #333; /* Default text color */
-  line-height: 1.6; /* Improved readability */
-  font-family: 'Inter', sans-serif; /* Modern, clean font */
-  padding: 0;
-  margin: 0;
-  overflow-x: hidden; /* Prevents horizontal scroll from responsive elements */
-  display: flex; /* Use flexbox for overall page layout */
-  flex-direction: column; /* Stack content vertically */
-  min-height: 100vh; /* Ensures footer sticks to bottom on short content pages */
-}
-
-/* Account Display at the top */
-.accountDisplay {
-    text-align: right;
-    padding: 10px 20px;
-    background-color: #f0f4f7; /* Light grey background */
-    border-bottom: 1px solid #e0e0e0;
-    color: #004d40; /* Dark teal text */
-    font-weight: bold;
-    font-size: 0.95rem;
-    display: flex;
-    justify-content: flex-end; /* Align content to the right */
     align-items: center;
-    gap: 10px; /* Space between name and button */
-    position: relative; /* For hamburger menu positioning */
-    z-index: 10; /* Ensure it's above other content but below modals */
-}
-
-.accountDisplay button {
-    background: none;
-    border: none;
-    color: #00796b; /* Teal link color */
-    font-weight: bold;
-    cursor: pointer;
-    text-decoration: underline;
-    font-size: 0.9rem;
-    padding: 0; /* Remove default button padding */
-}
-
-.accountDisplay button:hover {
-    color: #005c50; /* Darker teal on hover */
-}
-
-/* Hamburger Menu Icon */
-.hamburgerIcon {
-    font-size: 1.8rem;
-    color: #00796b;
-    cursor: pointer;
-    margin-left: 15px;
-    transition: color 0.2s ease;
-}
-
-.hamburgerIcon:hover {
-    color: #005c50;
-}
-
-/* Account Sidebar */
-.accountSidebarOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: flex-end; /* Push sidebar to the right */
-    z-index: 1100; /* Above all other content and modals */
+    z-index: 1000; /* Ensure it's on top of everything */
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-.accountSidebarOverlay.visible {
+.modalOverlay.visible {
     opacity: 1;
     visibility: visible;
 }
 
-.accountSidebar {
+.modalContent {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    max-width: 500px; /* Max width for modals */
+    width: 90%; /* Responsive width */
+    text-align: center;
+    position: relative; /* For close button positioning */
+    transform: translateY(20px); /* Initial subtle animation */
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.modalOverlay.visible .modalContent {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.modalTitle {
+    color: #00796b; /* Green theme */
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.modalText {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #555;
+    margin-bottom: 25px;
+    text-align: left; /* Align text left for readability in summary */
+}
+
+.modalText strong {
+    color: #004d40;
+}
+
+.modalText ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+.modalText ul li {
+    margin-bottom: 5px;
+}
+
+.modalButtons {
+    display: flex;
+    justify-content: center; /* Center buttons */
+    gap: 15px; /* Space between buttons */
+    margin-top: 30px;
+}
+
+.modalButton {
+    background-color: #00796b; /* Green theme */
+    color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.modalButton:hover {
+    background-color: #005c50;
+    transform: translateY(-1px);
+}
+
+.modalButton.cancel {
+    background-color: #ccc; /* Grey for cancel */
+    color: #333;
+}
+
+.modalButton.cancel:hover {
+    background-color: #b3b3b3;
+}
+
+.modalCloseButton {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #555;
+    transition: color 0.2s ease;
+}
+
+.modalCloseButton:hover {
+    color: #00796b;
+}
+
+/* Specific styles for the success page/modal */
+.successPage {
     background-color: #e0f7fa; /* Light green theme */
-    width: 300px; /* Fixed width for sidebar */
-    max-width: 90%; /* Responsive max-width */
+    padding: 50px 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+    position: relative;
+    /* Center in the viewport if not within modalOverlay */
+    margin: auto;
+    transform: translateY(0); /* Ensure it's not animated if standalone */
+    opacity: 1;
+}
+
+.successTitle {
+    color: #00796b;
+    font-size: 2.8rem;
+    margin-bottom: 25px;
+    font-weight: 700;
+}
+
+.successMessage {
+    font-size: 1.4rem;
+    color: #004d40;
+    margin-bottom: 30px;
+}
+
+/* --- NEW: Header and Account Sidebar Styles --- */
+.header {
+    width: 100%;
+    padding: 15px 20px;
+    background-color: #00796b; /* Teal background for the header */
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 50; /* Ensure header is above most content */
+}
+
+.headerTitle {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+    color: white; /* Ensure title is white */
+}
+
+.accountIcon {
+    font-size: 2rem;
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.accountIcon:hover {
+    color: #ffc107; /* Yellow on hover */
+    transform: scale(1.1);
+}
+
+.accountSidebar {
+    position: fixed;
+    top: 0;
+    right: -320px; /* Hidden by default */
+    width: 300px;
     height: 100%;
+    background-color: white;
     box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
-    transform: translateX(100%); /* Start off-screen */
-    transition: transform 0.3s ease;
+    transition: right 0.3s ease-in-out;
+    z-index: 100; /* Above modal overlay */
+    padding: 20px;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
 }
 
-.accountSidebarOverlay.visible .accountSidebar {
-    transform: translateX(0); /* Slide in */
+.accountSidebar.open {
+    right: 0; /* Slide in */
 }
 
 .sidebarHeader {
-    padding: 20px;
-    background-color: #00796b; /* Darker green header */
-    color: white;
-    font-size: 1.5rem;
-    font-weight: bold;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.sidebarTitle {
+    font-size: 1.8rem;
+    color: #00796b;
+    margin: 0;
 }
 
 .sidebarCloseButton {
     background: none;
     border: none;
-    color: white;
     font-size: 2rem;
     cursor: pointer;
-    transition: transform 0.2s ease;
+    color: #555;
+    transition: color 0.2s ease;
 }
 
 .sidebarCloseButton:hover {
-    transform: rotate(90deg);
+    color: #d32f2f; /* Red for close */
 }
 
-.sidebarTabs {
-    display: flex;
-    border-bottom: 1px solid #b2dfdb;
+.sidebarForm {
+    flex-grow: 1; /* Allows form to take available space */
 }
 
-.tabButton {
-    flex: 1;
-    padding: 15px 10px;
-    background-color: #e0f7fa;
-    border: none;
-    border-bottom: 3px solid transparent;
-    font-size: 1rem;
-    font-weight: bold;
-    color: #004d40;
-    cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-.tabButton:hover {
-    background-color: #c8e6c9; /* Lighter green on hover */
-}
-
-.tabButton.active {
-    background-color: white;
-    border-bottom-color: #00796b; /* Active tab indicator */
-    color: #00796b;
-}
-
-.tabContent {
-    flex-grow: 1;
-    padding: 20px;
-    background-color: white;
-    overflow-y: auto; /* Enable scrolling for content */
-}
-
-.tabContent h3 {
-    color: #00796b;
+.sidebarFormGroup {
     margin-bottom: 20px;
-    font-size: 1.4rem;
-    text-align: center;
 }
 
-/* Account Details Form */
-.accountDetailsForm .formGroup {
-    margin-bottom: 15px;
-}
-.accountDetailsForm .label {
-    font-size: 1rem;
-    color: #004d40;
-}
-.accountDetailsForm .input {
-    padding: 10px;
-    font-size: 0.95rem;
-}
-.accountDetailsForm .saveButton {
-    background-color: #4CAF50; /* Green for save */
-    margin-top: 20px;
-}
-.accountDetailsForm .saveButton:hover {
-    background-color: #45a049;
-}
-.accountDetailsForm .message {
-    text-align: center;
-    margin-top: 15px;
+.sidebarLabel {
+    display: block;
     font-weight: bold;
+    margin-bottom: 8px;
+    color: #004d40;
+    font-size: 1rem;
 }
 
-/* Addresses Tab */
-.addressList ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-.addressItem {
-    background-color: #f8f8f8;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    text-align: left;
-    position: relative;
-}
-.addressItem strong {
-    color: #004d40;
-    font-size: 1.1rem;
-}
-.addressItem p {
-    margin: 0;
+.sidebarInput {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #b2dfdb;
+    border-radius: 6px;
     font-size: 0.95rem;
-    color: #555;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
-.addressActions {
-    display: flex;
-    gap: 10px;
+
+.sidebarInput:focus {
+    border-color: #00796b;
+    box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.2);
+    outline: none;
+}
+
+.sidebarButton {
+    width: 100%;
+    padding: 12px;
+    background-color: #00796b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.05rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
     margin-top: 10px;
 }
-.addressActions button {
-    background-color: #f44336; /* Red for delete */
-    color: white;
-    padding: 8px 12px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    font-size: 0.85rem;
-    transition: background-color 0.2s ease;
-}
-.addressActions button:hover {
-    background-color: #da190b;
-}
 
-.addAddressButton {
-    background-color: #00796b;
-    margin-top: 20px;
-}
-.addAddressButton:hover {
+.sidebarButton:hover {
     background-color: #005c50;
+    transform: translateY(-1px);
 }
 
-.addressForm .formGroup {
-    margin-bottom: 15px;
-}
-.addressForm .formButtons {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 20px;
+.sidebarButton:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.8;
 }
 
 /* Responsive Adjustments using Media Queries */
 
 /* For tablets and larger phones (min-width: 768px) */
 @media (min-width: 768px) {
-  .hero {
-    height: 500px; /* Taller hero on tablets/desktops */
-  }
+    .hero {
+        height: 500px; /* Taller hero on tablets/desktops */
+    }
 
-  .heroTitle {
-    font-size: 4.5rem;
-  }
+    .heroTitle {
+        font-size: 4.5rem;
+    }
 
-  .heroSubtitle {
-    font-size: 1.8rem;
-  }
+    .heroSubtitle {
+        font-size: 1.8rem;
+    }
 
-  .lemonsGrid, .reviewsGrid {
-    grid-template-columns: repeat(3, 1fr); /* 3 columns on larger screens */
-  }
+    .lemonsGrid, .reviewsGrid {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns on larger screens */
+    }
 
-  /* Buttons in actions container should be inline-block and have space */
-  .actions {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-  }
+    /* Buttons in actions container should be inline-block and have space */
+    .actions {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
 
-  .actions .button {
-    width: auto; /* Allow buttons to shrink */
-    display: inline-flex; /* Use inline-flex for side-by-side with icon alignment */
-    margin-bottom: 0; /* Remove bottom margin for side-by-side */
-  }
+    .actions .button {
+        width: auto; /* Allow buttons to shrink */
+        display: inline-flex; /* Use inline-flex for side-by-side with icon alignment */
+        margin-bottom: 0; /* Remove bottom margin for side-by-side */
+    }
 
-  .form {
-    padding: 30px; /* More internal padding for the form */
-  }
+    .form {
+        padding: 30px; /* More internal padding for the form */
+    }
 
-  .modalContent {
-      padding: 40px;
-  }
+    .modalContent {
+        padding: 40px;
+    }
 }
 
 /* For large desktops (min-width: 1024px) */
 @media (min-width: 1024px) {
-  .hero {
-    height: 600px; /* Even taller hero on large desktops */
-  }
+    .hero {
+        height: 600px; /* Even taller hero on large desktops */
+    }
 
-  .heroTitle {
-    font-size: 5.5rem;
-  }
+    .heroTitle {
+        font-size: 5.5rem;
+    }
 }
