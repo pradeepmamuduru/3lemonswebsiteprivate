@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { FaWhatsapp, FaStar } from 'react-icons/fa';
 import { IoCloseCircleOutline, IoMenu } from 'react-icons/io5'; // IoMenu for hamburger, IoCloseCircleOutline for close buttons
 
-import styles from '../styles/styles.module.css';
+import styles from '../styles/styles.module.css'; // Your component-specific styles
 
 // --- getStaticProps: Fetches Lemon Product Data ---
 export async function getStaticProps() {
