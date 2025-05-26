@@ -1,8 +1,8 @@
 /* styles/globals.css */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 
+/* Define a vibrant and fresh color palette */
 :root {
-  /* Define a vibrant and fresh color palette */
   --primary-green: #37A24A; /* A rich, deep green for primary elements */
   --secondary-green: #6BCB77; /* A lighter, complementary green for accents */
   --accent-yellow: #FFD700; /* Bright gold for calls to action/highlights */
@@ -22,8 +22,8 @@ body {
   margin: 0;
   font-family: 'Inter', sans-serif;
   line-height: 1.6;
-  color: #333;
-  background-color: #f8f8f8; /* Light background for the whole page */
+  color: var(--text-dark); /* Use variable for consistency */
+  background-color: #f8f8f8;
   scroll-behavior: smooth;
   box-sizing: border-box;
 }
@@ -47,7 +47,7 @@ a {
   animation: spin 1s linear infinite;
   display: inline-block;
   vertical-align: middle;
-  margin-right: 8px; /* Space between spinner and text */
+  margin-right: 8px;
 }
 
 @keyframes spin {
@@ -55,11 +55,14 @@ a {
   100% { transform: rotate(360deg); }
 }
 
-/* Star rating styles (if using custom star characters or as a fallback) */
-/* The FaStar component from react-icons is used directly in pages/index.js */
-/* This style might be redundant if FaStar directly handles color, but kept for context */
-.star-rating {
-    color: #FFD700; /* Gold color for stars */
-    font-size: 1.2em;
-    margin-bottom: 10px;
+/* Star rating styles (for react-icons FaStar) */
+.star-rating svg {
+    color: var(--accent-yellow); /* Gold color for stars */
+    font-size: 1.5em; /* Match size with CSS module */
+    margin: 0 2px; /* Small space between stars */
+}
+
+/* Empty stars (for react-icons FaStar) */
+.star-rating .emptyStar {
+    opacity: 0.3;
 }
