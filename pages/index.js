@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react'; // Import Fragment
 import Head from 'next/head';
 import Image from 'next/image';
-import { FaWhatsapp, FaStar } from 'react-icons/fa'; // Import both icons
+import { FaWhatsapp, FaStar } from 'react-icons/fa';
+import { IoCloseCircleOutline } from 'react-icons/io5'; // New icon for close button
 import styles from '../styles/styles.module.css';
 
 // --- getStaticProps: Fetches Lemon Product Data ---
-// This function runs at build time (or revalidates) to fetch static data.
 export async function getStaticProps() {
   try {
     const res = await fetch("https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Lemons"); // *** IMPORTANT: Verify your SheetDB sheet name for lemons here ***
@@ -14,111 +14,74 @@ export async function getStaticProps() {
     }
     const lemons = await res.json();
 
-    // Ensure fetched data is an array to prevent errors during mapping
     if (!Array.isArray(lemons)) {
         console.error("Fetched lemons data is not an array:", lemons);
-        return { props: { lemons: [] }, revalidate: 3600 }; // Return empty array on malformed data
+        return { props: { lemons: [] }, revalidate: 3600 };
     }
 
     return {
-      props: { lemons }, // Pass fetched lemons data as a prop to the Home component
-      revalidate: 3600, // Revalidate data on the server every 3600 seconds (1 hour)
+      props: { lemons },
+      revalidate: 3600,
     };
   } catch (error) {
     console.error("Error in getStaticProps:", error);
-    return { props: { lemons: [] }, revalidate: 3600 }; // Return empty array on any fetch error
+    return { props: { lemons: [] }, revalidate: 3600 };
   }
 }
 
 // --- Home Component ---
 export default function Home({ lemons }) {
-  // State for managing multiple order items (grade and quantity for each)
-  const [orders, setOrders] = useState([{ grade: '', quantity: '' }]); // Initialize quantity as empty string for validation
-  // State for personal contact form details
+  const [orders, setOrders] = useState([{ grade: '', quantity: '' }]);
   const [form, setForm] = useState({ name: '', delivery: '', contact: '' });
-  // State for the calculated total price
   const [total, setTotal] = useState(0);
-  // State to manage submission loading state
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // State to display feedback messages to the user
   const [submissionMessage, setSubmissionMessage] = useState('');
 
-  // SheetDB URL for submitting orders. *** IMPORTANT: Verify your SheetDB sheet name for orders here ***
+  // New states for modal visibility
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  // State to store order details for confirmation modal
+  const [confirmedOrderDetails, setConfirmedOrderDetails] = useState(null);
+
   const ORDERS_SUBMISSION_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=orders'; 
 
-  // Hardcoded customer reviews for the reviews section.
-  // In a real application, you might fetch these dynamically from a backend/database.
   const customerReviews = [
-    {
-      id: 1,
-      text: "The lemons from 3 Lemons Traders are incredibly fresh and juicy! Perfect for my restaurant.",
-      name: "Chef Rahul S.",
-      rating: 5,
-    },
-    {
-      id: 2,
-      text: "Excellent quality and timely delivery. Their A1 grade lemons are truly the best.",
-      name: "Priya M.",
-      rating: 5,
-    },
-    {
-      id: 3,
-      text: "Great prices for bulk orders. The team is very responsive and helpful.",
-      name: "Kiran R.",
-      rating: 4,
-    },
-     {
-      id: 4,
-      text: "Consistently good quality. My go-to for all lemon needs.",
-      name: "Amit P.",
-      rating: 5,
-    },
-     {
-      id: 5,
-      text: "Freshness guaranteed every time. Highly recommend!",
-      name: "Sunita D.",
-      rating: 5,
-    },
+    { id: 1, text: "The lemons from 3 Lemons Traders are incredibly fresh and juicy! Perfect for my restaurant.", name: "Chef Rahul S.", rating: 5, },
+    { id: 2, text: "Excellent quality and timely delivery. Their A1 grade lemons are truly the best.", name: "Priya M.", rating: 5, },
+    { id: 3, text: "Great prices for bulk orders. The team is very responsive and helpful.", name: "Kiran R.", rating: 4, },
+    { id: 4, text: "Consistently good quality. My go-to for all lemon needs.", name: "Amit P.", rating: 5, },
+    { id: 5, text: "Freshness guaranteed every time. Highly recommend!", name: "Sunita D.", rating: 5, },
   ];
 
-
-  // Effect to recalculate total whenever 'orders' or 'lemons' data changes
   useEffect(() => {
     calculateTotal();
   }, [orders, lemons]);
 
-  // Handler for changes in individual order items (grade or quantity)
   const handleOrderChange = (index, field, value) => {
     const updated = [...orders];
     if (field === 'quantity') {
-      // Allow empty string to trigger HTML5 'required' validation visually
-      // For calculation, parse to integer, ensuring a minimum of 1 if a number is entered
-      value = value === '' ? '' : String(Math.max(1, parseInt(value) || 1)); // Convert back to string for input value
+      value = value === '' ? '' : String(Math.max(1, parseInt(value) || 1));
     }
     updated[index][field] = value;
     setOrders(updated);
   };
 
-  // Handler to add a new empty variety row to the order
   const handleAddVariety = () => {
-    setOrders([...orders, { grade: '', quantity: '' }]); // New item also starts with empty quantity
+    setOrders([...orders, { grade: '', quantity: '' }]);
   };
 
-  // Function to calculate the total price based on all order items and apply discounts
   const calculateTotal = () => {
     let totalPrice = 0;
     orders.forEach(order => {
-      const lemon = lemons.find(l => l.Grade === order.grade); // Find matching lemon data
-      if (lemon) { // Ensure lemon data is found
-        const pricePerKg = parseFloat(lemon['Price Per Kg']); // Parse price, allows decimals
-        const quantity = parseInt(order.quantity); // Parse quantity to integer
+      const lemon = lemons.find(l => l.Grade === order.grade);
+      if (lemon) {
+        const pricePerKg = parseFloat(lemon['Price Per Kg']);
+        const quantity = parseInt(order.quantity);
 
-        // Only calculate if both price and quantity are valid numbers and quantity is positive
         if (!isNaN(pricePerKg) && !isNaN(quantity) && quantity > 0) {
           let itemPrice = pricePerKg * quantity;
-          // Apply 10% discount if quantity for this specific item is over 50kg
           if (quantity > 50) {
-            itemPrice *= 0.90; // 10% discount
+            itemPrice *= 0.90;
           }
           totalPrice += itemPrice;
         }
@@ -127,92 +90,108 @@ export default function Home({ lemons }) {
     setTotal(totalPrice);
   };
 
-  // Handler for form submission
+  // --- NEW: Function to prepare data and show confirmation modal ---
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission behavior (page reload)
-    setIsSubmitting(true); // Set submitting state to true
+    e.preventDefault();
     setSubmissionMessage(''); // Clear any previous messages
 
-    // --- Client-Side Form Validation ---
-    // Validate personal details
+    // --- Client-Side Form Validation (Same as before) ---
     if (!form.name.trim() || !form.delivery.trim() || !form.contact.trim()) {
       setSubmissionMessage('Please fill in all your personal details (Name, Delivery Address, Contact).');
-      setIsSubmitting(false);
       return;
     }
-    // Validate 10-digit contact number
     if (!/^\d{10}$/.test(form.contact)) {
         setSubmissionMessage('Please enter a valid 10-digit contact number.');
-        setIsSubmitting(false);
         return;
     }
 
-    // Filter out invalid/empty order lines for submission
     const validOrders = orders.filter(order => order.grade && order.quantity && parseInt(order.quantity) > 0);
-    
-    // Check if at least one valid order item exists
     if (validOrders.length === 0) {
       setSubmissionMessage('Please add at least one lemon variety with a valid quantity (must be 1 or more).');
-      setIsSubmitting(false);
       return;
     }
-
-    // Check if any selected variety has an empty or invalid quantity
     const hasInvalidQuantity = orders.some(order => {
-        // If a grade is selected but quantity is empty, not a number, or zero/negative
         return (order.grade && (order.quantity === '' || isNaN(parseInt(order.quantity)) || parseInt(order.quantity) <= 0));
     });
-
     if (hasInvalidQuantity) {
         setSubmissionMessage('Please ensure all selected varieties have a valid quantity (1 or more).');
-        setIsSubmitting(false);
         return;
     }
-    // --- End Client-Side Form Validation ---
-    
-    // Map valid order items to the structure required by SheetDB
-    const rows = validOrders.map(order => {
+    // --- End Validation ---
+
+    // Prepare data for the confirmation modal
+    const preparedOrderRows = validOrders.map(order => {
         const lemon = lemons.find(l => l.Grade === order.grade);
-        const pricePerKg = parseFloat(lemon?.['Price Per Kg'] || 0); // Get price, default to 0 if not found
+        const pricePerKg = parseFloat(lemon?.['Price Per Kg'] || 0);
         const quantity = parseInt(order.quantity);
         let itemCalculatedPrice = pricePerKg * quantity;
         const discountApplied = quantity > 50 ? '10%' : '0%';
         
-        // Apply discount to this specific item's price for the sheet
         if (quantity > 50) {
             itemCalculatedPrice *= 0.90; 
         }
         
         return {
-            name: form.name,
+            grade: order.grade,
             quantity: quantity,
-            quality: order.grade,
-            'Price Per Kg': pricePerKg.toFixed(2), // Include original price per kg
-            'Item Total Price': itemCalculatedPrice.toFixed(2), // Total for this specific line item
-            delivery: form.delivery,
-            contact: form.contact,
+            pricePerKg: pricePerKg.toFixed(2),
+            itemTotalPrice: itemCalculatedPrice.toFixed(2),
             discount: discountApplied,
-            'Order Date': new Date().toLocaleString(), // Add timestamp for when the order was placed
-            // You can add more fields here if your SheetDB has more columns
         };
     });
 
-    // Send data to SheetDB
+    setConfirmedOrderDetails({
+        personal: form,
+        items: preparedOrderRows,
+        total: total.toFixed(2),
+    });
+    setShowConfirmModal(true); // Show the confirmation modal
+  };
+
+  // --- NEW: Function to actually submit the order after confirmation ---
+  const confirmAndSubmitOrder = async () => {
+    setShowConfirmModal(false); // Close the confirmation modal immediately
+    setIsSubmitting(true);
+    setSubmissionMessage('');
+
+    if (!confirmedOrderDetails) { // Should not happen if flow is correct
+        setSubmissionMessage('Error: No order details to confirm.');
+        setIsSubmitting(false);
+        return;
+    }
+
+    const { personal, items } = confirmedOrderDetails;
+
+    // Map confirmed items to the format required by SheetDB
+    const rows = items.map(item => ({
+        name: personal.name,
+        quantity: item.quantity,
+        quality: item.grade,
+        'Price Per Kg': item.pricePerKg,
+        'Item Total Price': item.itemTotalPrice,
+        delivery: personal.delivery,
+        contact: personal.contact,
+        discount: item.discount,
+        'Order Date': new Date().toLocaleString(),
+    }));
+
     try {
       const response = await fetch(ORDERS_SUBMISSION_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: rows }), // Send the array of rows to SheetDB
+        body: JSON.stringify({ data: rows }),
       });
 
       if (response.ok) {
-        setSubmissionMessage('Order submitted successfully!');
-        setOrders([{ grade: '', quantity: '' }]); // Reset order items
-        setForm({ name: '', delivery: '', contact: '' }); // Reset personal details
-        setTotal(0); // Reset total price
-        window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top for success message visibility
+        // Successfully submitted, show success modal
+        setShowSuccessModal(true);
+        // Reset form and orders on main page
+        setOrders([{ grade: '', quantity: '' }]);
+        setForm({ name: '', delivery: '', contact: '' });
+        setTotal(0);
+        setConfirmedOrderDetails(null); // Clear confirmed details
       } else {
-        const errorData = await response.json(); // Attempt to read specific error from SheetDB
+        const errorData = await response.json();
         console.error('SheetDB submission error:', response.status, errorData);
         setSubmissionMessage(`Failed to submit order: ${errorData.message || 'Server error'}. Please try again.`);
       }
@@ -221,20 +200,28 @@ export default function Home({ lemons }) {
       setSubmissionMessage('Failed to submit order. Please check your internet connection and try again.');
     }
 
-    setIsSubmitting(false); // Reset submitting state
+    setIsSubmitting(false);
   };
 
-  // Function to generate the WhatsApp deep link message
+  // --- NEW: Function to close the success modal and return to main page ---
+  const closeSuccessModal = () => {
+      setShowSuccessModal(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top
+  };
+
+  // --- NEW: Function to cancel confirmation and go back to form ---
+  const cancelConfirmation = () => {
+      setShowConfirmModal(false);
+      setConfirmedOrderDetails(null); // Clear details
+      // You can keep previous submission message or clear it
+  };
+
   const getWhatsappLink = () => {
-    // Filter to ensure only valid order items are included in the message
     const validOrders = orders.filter(order => order.grade && order.quantity && parseInt(order.quantity) > 0);
-    
-    // Prevent creating a link if contact is missing or invalid, or no valid orders
     if (validOrders.length === 0 || !form.contact || !/^\d{10}$/.test(form.contact)) {
-        return '#'; // Return a non-functional link if conditions aren't met
+        return '#';
     }
 
-    // Format each order item with its calculated price and discount note
     const orderDetails = validOrders.map(order => {
         const lemon = lemons.find(l => l.Grade === order.grade);
         const quantity = parseInt(order.quantity);
@@ -246,11 +233,9 @@ export default function Home({ lemons }) {
             discountMsg = ` (10% bulk discount applied)`;
         }
         return `${quantity} kg of ${order.grade} (Approx. ₹${itemPrice.toFixed(2)})${discountMsg}`;
-    }).join(', '); // Join multiple items with a comma and space
+    }).join(', ');
 
-    const whatsappContact = `91${form.contact}`; // Prefix with country code for India
-      
-    // Construct the full WhatsApp message
+    const whatsappContact = `91${form.contact}`;
     const whatsappMessage = `Hi, I'm ${form.name}.\n\nI want to order: ${orderDetails}.\n\nDelivery Address: ${form.delivery}.\nContact: ${form.contact}\n\nTotal estimated price: ₹${total.toFixed(2)}\n\nPlease confirm availability and final amount.`;
     
     return `https://wa.me/${whatsappContact}?text=${encodeURIComponent(whatsappMessage)}`;
@@ -258,24 +243,22 @@ export default function Home({ lemons }) {
 
   return (
     <div className={styles.page}>
-      {/* Head section for SEO and metadata */}
       <Head>
         <title>3 Lemons Traders – Buy Fresh Lemons Online</title>
         <meta name="description" content="Buy premium quality lemons at affordable prices across India. Direct farm to home delivery. Discounts on bulk orders!" />
         <meta property="og:title" content="Buy Fresh Lemons Online – 3 Lemons Traders" />
         <meta property="og:description" content="Get premium lemons delivered to your door at unbeatable prices. Farm fresh quality. Offering discounts on bulk purchases!" />
-        <meta property="og:image" content="/lemons-hero.jpg" /> {/* Ensure this image exists in your public folder */}
+        <meta property="og:image" content="/lemons-hero.jpg" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="canonical" href="https://3lemons.in" /> {/* Update this if your main domain changes */}
-        {/* Link to Inter font from Google Fonts for a modern look */}
+        <link rel="canonical" href="https://3lemons.in" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
       </Head>
 
-      <main className={styles.container}> {/* Main content area */}
+      <main className={styles.container}>
         {/* --- Hero Section --- */}
         <section className={styles.hero}>
           <img
-            src="/lemons-hero.jpg" // Image for the hero section
+            src="/lemons-hero.jpg"
             alt="Fresh Lemons"
             className={styles.heroImage}
           />
@@ -292,28 +275,26 @@ export default function Home({ lemons }) {
         <section className={styles.lemonsSection}>
           <h2 className={styles.sectionTitle}>Our Lemons</h2>
           <div className={styles.lemonsGrid}>
-            {/* Conditional rendering for lemons data */}
             {Array.isArray(lemons) && lemons.length > 0 ? (
               lemons.map((lemon, index) => (
                 <div key={index} className={styles.lemonCard}>
-                  {lemon['Image url'] && ( // Only render Image if URL exists
+                  {lemon['Image url'] && (
                     <Image
-                      src={lemon['Image url']} // Image URL from SheetDB
+                      src={lemon['Image url']}
                       alt={lemon['Grade'] || 'Lemon'}
-                      width={300} // Set appropriate dimensions for Next.js Image optimization
+                      width={300}
                       height={200}
-                      loading="lazy" // Lazy load images
+                      loading="lazy"
                       className={styles.cardImage}
                     />
                   )}
                   <p className={styles.cardTitle}>
-                    {lemon['Grade']} – ₹{parseFloat(lemon['Price Per Kg']).toFixed(2)}/kg {/* Display price */}
+                    {lemon['Grade']} – ₹{parseFloat(lemon['Price Per Kg']).toFixed(2)}/kg
                   </p>
                   <p className={styles.cardDescription}>{lemon['Description']}</p>
                 </div>
               ))
             ) : (
-              // Message if no lemon data is available
               <p style={{textAlign: 'center', width: '100%', gridColumn: '1 / -1'}}>
                 Loading lemons or no lemon data available. Please check your internet connection or SheetDB setup.
               </p>
@@ -324,7 +305,7 @@ export default function Home({ lemons }) {
         {/* --- Order Form Section --- */}
         <section id="buy-now" className={styles.formSection}>
           <h2 className={styles.sectionTitle}>Place Your Order</h2>
-          {submissionMessage && ( // Display submission feedback messages
+          {submissionMessage && (
             <p className={styles.statusMessage} style={{ color: submissionMessage.includes('successfully') ? 'green' : 'red' }}>
               {submissionMessage}
             </p>
@@ -362,9 +343,9 @@ export default function Home({ lemons }) {
                 required
                 value={form.contact}
                 onChange={(e) => setForm({ ...form, contact: e.target.value })}
-                maxLength={10} // Enforce 10 digits
-                pattern="[0-9]{10}" // Regex for 10 digits
-                title="Please enter a 10-digit mobile number" // Tooltip for pattern
+                maxLength={10}
+                pattern="[0-9]{10}"
+                title="Please enter a 10-digit mobile number"
                 placeholder="e.g., 9876543210"
               />
             </div>
@@ -392,14 +373,13 @@ export default function Home({ lemons }) {
                 <input
                   id={`quantity-${index}`}
                   type="number"
-                  min="1" // Minimum quantity is 1
+                  min="1"
                   className={styles.input}
                   value={order.quantity}
                   onChange={(e) => handleOrderChange(index, 'quantity', e.target.value)}
                   placeholder="e.g., 10"
-                  required // Quantity is required
+                  required
                 />
-                 {/* Display discount note if quantity for this item is over 50 */}
                  {parseInt(order.quantity) > 50 && (
                     <span className={styles.discountNote}> (10% bulk discount)</span>
                 )}
@@ -411,12 +391,12 @@ export default function Home({ lemons }) {
             </button>
 
             <div className={styles.orderSummary}>
-              <h3>Total: ₹{total.toFixed(2)}</h3> {/* Display total, formatted to 2 decimal places */}
+              <h3>Total: ₹{total.toFixed(2)}</h3>
             </div>
 
-            <div className={styles.actions}> {/* Container for the action buttons */}
+            <div className={styles.actions}>
                 <button type="submit" disabled={isSubmitting} className={styles.button}>
-                {isSubmitting ? 'Ordering...' : '🛒 Place Order on Website'}
+                {isSubmitting ? 'Checking Order...' : '🛒 Place Order on Website'}
                 </button>
 
                 <a
@@ -424,7 +404,6 @@ export default function Home({ lemons }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`${styles.button} ${styles.whatsappButton}`}
-                // Dynamic styling to visually "disable" WhatsApp button if conditions not met
                 style={{ pointerEvents: (!form.contact || orders.filter(o => o.grade && o.quantity && parseInt(o.quantity) > 0).length === 0) ? 'none' : 'auto', opacity: (!form.contact || orders.filter(o => o.grade && o.quantity && parseInt(o.quantity) > 0).length === 0) ? 0.6 : 1 }}
                 >
                 <FaWhatsapp className={styles.whatsappIcon} /> Place Order on WhatsApp
@@ -440,13 +419,11 @@ export default function Home({ lemons }) {
             {customerReviews.map(review => (
               <div key={review.id} className={styles.reviewCard}>
                 <div className={styles.reviewerRating}>
-                  {/* Render full stars */}
                   {Array.from({ length: review.rating }).map((_, i) => (
                     <FaStar key={i} />
                   ))}
-                  {/* Render faded empty stars for visual consistency */}
                   {Array.from({ length: 5 - review.rating }).map((_, i) => (
-                    <FaStar key={i + review.rating} style={{ opacity: 0.3 }} /> 
+                    <FaStar key={i + review.rating} style={{ opacity: 0.3 }} />
                   ))}
                 </div>
                 <p className={styles.reviewText}>"{review.text}"</p>
@@ -466,6 +443,60 @@ export default function Home({ lemons }) {
         </p>
         <p>&copy; {new Date().getFullYear()} 3 Lemons Traders. All rights reserved.</p>
       </div>
+
+      {/* --- Order Confirmation Modal --- */}
+      {showConfirmModal && confirmedOrderDetails && (
+        <div className={`${styles.modalOverlay} ${showConfirmModal ? styles.visible : ''}`}>
+          <div className={styles.modalContent}>
+            <button className={styles.modalCloseButton} onClick={cancelConfirmation}>
+                <IoCloseCircleOutline />
+            </button>
+            <h2 className={styles.modalTitle}>Confirm Your Order</h2>
+            <div className={styles.modalText}>
+              <p>Please review your order details before proceeding:</p>
+              <p><strong>Name:</strong> {confirmedOrderDetails.personal.name}</p>
+              <p><strong>Contact:</strong> {confirmedOrderDetails.personal.contact}</p>
+              <p><strong>Delivery Address:</strong> {confirmedOrderDetails.personal.delivery}</p>
+              <p><strong>Order Items:</strong></p>
+              <ul>
+                {confirmedOrderDetails.items.map((item, index) => (
+                  <li key={index}>
+                    {item.quantity} kg of {item.grade} (₹{item.itemTotalPrice})
+                    {item.discount === '10%' && <span className={styles.discountNote}> ({item.discount} discount applied)</span>}
+                  </li>
+                ))}
+              </ul>
+              <p><strong>Total Payable: ₹{confirmedOrderDetails.total}</strong></p>
+            </div>
+            <div className={styles.modalButtons}>
+              <button className={styles.modalButton} onClick={confirmAndSubmitOrder} disabled={isSubmitting}>
+                {isSubmitting ? 'Submitting...' : 'Proceed'}
+              </button>
+              <button className={`${styles.modalButton} ${styles.cancel}`} onClick={cancelConfirmation}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- Order Submitted Successfully Modal/Page --- */}
+      {showSuccessModal && (
+        <div className={`${styles.modalOverlay} ${showSuccessModal ? styles.visible : ''}`}>
+            <div className={`${styles.modalContent} ${styles.successPage}`}>
+                <button className={styles.modalCloseButton} onClick={closeSuccessModal}>
+                    <IoCloseCircleOutline />
+                </button>
+                <h2 className={styles.successTitle}>Order Submitted Successfully!</h2>
+                <p className={styles.successMessage}>
+                    Thank you for your order. We have received your details and will contact you shortly to confirm.
+                </p>
+                <button className={styles.modalButton} onClick={closeSuccessModal}>
+                    Close
+                </button>
+            </div>
+        </div>
+      )}
     </div>
   );
 }
