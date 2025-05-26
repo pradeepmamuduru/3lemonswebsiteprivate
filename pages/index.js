@@ -81,8 +81,7 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      <h1>🍋 3 Lemons Traders</h1>
-
+      <h1 className={styles.title}>🍋 3 Lemons Traders</h1>
       <form onSubmit={handleSubmit}>
         <div className={styles.formGroup}>
           <label className={styles.label}>Your Name</label>
