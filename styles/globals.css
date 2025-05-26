@@ -1,6 +1,21 @@
 /* styles/globals.css */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 
+:root {
+  /* Define a vibrant and fresh color palette */
+  --primary-green: #37A24A; /* A rich, deep green for primary elements */
+  --secondary-green: #6BCB77; /* A lighter, complementary green for accents */
+  --accent-yellow: #FFD700; /* Bright gold for calls to action/highlights */
+  --accent-orange: #FF8C00; /* A warm orange for secondary accents/hover states */
+  --text-dark: #333;
+  --text-light: #f8f8f8;
+  --bg-light: #ffffff;
+  --bg-faded-green: #e8f5e9; /* Very light green, almost white, for subtle backgrounds */
+  --shadow-light: rgba(0, 0, 0, 0.1);
+  --shadow-medium: rgba(0, 0, 0, 0.2);
+  --border-color: #ddd;
+}
+
 html,
 body {
   padding: 0;
