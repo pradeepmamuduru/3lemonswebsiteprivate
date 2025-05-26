@@ -1,14 +1,10 @@
-/* General Body and HTML styles */
-html,
-body {
-    padding: 0;
-    margin: 0;
-    font-family: 'Poppins', sans-serif; /* Modern, clean font */
-    line-height: 1.6;
-    color: #333;
-    background-color: #f8f8f8; /* Light background */
-    scroll-behavior: smooth; /* Smooth scrolling for anchor links */
-}
+/* styles/styles.module.css */
+
+/*
+   IMPORTANT: The 'html, body' styles have been moved to 'styles/globals.css'.
+   Do NOT put global selectors like 'html', 'body', or tag names directly here.
+   This file is for CSS Modules, which are scoped to components.
+*/
 
 .container {
     min-height: 100vh;
@@ -19,8 +15,8 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
-    box-sizing: border-box; /* Include padding in element's total width and height */
-    position: relative; /* For sidebar positioning */
+    box-sizing: border-box;
+    position: relative;
 }
 
 /* Header */
@@ -50,7 +46,6 @@ body {
 
 .logo {
     border-radius: 50%;
-    /* Add any other specific styling for the logo if needed */
 }
 
 .title {
