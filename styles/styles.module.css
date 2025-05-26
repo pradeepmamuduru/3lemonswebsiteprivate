@@ -1,9 +1,10 @@
 /* styles/styles.module.css */
 
 /*
-   IMPORTANT: The 'html, body' styles have been moved to 'styles/globals.css'.
-   Do NOT put global selectors like 'html', 'body', or tag names directly here.
-   This file is for CSS Modules, which are scoped to components.
+   IMPORTANT: Global styles for 'html, body', etc., are in 'styles/globals.css'.
+   This file is for CSS Modules. Classes defined here are locally scoped
+   when imported into a component (e.g., import styles from '../styles/styles.module.css').
+   You should reference them in your JSX like `className={styles.className}`.
 */
 
 .page {
@@ -77,20 +78,6 @@
     background-color: #FFA000; /* Darker amber */
     transform: translateY(-1px);
 }
-
-.hamburgerIcon {
-    font-size: 2.5em; /* Make it larger for better tap target */
-    cursor: pointer;
-    color: white;
-    transition: color 0.3s ease;
-    z-index: 1001; /* Ensure it's above header elements if any overlap */
-    display: none; /* Hidden by default, shown on small screens */
-}
-
-.hamburgerIcon:hover {
-    color: #e0e0e0;
-}
-
 
 /* Hero Section */
 .hero {
@@ -363,10 +350,6 @@
     background-color: #1DA851;
 }
 
-.whatsappIcon {
-    font-size: 1.2em;
-}
-
 .orderSummary {
     grid-column: 1 / -1; /* Span across all columns */
     text-align: center;
@@ -421,12 +404,6 @@
 
 .reviewCard:hover {
     transform: translateY(-3px);
-}
-
-.reviewerRating {
-    color: #FFD700; /* Gold for stars */
-    font-size: 1.2em;
-    margin-bottom: 10px;
 }
 
 .reviewText {
@@ -505,22 +482,6 @@
 .modalOverlay.visible .modalContent {
     transform: translateY(0);
     opacity: 1;
-}
-
-.modalCloseButton {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: none;
-    border: none;
-    font-size: 2em;
-    color: #999;
-    cursor: pointer;
-    transition: color 0.2s ease;
-}
-
-.modalCloseButton:hover {
-    color: #333;
 }
 
 .modalTitle {
@@ -698,19 +659,6 @@
     font-weight: 700;
 }
 
-.sidebarCloseButton {
-    background: none;
-    border: none;
-    font-size: 2em;
-    color: white;
-    cursor: pointer;
-    transition: color 0.2s ease;
-}
-
-.sidebarCloseButton:hover {
-    color: #e0e0e0;
-}
-
 .sidebarTabs {
     display: flex;
     border-bottom: 1px solid #eee;
@@ -846,17 +794,6 @@
     margin-top: 20px;
 }
 
-/* Spinner for loading states */
-.spinner {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-
 /* Responsive Adjustments */
 /* Tablets and larger phones */
 @media (max-width: 1024px) {
@@ -907,7 +844,7 @@
     .loginButton {
         display: none; /* Hide text login button on small screens */
     }
-    .hamburgerIcon {
+    .hamburger-icon {
         display: block; /* Show hamburger icon */
     }
     .hero {
@@ -1007,9 +944,6 @@
     }
     .sidebarTitle {
         font-size: 1.2em;
-    }
-    .sidebarCloseButton {
-        font-size: 1.8em;
     }
     .tabButton {
         font-size: 0.9em;
