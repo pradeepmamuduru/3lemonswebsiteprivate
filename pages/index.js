@@ -14,6 +14,15 @@ const SIGNUP_API_URL = "https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=signup";
 const ADDRESSES_API_URL = "https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Addresses";
 const FEEDBACK_API_URL = "https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Feedback"; // Placeholder for future use
 
+// --- Static Customer Reviews Data ---
+const customerReviews = [
+    { id: 1, name: "Anil Kumar S.", rating: 5, text: "Absolutely fresh and juicy lemons! Delivered quickly. Will definitely order again." },
+    { id: 2, name: "Priya Sharma", rating: 4, text: "Good quality lemons, perfect for my culinary needs. Packaging was excellent. A bit pricey but worth it." },
+    { id: 3, name: "Rajesh V.", rating: 5, text: "Impressed with the consistent quality. The bulk discount is a great deal. Highly recommend 3 Lemons Traders!" },
+    { id: 4, name: "Meena Devi", rating: 5, text: "Excellent customer service and prompt delivery. The lemons were exactly as described - fresh and fragrant." },
+    { id: 5, name: "Suresh Reddy", rating: 4, text: "Reliable service. The lemons were fresh, but a couple were slightly smaller than expected. Overall good experience." },
+];
+
 // --- getStaticProps: Fetches Lemon Product Data ---
 export async function getStaticProps() {
   try {
@@ -600,7 +609,7 @@ export default function Home({ lemons }) {
     // A more robust SheetDB DELETE would be:
     // DELETE https://sheetdb.io/api/v1/YOUR_API_ID/column/id/ID_TO_DELETE
     // However, your sheet doesn't have a unique 'id' column for addresses, only the auto-generated SheetDB row ID.
-    // We'll rely on the client-side filter for now and show a message.
+    // We'll rely on the client-side filter for now and provide a message.
     // If you add a unique 'AddressID' column to your SheetDB 'Addresses' tab, we can use that.
 
     // For now, we'll just remove from UI and give feedback.
