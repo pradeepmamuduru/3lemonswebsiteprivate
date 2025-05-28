@@ -1,68 +1,53 @@
 /* styles/globals.css */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 
-/* Define a vibrant and fresh color palette */
+/* Global CSS Variables (moved from styles.module.css) */
 :root {
-  --primary-green: #37A24A; /* A rich, deep green for primary elements */
-  --secondary-green: #6BCB77; /* A lighter, complementary green for accents */
-  --accent-yellow: #FFD700; /* Bright gold for calls to action/highlights */
-  --accent-orange: #FF8C00; /* A warm orange for secondary accents/hover states */
-  --text-dark: #333;
-  --text-light: #f8f8f8;
-  --bg-light: #ffffff;
-  --bg-faded-green: #e8f5e9; /* Very light green, almost white, for subtle backgrounds */
-  --shadow-light: rgba(0, 0, 0, 0.1);
-  --shadow-medium: rgba(0, 0, 0, 0.2);
-  --border-color: #ddd;
+    --primary-green: #2e8b57;
+    --light-green-bg: #e0ffe0;
+    --lighter-green-bg: #f0fff0;
+    --accent-orange: #f7b731;
+    --red-danger: #f44336;
+    --blue-info: #2196F3;
+    --whatsapp-green: #25D366;
+    --text-dark: #333;
+    --text-medium: #555;
+    --text-light: #666;
+    --border-light: #ddd;
+    --border-medium: #ccc;
+    --shadow-light: rgba(0, 0, 0, 0.1);
+    --shadow-medium: rgba(0, 0, 0, 0.2);
+    --transition-ease: all 0.3s ease;
+    --border-radius-small: 5px;
+    --border-radius-medium: 8px;
+    --border-radius-large: 10px;
 }
 
-html,
+/* Global Reset and Base Styles */
+html {
+    scroll-behavior: smooth;
+    box-sizing: border-box;
+}
+
+*, *::before, *::after {
+    box-sizing: inherit;
+}
+
 body {
-  padding: 0;
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  line-height: 1.6;
-  color: var(--text-dark); /* Use variable for consistency */
-  background-color: #f8f8f8;
-  scroll-behavior: smooth;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    color: var(--text-dark);
+    background-color: var(--light-green-bg); /* Lite green theme base */
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+    color: inherit;
+    text-decoration: none;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-/* Basic spinner for loading states (using simple CSS animation) */
-.spinner {
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-top: 4px solid #fff;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  animation: spin 1s linear infinite;
-  display: inline-block;
-  vertical-align: middle;
-  margin-right: 8px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Star rating styles (for react-icons FaStar) */
-.star-rating svg {
-    color: var(--accent-yellow); /* Gold color for stars */
-    font-size: 1.5em; /* Match size with CSS module */
-    margin: 0 2px; /* Small space between stars */
-}
-
-/* Empty stars (for react-icons FaStar) */
-.star-rating .emptyStar {
-    opacity: 0.3;
+button {
+    font-family: 'Arial', sans-serif;
 }
