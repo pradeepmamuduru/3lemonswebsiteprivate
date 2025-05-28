@@ -1,1360 +1,743 @@
-// pages/index.js
-import { useState, useEffect, Fragment, useContext } from 'react';
-import Head from 'next/head';
-import Image from 'next/image';
-import { FaWhatsapp, FaStar } from 'react-icons/fa';
-import { IoCloseCircleOutline, IoMenuOutline } from 'react-icons/io5'; // Added IoMenuOutline for hamburger
-import styles from '../styles/styles.module.css'; // Assuming styles.module.css exists and is used
-import { AuthContext } from './_app'; // Import AuthContext
+import React, { useState, Fragment, useEffect } from 'react';
+import { IoCloseCircleOutline } from 'react-icons/io5';
+import { FaPlus, FaMinus } from 'react-icons/fa'; // Import icons for add/remove variety buttons
+import styles from '../styles/styles.module.css'; // Make sure this path is correct
 
-// SheetDB URLs
-const LEMONS_API_URL = "https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Lemons";
-const ORDERS_API_URL = "https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=orders";
-const SIGNUP_API_URL = "https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=signup";
-const ADDRESSES_API_URL = "https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Addresses";
-const FEEDBACK_API_URL = "https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Feedback";
+// Assuming this is your API endpoint for lemons. REPLACE THIS WITH YOUR ACTUAL API URL.
+const LEMONS_DATA_URL = 'https://api.example.com/lemons'; // *** IMPORTANT: Replace with your actual lemons API URL ***
 
-// --- Static Customer Reviews Data ---
-const customerReviews = [
-    { id: 1, name: "Anil Kumar S.", rating: 5, text: "Absolutely fresh and juicy lemons! Delivered quickly. Will definitely order again." },
-    { id: 2, name: "Priya Sharma", rating: 4, text: "Good quality lemons, perfect for my culinary needs. Packaging was excellent. A bit pricey but worth it." },
-    { id: 3, name: "Rajesh V.", rating: 5, text: "Impressed with the consistent quality. The bulk discount is a great deal. Highly recommend 3 Lemons Traders!" },
-    { id: 4, name: "Meena Devi", rating: 5, text: "Excellent customer service and prompt delivery. The lemons were exactly as described - fresh and fragrant." },
-    { id: 5, name: "Suresh Reddy", rating: 4, text: "Reliable service. The lemons were fresh, but a couple were slightly smaller than expected. Overall good experience." },
-];
+// SheetDB API for Feedback
+const FEEDBACK_SHEETDB_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Feedback';
 
-// --- getStaticProps: Fetches Lemon Product Data ---
-export async function getStaticProps() {
-    try {
-        const res = await fetch(LEMONS_API_URL);
-        if (!res.ok) {
-            throw new Error(`Failed to fetch lemons: ${res.status} ${res.statusText}`);
-        }
-        const allLemons = await res.json();
-
-        if (!Array.isArray(allLemons)) {
-            console.error("Fetched lemons data is not an array:", allLemons);
-            return { props: { lemons: [] }, revalidate: 3600 };
-        }
-
-        // Filter to include only the first three qualities
-        const lemons = allLemons.slice(0, 3);
-
-        return {
-            props: { lemons },
-            revalidate: 3600,
-        };
-    } catch (error) {
-        console.error("Error in getStaticProps:", error);
-        return { props: { lemons: [] }, revalidate: 3600 };
-    }
-}
-
-// --- Home Component ---
 export default function Home({ lemons }) {
-    const { isLoggedIn, currentUser, login, logout, setCurrentUser } = useContext(AuthContext);
+    // --- Login Modal States ---
+    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+    const [loginForm, setLoginForm] = useState({ name: '', phone: '' });
+    const [isLoggingIn, setIsLoggingIn] = useState(false);
+    const [loginFeedback, setLoginFeedback] = useState({ message: '', type: '' }); // Specific feedback for login modal
 
-    // Page view state: 'home', 'login', 'signup'
-    const [currentPage, setCurrentPage] = useState('home');
+    // --- Account Sidebar States ---
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [activeAccountTab, setActiveAccountTab] = useState('accountDetails'); // Default tab
+    const [loggedInUser, setLoggedInUser] = useState(null); // Stores { name, phone, address, pincode }
+    const [accountDetailsForm, setAccountDetailsForm] = useState({ name: '', phone: '', address: '', pincode: '' });
+    const [isUpdatingAccount, setIsUpdatingAccount] = useState(false);
+    const [accountFeedback, setAccountFeedback] = useState({ message: '', type: '' }); // Specific feedback for account tabs
 
-    // Order Form States
-    const [orders, setOrders] = useState([{ grade: '', quantity: '' }]);
-    const [form, setForm] = useState({ name: '', delivery: '', contact: '' });
-    const [total, setTotal] = useState(0);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [submissionMessage, setSubmissionMessage] = useState('');
+    // --- Address Management States ---
+    const [userAddresses, setUserAddresses] = useState([]); // Array of { id, addressName, fullAddress, pincode }
+    const [showAddressForm, setShowAddressForm] = useState(false);
+    const [addressForm, setAddressForm] = useState({ id: null, addressName: '', fullAddress: '', pincode: '' });
+    const [isManagingAddresses, setIsManagingAddresses] = useState(false); // For loading states in address management
 
-    // Modals
-    const [showConfirmModal, setShowConfirmModal] = useState(false);
-    const [showSuccessModal, setShowSuccessModal] = useState(false);
-    const [confirmedOrderDetails, setConfirmedOrderDetails] = useState(null);
-    const [showAuthModal, setShowAuthModal] = useState(false); // For login/signup pop-up
-    const [authModalType, setAuthModalType] = useState('login'); // 'login' or 'signup'
-    const [authMessage, setAuthMessage] = useState(''); // Messages for auth modal
-
-    // Account Sidebar States
-    const [showAccountSidebar, setShowAccountSidebar] = useState(false);
-    const [activeSidebarTab, setActiveSidebarTab] = useState('account'); // 'account', 'addresses', 'feedback'
-    const [userAddresses, setUserAddresses] = useState([]);
-    const [isAddingAddress, setIsAddingAddress] = useState(false);
-    const [newAddress, setNewAddress] = useState({ street: '', city: '', state: '', pincode: '' });
-    const [isSavingAccount, setIsSavingAccount] = useState(false);
-    const [isSavingAddress, setIsSavingAddress] = useState(false);
-    const [selectedDeliveryAddress, setSelectedDeliveryAddress] = useState(''); // For dropdown in order form
-
-    // Feedback State
+    // --- Feedback Section States ---
     const [feedbackText, setFeedbackText] = useState('');
-    const [feedbackMessage, setFeedbackMessage] = useState('');
     const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+    const [feedbackSubmitted, setFeedbackSubmitted] = useState(false); // To show 'Thank you' message for feedback
 
+    // --- Variety Selection States ---
+    const [selectedVarieties, setSelectedVarieties] = useState([]); // e.g., [{ id: 1, name: 'Lemon Type A', price: 10.00 }]
 
-    // --- Effects ---
-
-    // Update order form 'name' and 'contact' if user is logged in
+    // --- Persist user and addresses to localStorage ---
     useEffect(() => {
-        if (isLoggedIn && currentUser) {
-            setForm(prevForm => ({
-                ...prevForm,
-                name: currentUser.name || '',
-                contact: currentUser.phone || ''
-            }));
-            // If user has saved addresses, set the first one as default
-            if (userAddresses.length > 0 && selectedDeliveryAddress === '') { // Only set default if nothing selected yet
-                setSelectedDeliveryAddress(userAddresses[0].fullAddress);
-                setForm(prevForm => ({ ...prevForm, delivery: userAddresses[0].fullAddress }));
-            } else if (userAddresses.length === 0) { // If no addresses, ensure delivery is empty
-                setSelectedDeliveryAddress('');
-                setForm(prevForm => ({ ...prevForm, delivery: '' }));
-            }
+        const storedUser = localStorage.getItem('loggedInUser');
+        const storedAddresses = localStorage.getItem('userAddresses');
+        if (storedUser) {
+            const user = JSON.parse(storedUser);
+            setLoggedInUser(user);
+            setAccountDetailsForm(user);
+        }
+        if (storedAddresses) {
+            setUserAddresses(JSON.parse(storedAddresses));
+        }
+    }, []);
+
+    useEffect(() => {
+        if (loggedInUser) {
+            localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
         } else {
-            // Clear form on logout
-            setForm({ name: '', delivery: '', contact: '' });
-            setSelectedDeliveryAddress('');
-            setOrders([{ grade: '', quantity: '' }]); // Reset order varieties
+            localStorage.removeItem('loggedInUser');
         }
-    }, [isLoggedIn, currentUser, userAddresses]); // Depend on userAddresses too
+    }, [loggedInUser]);
 
-    // Calculate total whenever orders or lemons data changes
     useEffect(() => {
-        let totalPrice = 0;
-        orders.forEach(order => {
-            const lemon = lemons.find(l => l.Grade === order.grade);
-            if (lemon) {
-                const pricePerKg = parseFloat(lemon['Price Per Kg']);
-                const quantity = parseInt(order.quantity);
+        localStorage.setItem('userAddresses', JSON.stringify(userAddresses));
+    }, [userAddresses]);
 
-                if (!isNaN(pricePerKg) && !isNaN(quantity) && quantity > 0) {
-                    let itemPrice = pricePerKg * quantity;
-                    if (quantity > 50) {
-                        itemPrice *= 0.90;
-                    }
-                    totalPrice += itemPrice;
-                }
-            }
-        });
-        setTotal(totalPrice);
-    }, [orders, lemons]);
-
-    // Fetch user addresses when sidebar opens or user logs in/out
-    useEffect(() => {
-        const fetchAddresses = async () => {
-            if (!isLoggedIn || !currentUser?.phone) {
-                setUserAddresses([]);
-                return;
-            }
-            try {
-                // Fetch addresses associated with the current user's phone number
-                const res = await fetch(`${ADDRESSES_API_URL}?phone=${currentUser.phone}`);
-                if (!res.ok) {
-                    // If the sheetdb response is 404 (no data found), it's not an error, just no addresses.
-                    // Check for specific SheetDB 'not found' message if available, otherwise assume no addresses.
-                    const errorText = await res.text();
-                    if (res.status === 404 && errorText.includes("Not Found")) {
-                        setUserAddresses([]); // No addresses found
-                        return;
-                    }
-                    throw new Error(`Failed to fetch addresses: ${res.status} ${res.statusText}`);
-                }
-                const data = await res.json();
-                // SheetDB returns an empty array if no data found for query, or an array of objects.
-                if (Array.isArray(data)) {
-                    // Filter out any rows that might somehow not belong or are incomplete, though unlikely with SheetDB queries.
-                    const validAddresses = data.filter(addr => addr.street && addr.city && addr.state && addr.pincode);
-                    const formattedAddresses = validAddresses.map((addr, index) => ({
-                        id: addr.id || `${addr.phone}-${index}`, // Use SheetDB's internal ID if available, otherwise generate
-                        ...addr,
-                        fullAddress: `${addr.street}, ${addr.city}, ${addr.state} - ${addr.pincode}`
-                    }));
-                    setUserAddresses(formattedAddresses);
-                    // If a saved address is still selected and not in the list, clear it.
-                    if (selectedDeliveryAddress && !formattedAddresses.some(addr => addr.fullAddress === selectedDeliveryAddress)) {
-                        setSelectedDeliveryAddress('');
-                        setForm(prevForm => ({ ...prevForm, delivery: '' }));
-                    } else if (formattedAddresses.length > 0 && selectedDeliveryAddress === '') { // If there are addresses but none selected, select the first
-                        setSelectedDeliveryAddress(formattedAddresses[0].fullAddress);
-                        setForm(prevForm => ({ ...prevForm, delivery: formattedAddresses[0].fullAddress }));
-                    }
-                } else {
-                    console.warn("Fetched addresses data is not an array:", data);
-                    setUserAddresses([]);
-                }
-            } catch (error) {
-                console.error("Error fetching addresses:", error);
-                setUserAddresses([]);
-            }
-        };
-        fetchAddresses();
-    }, [isLoggedIn, currentUser?.phone, selectedDeliveryAddress]); // Refetch when user logs in/out or phone changes or selectedDeliveryAddress changes
-
-    // Clear feedback message after a delay
-    useEffect(() => {
-        if (feedbackMessage) {
-            const timer = setTimeout(() => setFeedbackMessage(''), 5000);
-            return () => clearTimeout(timer);
-        }
-    }, [feedbackMessage]);
-
-
-    // --- General UI Functions ---
-
-    const showFeedback = (message, type = 'info') => {
-        setSubmissionMessage(message);
-        // Clear message after a few seconds if it's not a modal
-        if (type !== 'success') {
-            const timer = setTimeout(() => setSubmissionMessage(''), 5000);
-            return () => clearTimeout(timer);
-        }
+    // --- Login Handlers ---
+    const handleLoginFormChange = (e) => {
+        const { name, value } = e.target;
+        setLoginForm(prev => ({ ...prev, [name]: value }));
     };
 
-    const openAuthModal = (type) => {
-        setAuthModalType(type);
-        setAuthMessage(''); // Clear previous messages
-        setShowAuthModal(true);
-    };
-
-    const closeAuthModal = () => {
-        setShowAuthModal(false);
-        setAuthMessage('');
-    };
-
-    const toggleAccountSidebar = () => {
-        setShowAccountSidebar(prev => !prev);
-        if (!showAccountSidebar) { // If opening, default to account tab
-            setActiveSidebarTab('account');
-        }
-    };
-
-    const handleSidebarTabClick = (tab) => {
-        setActiveSidebarTab(tab);
-    };
-
-    // --- Authentication Logic ---
-
-    const handleLogin = async (e) => {
+    const handleLoginSubmit = async (e) => {
         e.preventDefault();
-        setAuthMessage('');
-        const name = e.target.name.value.trim();
-        const phone = e.target.phone.value.trim();
+        setLoginFeedback({ message: '', type: '' }); // Clear previous feedback
+        setIsLoggingIn(true);
 
-        if (!name || !phone) {
-            setAuthMessage('Please enter both name and mobile number.');
-            return;
-        }
-        if (!/^\d{10}$/.test(phone)) {
-            setAuthMessage('Please enter a valid 10-digit mobile number.');
-            return;
-        }
-
+        // Dummy Login Logic: In a real app, this would be an API call
         try {
-            // Fetch all users from signup sheet
-            const res = await fetch(`${SIGNUP_API_URL}?phone=${phone}`); // Query by phone for efficiency
-            if (!res.ok) throw new Error('Failed to fetch user data');
-            const users = await res.json();
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
 
-            const user = Array.isArray(users) ? users.find(u => u.name === name && u.phone === phone) : null;
-
-            if (user) {
-                login(user); // Set user in context
-                setAuthMessage(`Welcome back, ${user.name}! 😊`);
-                setTimeout(() => {
-                    closeAuthModal();
-                    setCurrentPage('home'); // Redirect to home/order section
-                }, 1500);
+            if (loginForm.phone === '9876543210' && loginForm.name === 'John Doe') {
+                const user = {
+                    name: loginForm.name,
+                    phone: loginForm.phone,
+                    address: '123 Main St, Anytown', // Dummy address
+                    pincode: '110001'      // Dummy pincode
+                };
+                setLoggedInUser(user);
+                setAccountDetailsForm(user);
+                setLoginFeedback({ message: 'Login successful!', type: 'success' });
+                setIsLoginModalOpen(false);
+                setIsSidebarOpen(true);
+                setActiveAccountTab('accountDetails');
             } else {
-                setAuthMessage("You're not registered yet. Please sign up to continue.");
-                setAuthModalType('signup'); // Suggest signup
+                setLoginFeedback({ message: 'Invalid credentials. Please try again or sign up.', type: 'error' });
             }
         } catch (error) {
-            console.error("Login error:", error);
-            setAuthMessage('Login failed. Please try again later.');
+            console.error('Login error:', error);
+            setLoginFeedback({ message: 'An error occurred during login.', type: 'error' });
+        } finally {
+            setIsLoggingIn(false);
         }
     };
 
-    const handleSignup = async (e) => {
-        e.preventDefault();
-        setAuthMessage('');
-        const name = e.target.name.value.trim();
-        const phone = e.target.phone.value.trim();
-        const address = e.target.address.value.trim(); // This is the main address from signup
-        const pincode = e.target.pincode.value.trim();
+    const closeLoginModal = () => {
+        setIsLoginModalOpen(false);
+        setLoginFeedback({ message: '', type: '' });
+        setLoginForm({ name: '', phone: '' });
+    };
 
-        if (!name || !phone || !address || !pincode) {
-            setAuthMessage('Please fill in all fields.');
-            return;
-        }
-        if (!/^\d{10}$/.test(phone)) {
-            setAuthMessage('Please enter a valid 10-digit mobile number.');
-            return;
-        }
-        if (!/^\d{6}$/.test(pincode)) {
-            setAuthMessage('Please enter a valid 6-digit pincode.');
-            return;
-        }
+    // --- Account Details Handlers ---
+    const handleAccountDetailsFormChange = (e) => {
+        const { name, value } = e.target;
+        setAccountDetailsForm(prev => ({ ...prev, [name]: value }));
+    };
+
+    const saveAccountDetails = async (e) => {
+        e.preventDefault();
+        setAccountFeedback({ message: '', type: '' });
+        setIsUpdatingAccount(true);
 
         try {
-            // Check if user already exists
-            const checkRes = await fetch(`${SIGNUP_API_URL}?phone=${phone}`);
-            const existingUsers = await checkRes.json();
-            if (Array.isArray(existingUsers) && existingUsers.length > 0) {
-                setAuthMessage('This mobile number is already registered. Please log in.');
-                setAuthModalType('login'); // Suggest login
-                return;
-            }
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
 
-            const res = await fetch(SIGNUP_API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ data: [{ name, phone, address, pincode }] }),
-            });
-
-            if (res.ok) {
-                const newUser = { name, phone, address, pincode };
-                login(newUser); // Log user in immediately
-
-                // Also add the primary signup address to the Addresses sheet
-                await fetch(ADDRESSES_API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ data: [{
-                        phone: phone,
-                        street: address, // Using the main address field as street for initial signup
-                        city: 'N/A', // You might want to ask for city/state/pincode separately on signup
-                        state: 'N/A',
-                        pincode: pincode
-                    }]}),
-                });
-
-                setAuthMessage(`🎉 Thank you, ${name}, for signing up! Let's start ordering! 😊`);
-                setTimeout(() => {
-                    closeAuthModal();
-                    setCurrentPage('home'); // Redirect to home/order section
-                }, 1500);
-            } else {
-                const errorData = await res.json();
-                console.error('Signup error:', res.status, errorData);
-                setAuthMessage(`Signup failed: ${errorData.message || 'Server error'}. Please try again.`);
-            }
+            const updatedUser = { ...loggedInUser, ...accountDetailsForm };
+            setLoggedInUser(updatedUser);
+            setAccountFeedback({ message: 'Account details updated successfully!', type: 'success' });
         } catch (error) {
-            console.error("Signup error:", error);
-            setAuthMessage('Signup failed. Please check your internet connection and try again.');
+            console.error('Error updating account details:', error);
+            setAccountFeedback({ message: 'Failed to update account details.', type: 'error' });
+        } finally {
+            setIsUpdatingAccount(false);
         }
     };
 
     const handleLogout = () => {
-        logout();
-        showFeedback('You have been logged out.', 'info');
-        setCurrentPage('home'); // Go back to home page, which will show login prompt for order
-        setShowAccountSidebar(false); // Close sidebar
+        setLoggedInUser(null);
+        setAccountDetailsForm({ name: '', phone: '', address: '', pincode: '' });
+        setUserAddresses([]);
+        localStorage.removeItem('loggedInUser');
+        localStorage.removeItem('userAddresses');
+        setIsSidebarOpen(false);
+        setLoginFeedback({ message: 'You have been logged out.', type: 'success' }); // Show feedback on main page or next login attempt
     };
 
-    // --- Order Form Logic ---
-
-    const handleOrderChange = (index, field, value) => {
-        const updated = [...orders];
-
-        if (field === 'grade') {
-            // Functionality 1: Prevent duplicate varieties in the same order
-            const selectedGrades = updated.map((order, i) => (i === index ? value : order.grade));
-            const hasDuplicate = selectedGrades.filter(g => g !== '').some((g, i, arr) => arr.indexOf(g) !== i);
-
-            if (hasDuplicate) {
-                showFeedback(`The variety "${value}" is already selected in another row. Please choose a unique variety.`, 'error');
-                return; // Prevent setting the duplicate grade
-            }
-        }
-
-        if (field === 'quantity') {
-            value = value === '' ? '' : String(Math.max(1, parseInt(value) || 1));
-        }
-        updated[index][field] = value;
-        setOrders(updated);
-    };
-
-    const handleAddVariety = () => {
-        setOrders([...orders, { grade: '', quantity: '' }]);
-    };
-
-    const handleSubmitOrder = async (e) => {
-        e.preventDefault();
-        setSubmissionMessage('');
-
-        // Gated Access Check
-        if (!isLoggedIn) {
-            openAuthModal('login');
-            setAuthMessage('Please log in or sign up to place an order.');
-            return;
-        }
-
-        // Form Validation
-        if (!form.name.trim() || !form.delivery.trim() || !form.contact.trim()) {
-            showFeedback('Please provide your Name, Delivery Address, and Contact Number.', 'error');
-            return;
-        }
-        if (!/^\d{10}$/.test(form.contact)) {
-            showFeedback('Please enter a valid 10-digit contact number.', 'error');
-            return;
-        }
-
-        const validOrders = orders.filter(order => order.grade && order.quantity && parseInt(order.quantity) > 0);
-        if (validOrders.length === 0) {
-            showFeedback('Please add at least one lemon variety with a valid quantity (must be 1 or more).', 'error');
-            return;
-        }
-        const hasInvalidQuantity = orders.some(order => {
-            return (order.grade && (order.quantity === '' || isNaN(parseInt(order.quantity)) || parseInt(order.quantity) <= 0));
-        });
-        if (hasInvalidQuantity) {
-            showFeedback('Please ensure all selected varieties have a valid quantity (1 or more).', 'error');
-            return;
-        }
-
-        // Prepare data for the confirmation modal
-        const preparedOrderRows = validOrders.map(order => {
-            const lemon = lemons.find(l => l.Grade === order.grade);
-            const pricePerKg = parseFloat(lemon?.['Price Per Kg'] || 0);
-            const quantity = parseInt(order.quantity);
-            let itemCalculatedPrice = pricePerKg * quantity;
-            const discountApplied = quantity > 50 ? '10%' : '0%';
-
-            if (quantity > 50) {
-                itemCalculatedPrice *= 0.90;
-            }
-
-            return {
-                grade: order.grade,
-                quantity: quantity,
-                pricePerKg: pricePerKg.toFixed(2),
-                itemTotalPrice: itemCalculatedPrice.toFixed(2),
-                discount: discountApplied,
-            };
-        });
-
-        setConfirmedOrderDetails({
-            personal: form,
-            items: preparedOrderRows,
-            total: total.toFixed(2),
-        });
-        setShowConfirmModal(true); // Show the confirmation modal
-    };
-
-    const confirmAndSubmitOrder = async () => {
-        setShowConfirmModal(false);
-        setIsSubmitting(true);
-        setSubmissionMessage('');
-
-        if (!confirmedOrderDetails) {
-            setSubmissionMessage('Error: No order details to confirm.');
-            setIsSubmitting(false);
-            return;
-        }
-
-        const { personal, items } = confirmedOrderDetails;
-
-        const rows = items.map(item => ({
-            name: personal.name,
-            quantity: item.quantity,
-            quality: item.grade,
-            'Price Per Kg': item.pricePerKg,
-            'Item Total Price': item.itemTotalPrice,
-            delivery: personal.delivery,
-            contact: personal.contact,
-            discount: item.discount,
-            'Order Date': new Date().toLocaleString(),
-        }));
-
-        try {
-            const response = await fetch(ORDERS_API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ data: rows }),
-            });
-
-            if (response.ok) {
-                setShowSuccessModal(true);
-                // Reset form and orders on main page
-                setOrders([{ grade: '', quantity: '' }]);
-                setForm(prevForm => ({
-                    ...prevForm,
-                    delivery: userAddresses.length > 0 ? userAddresses[0].fullAddress : '', // Reset delivery to default or empty
-                }));
-                setSelectedDeliveryAddress(userAddresses.length > 0 ? userAddresses[0].fullAddress : '');
-                setTotal(0);
-                setConfirmedOrderDetails(null);
-            } else {
-                const errorData = await response.json();
-                console.error('SheetDB submission error:', response.status, errorData);
-                showFeedback(`Failed to submit order: ${errorData.message || 'Server error'}. Please try again.`, 'error');
-            }
-        } catch (err) {
-            console.error('Network or submission error:', err);
-            showFeedback('Failed to submit order. Please check your internet connection and try again.', 'error');
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    const closeSuccessModal = () => {
-        setShowSuccessModal(false);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    const cancelConfirmation = () => {
-        setShowConfirmModal(false);
-        setConfirmedOrderDetails(null);
-    };
-
-    const getWhatsappLink = () => {
-        // This link should only be active if the user is logged in and form is valid
-        const validOrders = orders.filter(order => order.grade && order.quantity && parseInt(order.quantity) > 0);
-        if (!isLoggedIn || validOrders.length === 0 || !form.contact || !/^\d{10}$/.test(form.contact)) {
-            return '#'; // Disable link
-        }
-
-        const orderDetails = validOrders.map(order => {
-            const lemon = lemons.find(l => l.Grade === order.grade);
-            const quantity = parseInt(order.quantity);
-            const pricePerKg = parseFloat(lemon?.['Price Per Kg'] || 0);
-            let itemPrice = pricePerKg * quantity;
-            let discountMsg = '';
-            if (quantity > 50) {
-                itemPrice *= 0.90;
-                discountMsg = ` (10% bulk discount applied)`;
-            }
-            return `${quantity} kg of ${order.grade} (Approx. ₹${itemPrice.toFixed(2)})${discountMsg}`;
-        }).join(', ');
-
-        const whatsappContact = `918500130926`; // Your WhatsApp number
-        const whatsappMessage = `Hi, I'm ${form.name}.\n\nI want to order: ${orderDetails}.\n\nDelivery Address: ${form.delivery}.\nContact: ${form.contact}\n\nTotal estimated price: ₹${total.toFixed(2)}\n\nPlease confirm availability and final amount.`;
-
-        return `https://wa.me/${whatsappContact}?text=${encodeURIComponent(whatsappMessage)}`;
-    };
-
-    // --- Account Sidebar Logic ---
-    const handleAccountDetailChange = (e) => {
+    // --- Address Management Handlers ---
+    const handleAddressFormChange = (e) => {
         const { name, value } = e.target;
-        setCurrentUser(prev => ({ ...prev, [name]: value }));
+        setAddressForm(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSaveAccountDetails = async (e) => {
+    const handleSaveAddress = async (e) => {
         e.preventDefault();
-        setIsSavingAccount(true);
-        setAuthMessage(''); // Clear auth message
-
-        if (!currentUser || !currentUser.phone) {
-            showFeedback('No user data to save.', 'error');
-            setIsSavingAccount(false);
-            return;
-        }
-        if (!currentUser.name.trim() || !currentUser.address.trim() || !currentUser.pincode.trim()) {
-            showFeedback('Please fill all account details fields.', 'error');
-            setIsSavingAccount(false);
-            return;
-        }
-        if (!/^\d{6}$/.test(currentUser.pincode)) {
-            showFeedback('Please enter a valid 6-digit pincode.', 'error');
-            setIsSavingAccount(false);
-            return;
-        }
+        setAccountFeedback({ message: '', type: '' }); // Clear previous feedback
+        setIsManagingAddresses(true);
 
         try {
-            // SheetDB PUT request to update user details by phone number
-            const res = await fetch(`${SIGNUP_API_URL}/phone/${currentUser.phone}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ data: {
-                    name: currentUser.name,
-                    address: currentUser.address,
-                    pincode: currentUser.pincode
-                }}),
-            });
+            await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API call
 
-            if (res.ok) {
-                // Update localStorage via AuthContext's setCurrentUser
-                // This is already done by handleAccountDetailChange, but ensure it's persisted
-                // The AuthContext useEffect handles localStorage update
-                showFeedback('Account details saved successfully!', 'success');
-                // No need to close sidebar immediately, user might want to check addresses
+            if (addressForm.id) {
+                // Edit existing address
+                setUserAddresses(prev =>
+                    prev.map(addr =>
+                        addr.id === addressForm.id ? { ...addressForm } : addr
+                    )
+                );
+                setAccountFeedback({ message: 'Address updated successfully!', type: 'success' });
             } else {
-                const errorData = await res.json();
-                console.error('Account update error:', res.status, errorData);
-                showFeedback(`Failed to save account details: ${errorData.message || 'Server error'}`, 'error');
-            }
-        } catch (error) {
-            console.error("Error saving account details:", error);
-            showFeedback('Error saving account details. Please try again.', 'error');
-        } finally {
-            setIsSavingAccount(false);
-        }
-    };
-
-    const handleNewAddressChange = (e) => {
-        const { name, value } = e.target;
-        setNewAddress(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleAddAddress = async (e) => {
-        e.preventDefault();
-        setIsSavingAddress(true);
-        setAuthMessage(''); // Clear auth message
-
-        if (!currentUser?.phone) {
-            showFeedback('Please log in to add addresses.', 'error');
-            setIsSavingAddress(false);
-            return;
-        }
-        if (userAddresses.length >= 5) {
-            showFeedback('You can save a maximum of 5 addresses.', 'error');
-            setIsSavingAddress(false);
-            return;
-        }
-        if (!newAddress.street.trim() || !newAddress.city.trim() || !newAddress.state.trim() || !newAddress.pincode.trim()) {
-            showFeedback('Please fill all address fields.', 'error');
-            setIsSavingAddress(false);
-            return;
-        }
-        if (!/^\d{6}$/.test(newAddress.pincode)) {
-            showFeedback('Please enter a valid 6-digit pincode for the address.', 'error');
-            setIsSavingAddress(false);
-            return;
-        }
-
-        try {
-            const res = await fetch(ADDRESSES_API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ data: [{
-                    phone: currentUser.phone, // Link address to user's phone
-                    street: newAddress.street,
-                    city: newAddress.city,
-                    state: newAddress.state,
-                    pincode: newAddress.pincode
-                }] }),
-            });
-
-            if (res.ok) {
-                // SheetDB post returns a success message, not the new row.
-                // We need to refetch to get the updated list, including the new item's ID.
-                const updatedRes = await fetch(`${ADDRESSES_API_URL}?phone=${currentUser.phone}`);
-                if (!updatedRes.ok) throw new Error('Failed to refetch addresses after adding.');
-                const updatedData = await updatedRes.json();
-                const formattedAddresses = updatedData.map((addr, index) => ({
-                    id: addr.id || `${addr.phone}-${index}`, // Ensure id is set for deletion
-                    ...addr,
-                    fullAddress: `${addr.street}, ${addr.city}, ${addr.state} - ${addr.pincode}`
-                }));
-                setUserAddresses(formattedAddresses || []);
-                // After adding, set the newly added address as the selected one in the order form
-                if (formattedAddresses.length > 0) {
-                    setSelectedDeliveryAddress(formattedAddresses[formattedAddresses.length - 1].fullAddress);
-                    setForm(prevForm => ({ ...prevForm, delivery: formattedAddresses[formattedAddresses.length - 1].fullAddress }));
+                // Add new address
+                if (userAddresses.length >= 5) {
+                    setAccountFeedback({ message: 'You can save a maximum of 5 addresses.', type: 'error' });
+                    return;
                 }
-
-
-                setNewAddress({ street: '', city: '', state: '', pincode: '' });
-                setIsAddingAddress(false);
-                showFeedback('Address added successfully!', 'success');
-            } else {
-                const errorData = await res.json();
-                console.error('Add address error:', res.status, errorData);
-                showFeedback(`Failed to add address: ${errorData.message || 'Server error'}`, 'error');
+                const newAddress = { ...addressForm, id: Date.now() }; // Simple ID generation
+                setUserAddresses(prev => [...prev, newAddress]);
+                setAccountFeedback({ message: 'Address added successfully!', type: 'success' });
             }
+            setShowAddressForm(false);
+            setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' }); // Clear form
         } catch (error) {
-            console.error("Error adding address:", error);
-            showFeedback('Error adding address. Please try again.', 'error');
+            console.error('Error saving address:', error);
+            setAccountFeedback({ message: 'Failed to save address.', type: 'error' });
         } finally {
-            setIsSavingAddress(false);
+            setIsManagingAddresses(false);
         }
     };
 
-    const handleDeleteAddress = async (idToDelete) => {
-        if (!currentUser?.phone) {
-            showFeedback('Please log in to delete addresses.', 'error');
-            return;
-        }
+    const handleEditAddress = (addr) => {
+        setAddressForm({ ...addr });
+        setShowAddressForm(true);
+        setAccountFeedback({ message: '', type: '' }); // Clear any previous feedback
+    };
+
+    const handleDeleteAddress = async (id) => {
+        setAccountFeedback({ message: '', type: '' });
+        setIsManagingAddresses(true);
 
         if (window.confirm('Are you sure you want to delete this address?')) {
             try {
-                // SheetDB's DELETE endpoint works directly on a column value.
-                // Assuming `id` is a unique identifier you've added to your SheetDB 'Addresses' sheet
-                // OR if it's the auto-generated SheetDB row ID (which is more complex to get reliably for client-side delete).
-                // For a robust solution, it's best to have a unique ID column in your sheet (e.g., 'AddressID').
-                // If you have `id` as a column in your SheetDB:
-                const res = await fetch(`${ADDRESSES_API_URL}/id/${idToDelete}`, {
-                    method: 'DELETE',
-                });
-
-                if (res.ok) {
-                    // Update the UI immediately by filtering the state
-                    setUserAddresses(prev => prev.filter(addr => addr.id !== idToDelete));
-                    showFeedback('Address deleted successfully!', 'success');
-                    // If the deleted address was selected for delivery, clear the selection
-                    if (selectedDeliveryAddress === userAddresses.find(addr => addr.id === idToDelete)?.fullAddress) {
-                        setSelectedDeliveryAddress('');
-                        setForm(prevForm => ({ ...prevForm, delivery: '' }));
-                    }
-                } else {
-                    const errorData = await res.json();
-                    console.error('Delete address error:', res.status, errorData);
-                    showFeedback(`Failed to delete address: ${errorData.message || 'Server error'}`, 'error');
-                }
+                await new Promise(resolve => setTimeout(resolve, 300)); // Simulate API call
+                setUserAddresses(prev => prev.filter(addr => addr.id !== id));
+                setAccountFeedback({ message: 'Address deleted successfully!', type: 'success' });
             } catch (error) {
-                console.error("Error deleting address:", error);
-                showFeedback('Failed to delete address. Please try again.', 'error');
+                console.error('Error deleting address:', error);
+                setAccountFeedback({ message: 'Failed to delete address.', type: 'error' });
+            } finally {
+                setIsManagingAddresses(false);
             }
+        } else {
+            setIsManagingAddresses(false); // Reset loading state if cancelled
         }
     };
 
-    const handleDeliveryAddressChange = (e) => {
-        const selectedValue = e.target.value;
-        setSelectedDeliveryAddress(selectedValue);
-        if (selectedValue === 'new') {
-            setForm(prevForm => ({ ...prevForm, delivery: '' })); // Clear delivery for new input
-        } else {
-            setForm(prevForm => ({ ...prevForm, delivery: selectedValue }));
-        }
+    // --- Feedback Handlers ---
+    const handleFeedbackTextChange = (e) => {
+        setFeedbackText(e.target.value);
+        setFeedbackSubmitted(false); // Reset 'thank you' message if user starts typing again
+        setAccountFeedback({ message: '', type: '' }); // Clear any general feedback
     };
 
     const handleSubmitFeedback = async (e) => {
         e.preventDefault();
-        setFeedbackMessage('');
+        setAccountFeedback({ message: '', type: '' });
         setIsSubmittingFeedback(true);
 
-        if (!currentUser?.phone) {
-            setFeedbackMessage('Please log in to submit feedback.');
+        if (!loggedInUser) {
+            setAccountFeedback({ message: 'Please log in to submit feedback.', type: 'error' });
             setIsSubmittingFeedback(false);
             return;
         }
 
         if (!feedbackText.trim()) {
-            setFeedbackMessage('Feedback cannot be empty.');
+            setAccountFeedback({ message: 'Feedback cannot be empty.', type: 'error' });
             setIsSubmittingFeedback(false);
             return;
         }
 
         try {
-            const res = await fetch(FEEDBACK_API_URL, {
+            const feedbackData = {
+                Name: loggedInUser.name,
+                Phone: loggedInUser.phone,
+                Address: loggedInUser.address || 'N/A', // Use address from loggedInUser, or 'N/A'
+                Feedback: feedbackText,
+            };
+
+            const res = await fetch(FEEDBACK_SHEETDB_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ data: [{
-                    name: currentUser.name,
-                    phone: currentUser.phone,
-                    feedback: feedbackText.trim(),
-                    'Timestamp': new Date().toLocaleString()
-                }]}),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(feedbackData)
             });
 
-            if (res.ok) {
-                setFeedbackMessage('Thank you for your feedback! It has been submitted successfully.');
-                setFeedbackText('');
-            } else {
+            if (!res.ok) {
                 const errorData = await res.json();
-                console.error('Feedback submission error:', res.status, errorData);
-                setFeedbackMessage(`Failed to submit feedback: ${errorData.message || 'Server error'}.`);
+                throw new Error(errorData.message || `Failed to submit feedback: ${res.status} ${res.statusText}`);
             }
+
+            setFeedbackText(''); // Clear textarea
+            setFeedbackSubmitted(true); // Show thank you message
+            setAccountFeedback({ message: 'Thank you for your valuable feedback!', type: 'success' });
+
         } catch (error) {
-            console.error("Error submitting feedback:", error);
-            setFeedbackMessage('Error submitting feedback. Please try again.');
+            console.error('Error submitting feedback:', error);
+            setAccountFeedback({ message: `Error submitting feedback: ${error.message}`, type: 'error' });
+            setFeedbackSubmitted(false); // Don't show thank you on error
         } finally {
             setIsSubmittingFeedback(false);
         }
     };
 
+    // --- Variety Selection Logic ---
+    const handleAddVarietyToOrder = (variety) => {
+        // Check if the variety is already selected
+        if (selectedVarieties.some(item => item.id === variety.id)) {
+            setAccountFeedback({ message: `Variety "${variety.name}" is already in your selection.`, type: 'error' }); // Using account feedback for demo
+            return;
+        }
+        setSelectedVarieties(prev => [...prev, variety]);
+        setAccountFeedback({ message: `Added "${variety.name}" to selection.`, type: 'success' }); // Using account feedback for demo
+    };
 
+    const handleRemoveVarietyFromOrder = (varietyId) => {
+        setSelectedVarieties(prev => prev.filter(item => item.id !== varietyId));
+        setAccountFeedback({ message: 'Variety removed from selection.', type: 'success' }); // Using account feedback for demo
+    };
+
+    // --- Main Component Render ---
     return (
         <div className={styles.page}>
-            <Head>
-                <title>3 Lemons Traders - Fresh Lemons</title>
-                <meta name="description" content="Order fresh lemons directly from 3 Lemons Traders. Wholesale and retail available." />
-                <link rel="icon" href="/favicon.ico" />
-            </Head>
-
-            {/* Header */}
-            <header className={styles.header}>
-                <h1 className={styles.headerTitle}>3 Lemons Traders</h1>
-                <div className={styles.headerActions}>
-                    {isLoggedIn && (
-                        <span className={styles.loggedInUser}>
-                            Hello, {currentUser?.name?.split(' ')[0]}!
-                        </span>
+            {/* Header / Navigation Bar */}
+            <header style={{ padding: '20px', backgroundColor: '#f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h1>My Lemon Shop</h1>
+                <div>
+                    {!loggedInUser ? (
+                        <button onClick={() => setIsLoginModalOpen(true)} className={styles.modalButton}>
+                            Login
+                        </button>
+                    ) : (
+                        <button onClick={() => setIsSidebarOpen(true)} className={styles.modalButton}>
+                            My Account
+                        </button>
                     )}
-                    <button onClick={toggleAccountSidebar} className={styles.hamburgerIcon}>
-                        <IoMenuOutline />
-                    </button>
                 </div>
             </header>
 
-            {/* Hero Section */}
-            <section className={styles.hero}>
-                <Image
-                    src="/hero-lemons.jpg" // Ensure this image is in your public folder
-                    alt="Fresh Lemons"
-                    layout="fill"
-                    objectFit="cover"
-                    priority={true}
-                    className={styles.heroImage}
-                />
-                <div className={styles.heroOverlay}>
-                    <h2 className={styles.heroTitle}>Your Source for Fresh Lemons</h2>
-                    <p className={styles.heroSubtitle}>High-quality lemons, delivered straight to your door!</p>
-                    <button onClick={() => window.location.href = '#order-form'} className={styles.heroButton}>
-                        Order Now
-                    </button>
-                </div>
-            </section>
+            {/* Dummy Variety Selection Section (Illustrative) */}
+            <div className={styles.container}>
+                <h2 className={styles.sectionTitle}>Our Lemon Varieties</h2>
+                {loginFeedback.message && loginFeedback.type === 'success' && ( // Display login success message here if applicable
+                    <p className={`${styles.statusMessage} ${styles.feedbackSuccess}`}>
+                        {loginFeedback.message}
+                    </p>
+                )}
+                {accountFeedback.message && (accountFeedback.type === 'success' || accountFeedback.type === 'error') && (
+                    // Display general feedback below the section title (can be for variety selection too)
+                    <p className={`${styles.feedbackMessage} ${styles[`feedback${accountFeedback.type.charAt(0).toUpperCase() + accountFeedback.type.slice(1)}`]}`}>
+                        {accountFeedback.message}
+                    </p>
+                )}
 
-            <main className={styles.container}>
-                {/* Product Section */}
-                <section className={styles.lemonsSection}>
-                    <h2 className={styles.sectionTitle}>Our Lemon Varieties</h2>
-                    {lemons.length === 0 ? (
-                        <p className={styles.noDataMessage}>No lemon varieties available at the moment. Please check back later!</p>
-                    ) : (
-                        <div className={styles.lemonsGrid}>
-                            {lemons.map((lemon) => (
-                                <div key={lemon.Grade} className={styles.lemonCard}>
-                                    <Image
-                                        src={lemon.ImageURL || '/default-lemon.jpg'} // Fallback image
-                                        alt={lemon.Grade}
-                                        width={400}
-                                        height={220}
-                                        className={styles.cardImage}
-                                    />
-                                    <div className={styles.cardContent}>
-                                        <h3 className={styles.cardTitle}>{lemon.Grade}</h3>
-                                        <p className={styles.cardDescription}>{lemon.Description}</p>
-                                        <p className={styles.cardPrice}>Price: ₹{parseFloat(lemon['Price Per Kg']).toFixed(2)} / Kg</p>
-                                        <p className={styles.cardPrice}>(Bulk Discount: 10% off for &gt;50 Kg)</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </section>
-
-                {/* Customer Reviews Section */}
-                <section className={styles.reviewsSection}>
-                    <h2 className={styles.sectionTitle}>What Our Customers Say</h2>
-                    <div className={styles.reviewsGrid}>
-                        {customerReviews.map(review => (
-                            <div key={review.id} className={styles.reviewCard}>
-                                <div className={styles.reviewerRating}>
-                                    {[...Array(5)].map((_, i) => (
-                                        <FaStar key={i} className={i < review.rating ? styles.filledStar : styles.emptyStar} />
-                                    ))}
-                                </div>
-                                <p className={styles.reviewText}>"{review.text}"</p>
-                                <p className={styles.reviewerName}>- {review.name}</p>
+                <div className={styles.lemonsGrid}>
+                    {lemons.length > 0 ? (
+                        lemons.map(lemon => (
+                            <div key={lemon.id} className={styles.lemonCard}>
+                                <img src={lemon.image || '/images/default-lemon.jpg'} alt={lemon.name} className={styles.cardImage} />
+                                <h3 className={styles.cardTitle}>{lemon.name}</h3>
+                                <p className={styles.cardDescription}>Price: ${lemon.price ? lemon.price.toFixed(2) : 'N/A'}</p>
+                                <button
+                                    onClick={() => handleAddVarietyToOrder(lemon)}
+                                    className={styles.addVarietyButton}
+                                    title="Add this variety"
+                                >
+                                    <FaPlus />
+                                </button>
                             </div>
-                        ))}
-                    </div>
-                </section>
-
-                {/* Order Form Section */}
-                <section id="order-form">
-                    <h2 className={styles.sectionTitle}>Place Your Order</h2>
-
-                    {!isLoggedIn && (
-                        <div className={styles.loginPrompt}>
-                            <p>Please **log in** or **sign up** to place an order and manage your account details.</p>
-                            <button onClick={() => openAuthModal('login')}>Login / Signup</button>
-                        </div>
+                        ))
+                    ) : (
+                        <p style={{ gridColumn: '1 / -1', textAlign: 'center' }}>No lemon varieties available at the moment.</p>
                     )}
+                </div>
 
-                    <form onSubmit={handleSubmitOrder} className={styles.form}>
-                        {submissionMessage && (
-                            <p className={`${styles.statusMessage} ${submissionMessage.includes('successfully') ? styles.successMessage : styles.errorMessage}`}>
-                                {submissionMessage}
+                {selectedVarieties.length > 0 && (
+                    <div style={{ marginTop: '30px', borderTop: '1px solid #eee', paddingTop: '20px' }}>
+                        <h3 className={styles.sectionTitle} style={{fontSize: '1.8rem', marginBottom: '20px'}}>Your Current Variety Selection:</h3>
+                        <ul style={{ listStyle: 'none', padding: 0 }}>
+                            {selectedVarieties.map(variety => (
+                                <li key={variety.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px dashed #eee' }}>
+                                    <span>{variety.name} (${variety.price ? variety.price.toFixed(2) : 'N/A'})</span>
+                                    <button
+                                        onClick={() => handleRemoveVarietyFromOrder(variety.id)}
+                                        className={styles.removeVarietyButton}
+                                        title="Remove this variety"
+                                    >
+                                        <FaMinus />
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+            </div>
+
+            {/* --- Login Modal --- */}
+            {isLoginModalOpen && (
+                <div className={`${styles.modalOverlay} ${isLoginModalOpen ? styles.visible : ''}`} onClick={closeLoginModal}>
+                    <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                        <div className={styles.modalHeader}>
+                            <h3 className={styles.modalTitle}>Login</h3>
+                            <button className={styles.modalCloseButton} onClick={closeLoginModal}>
+                                <IoCloseCircleOutline />
+                            </button>
+                        </div>
+                        {loginFeedback.message && loginFeedback.type === 'error' && (
+                            <p className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
+                                {loginFeedback.message}
                             </p>
                         )}
-
-                        <div className={styles.formGroup}>
-                            <label htmlFor="name" className={styles.label}>Your Name:</label>
-                            <input
-                                type="text"
-                                id="name"
-                                name="name"
-                                value={form.name}
-                                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                className={styles.input}
-                                required
-                                disabled={isLoggedIn} // Disable if logged in, as it's pre-filled
-                            />
-                        </div>
-
-                        <div className={styles.formGroup}>
-                            <label htmlFor="contact" className={styles.label}>Your Mobile Number:</label>
-                            <input
-                                type="tel"
-                                id="contact"
-                                name="contact"
-                                value={form.contact}
-                                onChange={(e) => setForm({ ...form, contact: e.target.value })}
-                                className={styles.input}
-                                pattern="\d{10}"
-                                title="Please enter a 10-digit mobile number"
-                                required
-                                disabled={isLoggedIn} // Disable if logged in, as it's pre-filled
-                            />
-                        </div>
-
-                        <div className={styles.formGroup}>
-                            <label htmlFor="delivery" className={styles.label}>Delivery Address:</label>
-                            {isLoggedIn && userAddresses.length > 0 ? (
-                                <Fragment>
-                                    <select
-                                        id="delivery"
-                                        name="delivery"
-                                        value={selectedDeliveryAddress}
-                                        onChange={handleDeliveryAddressChange}
-                                        className={styles.select}
-                                        required
-                                    >
-                                        <option value="">Select a saved address or enter new</option>
-                                        {userAddresses.map((addr) => (
-                                            <option key={addr.id} value={addr.fullAddress}>
-                                                {addr.fullAddress}
-                                            </option>
-                                        ))}
-                                        <option value="new">Add New Address...</option>
-                                    </select>
-                                    {selectedDeliveryAddress === 'new' && (
-                                        <textarea
-                                            value={form.delivery}
-                                            onChange={(e) => setForm({ ...form, delivery: e.target.value })}
-                                            className={styles.textarea}
-                                            placeholder="Enter your full new delivery address (Street, City, State, Pincode)"
-                                            rows="3"
-                                            required
-                                            aria-label="New delivery address"
-                                        ></textarea>
-                                    )}
-                                </Fragment>
-                            ) : (
-                                <textarea
-                                    id="delivery"
-                                    name="delivery"
-                                    value={form.delivery}
-                                    onChange={(e) => setForm({ ...form, delivery: e.target.value })}
-                                    className={styles.textarea}
-                                    placeholder="Enter your full delivery address (Street, City, State, Pincode)"
-                                    rows="3"
+                        <form onSubmit={handleLoginSubmit}>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label} htmlFor="login-name">Your Name</label>
+                                <input
+                                    id="login-name"
+                                    className={styles.input}
+                                    name="name"
                                     required
-                                    disabled={!isLoggedIn} // Only allow input if not logged in or no addresses
-                                ></textarea>
-                            )}
-                        </div>
-
-                        <h3 className={styles.sectionTitle} style={{ fontSize: '1.5em', marginBottom: '20px' }}>Your Order:</h3>
-                        {orders.map((order, index) => (
-                            <div key={index} className={styles.orderVarietyGroup}>
-                                <div className={styles.formGroup}>
-                                    <label htmlFor={`grade-${index}`} className={styles.label}>Lemon Variety:</label>
-                                    <select
-                                        id={`grade-${index}`}
-                                        name="grade"
-                                        value={order.grade}
-                                        onChange={(e) => handleOrderChange(index, 'grade', e.target.value)}
-                                        className={styles.select}
-                                        required
-                                        disabled={!isLoggedIn}
-                                    >
-                                        <option value="">Select a quality</option>
-                                        {lemons.map((lemon) => (
-                                            <option key={lemon.Grade} value={lemon.Grade} disabled={orders.some((o, i) => i !== index && o.grade === lemon.Grade)}>
-                                                {lemon.Grade} (₹{parseFloat(lemon['Price Per Kg']).toFixed(2)}/Kg)
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className={styles.formGroup}>
-                                    <label htmlFor={`quantity-${index}`} className={styles.label}>Quantity (Kg):</label>
-                                    <input
-                                        type="number"
-                                        id={`quantity-${index}`}
-                                        name="quantity"
-                                        value={order.quantity}
-                                        onChange={(e) => handleOrderChange(index, 'quantity', e.target.value)}
-                                        className={styles.input}
-                                        min="1"
-                                        required
-                                        disabled={!isLoggedIn || !order.grade} // Disable quantity if not logged in or no grade selected
-                                    />
-                                    {order.quantity > 50 && <span className={styles.discountNote}>10% Bulk Discount Applied!</span>}
-                                </div>
-                                {orders.length > 1 && (
-                                    <button
-                                        type="button"
-                                        onClick={() => setOrders(orders.filter((_, i) => i !== index))}
-                                        className={styles.removeVarietyButton} // Applied the new class
-                                        disabled={!isLoggedIn}
-                                    >
-                                        Remove
-                                    </button>
-                                )}
+                                    value={loginForm.name}
+                                    onChange={handleLoginFormChange}
+                                />
                             </div>
-                        ))}
+                            <div className={styles.formGroup}>
+                                <label className={styles.label} htmlFor="login-phone">Phone Number</label>
+                                <input
+                                    id="login-phone"
+                                    type="tel"
+                                    className={styles.input}
+                                    name="phone"
+                                    required
+                                    value={loginForm.phone}
+                                    onChange={handleLoginFormChange}
+                                    maxLength={10}
+                                    pattern="[0-9]{10}"
+                                    title="Please enter a 10-digit mobile number"
+                                    placeholder="e.g., 9876543210"
+                                />
+                            </div>
+                            <div className={styles.modalButtons}>
+                                <button type="submit" className={styles.modalButton} disabled={isLoggingIn}>
+                                    {isLoggingIn ? 'Logging In...' : 'Login'}
+                                </button>
+                                {/* Removed the "New User? Sign Up" button as it's not implemented yet */}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
 
-                        <button
-                            type="button"
-                            onClick={handleAddVariety}
-                            className={styles.addVarietyButton} // Applied the new class
-                            disabled={!isLoggedIn || orders.length >= lemons.length} // Limit adding varieties to available lemons
-                        >
-                            Add Another Variety
-                        </button>
-
-                        <p className={styles.orderSummary}>Total Estimated Price: ₹{total.toFixed(2)}</p>
-
-                        <div className={styles.actions}>
-                            <button
-                                type="submit"
-                                className={styles.button}
-                                disabled={isSubmitting || !isLoggedIn || orders.every(o => !o.grade || !o.quantity)}
-                            >
-                                {isSubmitting ? 'Submitting...' : 'Place Order'}
+            {/* --- Account Sidebar --- */}
+            {isSidebarOpen && (
+                <div className={`${styles.accountSidebarOverlay} ${isSidebarOpen ? styles.visible : ''}`} onClick={() => setIsSidebarOpen(false)}>
+                    <div className={`${styles.accountSidebar} ${isSidebarOpen ? styles.open : ''}`} onClick={(e) => e.stopPropagation()}>
+                        <div className={styles.sidebarHeader}>
+                            <h3 className={styles.sidebarTitle}>My Account</h3>
+                            <button className={styles.sidebarCloseButton} onClick={() => setIsSidebarOpen(false)}>
+                                <IoCloseCircleOutline />
                             </button>
-                            <a
-                                href={getWhatsappLink()}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={`${styles.button} ${styles.whatsappButton}`}
-                                disabled={!isLoggedIn || orders.every(o => !o.grade || !o.quantity) || !form.name || !form.contact || !form.delivery}
-                                onClick={(e) => {
-                                    if (!isLoggedIn || orders.every(o => !o.grade || !o.quantity) || !form.name || !form.contact || !form.delivery) {
-                                        e.preventDefault();
-                                        showFeedback('Please fill out all order details and select at least one variety to generate WhatsApp message.', 'error');
-                                    }
+                        </div>
+                        <div className={styles.sidebarTabs}>
+                            <button
+                                className={`${styles.tabButton} ${activeAccountTab === 'accountDetails' ? styles.active : ''}`}
+                                onClick={() => setActiveAccountTab('accountDetails')}
+                            >
+                                Account Details
+                            </button>
+                            <button
+                                className={`${styles.tabButton} ${activeAccountTab === 'addresses' ? styles.active : ''}`}
+                                onClick={() => setActiveAccountTab('addresses')}
+                            >
+                                Addresses
+                            </button>
+                            <button
+                                className={`${styles.tabButton} ${activeAccountTab === 'feedback' ? styles.active : ''}`}
+                                onClick={() => {
+                                    setActiveAccountTab('feedback');
+                                    setFeedbackSubmitted(false); // Reset 'thank you' message when entering tab
+                                    setFeedbackText(''); // Clear feedback text on tab switch
+                                    setAccountFeedback({ message: '', type: '' }); // Clear general feedback
                                 }}
                             >
-                                <FaWhatsapp className={styles.buttonIcon} /> Order via WhatsApp
-                            </a>
+                                Feedback
+                            </button>
                         </div>
-                    </form>
-                </section>
-            </main>
 
-            {/* Footer */}
-            <footer className={styles.footer}>
-                <p>&copy; {new Date().getFullYear()} 3 Lemons Traders. All rights reserved.</p>
-                <p>Designed and Developed with ❤️ by <a href="https://linkedin.com/in/mohammed-samiul-haq" target="_blank" rel="noopener noreferrer">Mohammed Samiul Haq</a></p>
-            </footer>
-
-            {/* Modals */}
-            {/* Authentication Modal (Login/Signup) */}
-            <div className={`${styles.modalOverlay} ${showAuthModal ? styles.visible : ''}`}>
-                <div className={styles.modalContent}>
-                    <button onClick={closeAuthModal} className={styles.modalCloseButton}>
-                        <IoCloseCircleOutline />
-                    </button>
-                    <h2 className={styles.modalTitle}>{authModalType === 'login' ? 'Login' : 'Sign Up'}</h2>
-                    {authMessage && (
-                        <p className={`${styles.statusMessage} ${authMessage.includes('Welcome') || authMessage.includes('Thank you') ? styles.successMessage : styles.errorMessage}`}>
-                            {authMessage}
-                        </p>
-                    )}
-                    {authModalType === 'login' ? (
-                        <form onSubmit={handleLogin} className={styles.authForm}>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="loginName" className={styles.label}>Name:</label>
-                                <input type="text" id="loginName" name="name" className={styles.input} required />
-                            </div>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="loginPhone" className={styles.label}>Mobile Number:</label>
-                                <input type="tel" id="loginPhone" name="phone" className={styles.input} pattern="\d{10}" title="10-digit mobile number" required />
-                            </div>
-                            <div className={styles.modalButtons}>
-                                <button type="submit" className={`${styles.button} ${styles.modalButton}`}>Login</button>
-                            </div>
-                        </form>
-                    ) : (
-                        <form onSubmit={handleSignup} className={styles.authForm}>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="signupName" className={styles.label}>Name:</label>
-                                <input type="text" id="signupName" name="name" className={styles.input} required />
-                            </div>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="signupPhone" className={styles.label}>Mobile Number:</label>
-                                <input type="tel" id="signupPhone" name="phone" className={styles.input} pattern="\d{10}" title="10-digit mobile number" required />
-                            </div>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="signupAddress" className={styles.label}>Primary Address:</label>
-                                <textarea id="signupAddress" name="address" className={styles.textarea} rows="2" required></textarea>
-                            </div>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="signupPincode" className={styles.label}>Pincode:</label>
-                                <input type="text" id="signupPincode" name="pincode" className={styles.input} pattern="\d{6}" title="6-digit pincode" required />
-                            </div>
-                            <div className={styles.modalButtons}>
-                                <button type="submit" className={`${styles.button} ${styles.modalButton}`}>Sign Up</button>
-                            </div>
-                        </form>
-                    )}
-                    <p className={styles.authSwitch}>
-                        {authModalType === 'login' ? (
-                            <Fragment>Don't have an account? <span onClick={() => setAuthModalType('signup')} className={styles.authLink}>Sign up here</span></Fragment>
-                        ) : (
-                            <Fragment>Already have an account? <span onClick={() => setAuthModalType('login')} className={styles.authLink}>Login here</span></Fragment>
-                        )}
-                    </p>
-                </div>
-            </div>
-
-            {/* Order Confirmation Modal */}
-            <div className={`${styles.modalOverlay} ${showConfirmModal ? styles.visible : ''}`}>
-                <div className={styles.modalContent}>
-                    <button onClick={cancelConfirmation} className={styles.modalCloseButton}>
-                        <IoCloseCircleOutline />
-                    </button>
-                    <h2 className={styles.modalTitle}>Confirm Your Order</h2>
-                    {confirmedOrderDetails && (
-                        <ul className={styles.orderSummaryList}>
-                            <li><strong>Name:</strong> {confirmedOrderDetails.personal.name}</li>
-                            <li><strong>Contact:</strong> {confirmedOrderDetails.personal.contact}</li>
-                            <li><strong>Delivery Address:</strong> {confirmedOrderDetails.personal.delivery}</li>
-                            <li>
-                                <strong>Items:</strong>
-                                <ul>
-                                    {confirmedOrderDetails.items.map((item, index) => (
-                                        <li key={index}>
-                                            {item.quantity} Kg of {item.grade} (₹{item.pricePerKg}/Kg) - Item Total: ₹{item.itemTotalPrice} {item.discount !== '0%' && `(${item.discount} discount)`}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </li>
-                            <li className={styles.totalPayable}><strong>Total Payable: ₹{confirmedOrderDetails.total}</strong></li>
-                        </ul>
-                    )}
-                    <div className={styles.modalButtons}>
-                        <button onClick={cancelConfirmation} className={`${styles.button} ${styles.modalButton} ${styles.modalButtonCancel}`}>
-                            Cancel
-                        </button>
-                        <button onClick={confirmAndSubmitOrder} className={`${styles.button} ${styles.modalButton}`} disabled={isSubmitting}>
-                            {isSubmitting ? 'Confirming...' : 'Confirm Order'}
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Order Success Modal */}
-            <div className={`${styles.modalOverlay} ${showSuccessModal ? styles.visible : ''}`}>
-                <div className={`${styles.modalContent} ${styles.successPage}`}>
-                    <button onClick={closeSuccessModal} className={styles.modalCloseButton}>
-                        <IoCloseCircleOutline />
-                    </button>
-                    <h2 className={styles.successTitle}>Order Placed Successfully!</h2>
-                    <p className={styles.successMessageText}>
-                        Thank you for your order! We have received it and will process it shortly.
-                        You will receive a confirmation call or message on your provided contact number.
-                    </p>
-                    <button onClick={closeSuccessModal} className={`${styles.button} ${styles.modalButton}`}>
-                        Continue Shopping
-                    </button>
-                </div>
-            </div>
-
-            {/* Account Sidebar */}
-            <div className={`${styles.accountSidebarOverlay} ${showAccountSidebar ? styles.visible : ''}`} onClick={toggleAccountSidebar}>
-                <aside className={styles.accountSidebar} onClick={(e) => e.stopPropagation()}> {/* Prevent closing when clicking inside */}
-                    <div className={styles.sidebarHeader}>
-                        <h2 className={styles.sidebarTitle}>My Account</h2>
-                        <button onClick={toggleAccountSidebar} className={styles.sidebarCloseButton}>
-                            <IoCloseCircleOutline />
-                        </button>
-                    </div>
-
-                    <div className={styles.sidebarTabs}>
-                        <button
-                            className={`${styles.tabButton} ${activeSidebarTab === 'account' ? styles.active : ''}`}
-                            onClick={() => handleSidebarTabClick('account')}
-                        >
-                            Account Details
-                        </button>
-                        <button
-                            className={`${styles.tabButton} ${activeSidebarTab === 'addresses' ? styles.active : ''}`}
-                            onClick={() => handleSidebarTabClick('addresses')}
-                        >
-                            Addresses
-                        </button>
-                        <button
-                            className={`${styles.tabButton} ${activeSidebarTab === 'feedback' ? styles.active : ''}`}
-                            onClick={() => handleSidebarTabClick('feedback')}
-                        >
-                            Feedback
-                        </button>
-                    </div>
-
-                    <div className={styles.tabContent}>
-                        {activeSidebarTab === 'account' && (
-                            <Fragment>
-                                <h3>Account Details</h3>
-                                <form onSubmit={handleSaveAccountDetails} className={styles.accountDetailsForm}>
-                                    <div className={styles.formGroup}>
-                                        <label htmlFor="accountName" className={styles.label}>Name:</label>
-                                        <input
-                                            type="text"
-                                            id="accountName"
-                                            name="name"
-                                            value={currentUser?.name || ''}
-                                            onChange={handleAccountDetailChange}
-                                            className={styles.input}
-                                            required
-                                        />
-                                    </div>
-                                    <div className={styles.formGroup}>
-                                        <label htmlFor="accountPhone" className={styles.label}>Mobile Number:</label>
-                                        <input
-                                            type="tel"
-                                            id="accountPhone"
-                                            name="phone"
-                                            value={currentUser?.phone || ''}
-                                            className={styles.input}
-                                            disabled // Phone number should generally not be editable here
-                                        />
-                                    </div>
-                                    <div className={styles.formGroup}>
-                                        <label htmlFor="accountAddress" className={styles.label}>Primary Address:</label>
-                                        <textarea
-                                            id="accountAddress"
-                                            name="address"
-                                            value={currentUser?.address || ''}
-                                            onChange={handleAccountDetailChange}
-                                            className={styles.textarea}
-                                            rows="2"
-                                            required
-                                        ></textarea>
-                                    </div>
-                                    <div className={styles.formGroup}>
-                                        <label htmlFor="accountPincode" className={styles.label}>Pincode:</label>
-                                        <input
-                                            type="text"
-                                            id="accountPincode"
-                                            name="pincode"
-                                            value={currentUser?.pincode || ''}
-                                            onChange={handleAccountDetailChange}
-                                            className={styles.input}
-                                            pattern="\d{6}"
-                                            title="6-digit pincode"
-                                            required
-                                        />
-                                    </div>
-                                    {submissionMessage && activeSidebarTab === 'account' && (
-                                        <p className={`${styles.statusMessage} ${submissionMessage.includes('successfully') ? styles.successMessage : styles.errorMessage}`}>
-                                            {submissionMessage}
+                        <div className={styles.tabContent}>
+                            {activeAccountTab === 'accountDetails' && (
+                                <Fragment>
+                                    <h3>Your Profile</h3>
+                                    {accountFeedback.message && (accountFeedback.type === 'success' || accountFeedback.type === 'error') && (
+                                        <p className={`${styles.feedbackMessage} ${styles[`feedback${accountFeedback.type.charAt(0).toUpperCase() + accountFeedback.type.slice(1)}`]}`}>
+                                            {accountFeedback.message}
                                         </p>
                                     )}
-                                    <div className={styles.formButtons}>
-                                        <button type="submit" className={`${styles.button} ${styles.saveButton}`} disabled={isSavingAccount}>
-                                            {isSavingAccount ? 'Saving...' : 'Save Changes'}
-                                        </button>
-                                        <button type="button" onClick={handleLogout} className={`${styles.button} ${styles.logoutButton}`}>
-                                            Logout
-                                        </button>
-                                    </div>
-                                </form>
-                            </Fragment>
-                        )}
-
-                        {activeSidebarTab === 'addresses' && (
-                            <Fragment>
-                                <h3>My Addresses</h3>
-                                {userAddresses.length === 0 && !isAddingAddress && (
-                                    <p className={styles.noDataMessage}>No saved addresses found. Add one below!</p>
-                                )}
-                                <ul className={styles.addressList}>
-                                    {userAddresses.map((addr) => (
-                                        <li key={addr.id} className={styles.addressItem}>
-                                            <p>{addr.fullAddress}</p>
-                                            <div className={styles.addressActions}>
-                                                <button onClick={() => handleDeleteAddress(addr.id)} className={styles.deleteAddressButton}>
-                                                    Delete
-                                                </button>
+                                    {loggedInUser ? (
+                                        <form className={styles.accountDetailsForm} onSubmit={saveAccountDetails}>
+                                            <div className={styles.formGroup}>
+                                                <label className={styles.label} htmlFor="acc-name">Name</label>
+                                                <input
+                                                    id="acc-name"
+                                                    className={styles.input}
+                                                    name="name"
+                                                    value={accountDetailsForm.name || ''}
+                                                    onChange={handleAccountDetailsFormChange}
+                                                    required
+                                                />
                                             </div>
-                                        </li>
-                                    ))}
-                                </ul>
-
-                                {!isAddingAddress ? (
-                                    userAddresses.length < 5 && (
-                                        <button onClick={() => setIsAddingAddress(true)} className={`${styles.button} ${styles.addAddressButton}`}>
-                                            Add New Address
-                                        </button>
-                                    )
-                                ) : (
-                                    <form onSubmit={handleAddAddress} className={styles.addressForm}>
-                                        <h4>Add New Address</h4>
-                                        <div className={styles.formGroup}>
-                                            <label htmlFor="newStreet" className={styles.label}>Street/Building:</label>
-                                            <input type="text" id="newStreet" name="street" value={newAddress.street} onChange={handleNewAddressChange} className={styles.input} required />
-                                        </div>
-                                        <div className={styles.formGroup}>
-                                            <label htmlFor="newCity" className={styles.label}>City:</label>
-                                            <input type="text" id="newCity" name="city" value={newAddress.city} onChange={handleNewAddressChange} className={styles.input} required />
-                                        </div>
-                                        <div className={styles.formGroup}>
-                                            <label htmlFor="newState" className={styles.label}>State:</label>
-                                            <input type="text" id="newState" name="state" value={newAddress.state} onChange={handleNewAddressChange} className={styles.input} required />
-                                        </div>
-                                        <div className={styles.formGroup}>
-                                            <label htmlFor="newPincode" className={styles.label}>Pincode:</label>
-                                            <input type="text" id="newPincode" name="pincode" value={newAddress.pincode} onChange={handleNewAddressChange} className={styles.input} pattern="\d{6}" title="6-digit pincode" required />
-                                        </div>
-                                        {feedbackMessage && activeSidebarTab === 'addresses' && (
-                                            <p className={`${styles.statusMessage} ${feedbackMessage.includes('successfully') ? styles.successMessage : styles.errorMessage}`}>
-                                                {feedbackMessage}
-                                            </p>
-                                        )}
-                                        <div className={styles.formButtons}>
-                                            <button type="button" onClick={() => setIsAddingAddress(false)} className={`${styles.button} ${styles.modalButtonCancel}`}>
-                                                Cancel
+                                            <div className={styles.formGroup}>
+                                                <label className={styles.label} htmlFor="acc-phone">Phone Number</label>
+                                                <input
+                                                    id="acc-phone"
+                                                    className={styles.input}
+                                                    name="phone"
+                                                    value={accountDetailsForm.phone || ''}
+                                                    readOnly // Phone number should not be editable after signup (as it's the identifier)
+                                                    style={{ backgroundColor: '#f0f0f0', cursor: 'not-allowed' }}
+                                                />
+                                            </div>
+                                            <div className={styles.formGroup}>
+                                                <label className={styles.label} htmlFor="acc-address">Address</label>
+                                                <input
+                                                    id="acc-address"
+                                                    className={styles.input}
+                                                    name="address"
+                                                    value={accountDetailsForm.address || ''}
+                                                    onChange={handleAccountDetailsFormChange}
+                                                    required
+                                                />
+                                            </div>
+                                            <div className={styles.formGroup}>
+                                                <label className={styles.label} htmlFor="acc-pincode">Pincode</label>
+                                                <input
+                                                    id="acc-pincode"
+                                                    className={styles.input}
+                                                    name="pincode"
+                                                    value={accountDetailsForm.pincode || ''}
+                                                    onChange={handleAccountDetailsFormChange}
+                                                    maxLength={6}
+                                                    pattern="[0-9]{6}"
+                                                    title="Please enter a 6-digit pincode"
+                                                    required
+                                                />
+                                            </div>
+                                            <button
+                                                type="submit"
+                                                className={`${styles.button} ${styles.saveButton}`}
+                                                disabled={isUpdatingAccount}
+                                            >
+                                                {isUpdatingAccount ? 'Saving...' : 'Save Changes'}
                                             </button>
-                                            <button type="submit" className={`${styles.button} ${styles.saveButton}`} disabled={isSavingAddress}>
-                                                {isSavingAddress ? 'Adding...' : 'Save Address'}
+                                            <button
+                                                type="button"
+                                                className={`${styles.button} ${styles.cancel}`}
+                                                onClick={handleLogout}
+                                                style={{ marginTop: '10px' }}
+                                            >
+                                                Logout
                                             </button>
-                                        </div>
-                                    </form>
-                                )}
-                                {userAddresses.length >= 5 && !isAddingAddress && (
-                                    <p className={styles.limitMessage}>You have reached the maximum limit of 5 saved addresses.</p>
-                                )}
-                            </Fragment>
-                        )}
+                                        </form>
+                                    ) : (
+                                        <p style={{ textAlign: 'center', marginTop: '20px' }}>Please log in to view and manage your account details.</p>
+                                    )}
+                                </Fragment>
+                            )}
 
-                        {activeSidebarTab === 'feedback' && (
-                            <Fragment>
-                                <h3>Submit Feedback</h3>
-                                <form onSubmit={handleSubmitFeedback} className={styles.authForm}> {/* Reusing authForm styles for spacing */}
-                                    <div className={styles.formGroup}>
-                                        <label htmlFor="feedbackText" className={styles.label}>Your Feedback:</label>
-                                        <textarea
-                                            id="feedbackText"
-                                            value={feedbackText}
-                                            onChange={(e) => setFeedbackText(e.target.value)}
-                                            className={styles.textarea}
-                                            rows="5"
-                                            placeholder="Tell us what you think..."
-                                            required
-                                        ></textarea>
-                                    </div>
-                                    {feedbackMessage && (
-                                        <p className={`${styles.statusMessage} ${feedbackMessage.includes('successfully') ? styles.successMessage : styles.errorMessage}`}>
-                                            {feedbackMessage}
+                            {activeAccountTab === 'addresses' && (
+                                <Fragment>
+                                    <h3>Your Saved Addresses ({userAddresses.length}/5)</h3>
+                                    {accountFeedback.message && (accountFeedback.type === 'success' || accountFeedback.type === 'error') && (
+                                        <p className={`${styles.feedbackMessage} ${styles[`feedback${accountFeedback.type.charAt(0).toUpperCase() + accountFeedback.type.slice(1)}`]}`}>
+                                            {accountFeedback.message}
                                         </p>
                                     )}
-                                    <div className={styles.formButtons}>
-                                        <button
-                                            type="submit"
-                                            className={`${styles.button} ${styles.saveButton}`}
-                                            disabled={isSubmittingFeedback}
-                                        >
-                                            {isSubmittingFeedback ? 'Submitting...' : 'Submit Feedback'}
-                                        </button>
-                                    </div>
-                                </form>
-                            </Fragment>
-                        )}
+                                    {isManagingAddresses && <p style={{ textAlign: 'center' }}>Loading addresses...</p>}
+
+                                    {loggedInUser ? (
+                                        <Fragment>
+                                            <div className={styles.addressList}>
+                                                {userAddresses.length > 0 ? (
+                                                    <ul>
+                                                        {userAddresses.map(addr => (
+                                                            <li key={addr.id} className={styles.addressItem}>
+                                                                <strong>{addr.addressName}</strong>
+                                                                <p>{addr.fullAddress}</p>
+                                                                <p>Pincode: {addr.pincode}</p>
+                                                                <div className={styles.addressActions}>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => handleEditAddress(addr)}
+                                                                        style={{ backgroundColor: '#00796b' }}
+                                                                    >
+                                                                        Edit
+                                                                    </button>
+                                                                    <button type="button" onClick={() => handleDeleteAddress(addr.id)}>
+                                                                        Delete
+                                                                    </button>
+                                                                </div>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                ) : (
+                                                    <p style={{ textAlign: 'center', marginBottom: '20px' }}>No addresses saved yet.</p>
+                                                )}
+                                            </div>
+
+                                            {userAddresses.length < 5 && !showAddressForm && (
+                                                <button
+                                                    type="button"
+                                                    className={`${styles.button} ${styles.addAddressButton}`}
+                                                    onClick={() => {
+                                                        setShowAddressForm(true);
+                                                        setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' }); // Reset form for new address
+                                                    }}
+                                                >
+                                                    <FaPlus /> Add New Address
+                                                </button>
+                                            )}
+
+                                            {showAddressForm && (
+                                                <form onSubmit={handleSaveAddress} className={styles.addressForm}>
+                                                    <h3>{addressForm.id ? 'Edit Address' : 'Add New Address'}</h3>
+                                                    <div className={styles.formGroup}>
+                                                        <label className={styles.label} htmlFor="addr-name">Address Name (e.g., Home, Work)</label>
+                                                        <input
+                                                            id="addr-name"
+                                                            className={styles.input}
+                                                            name="addressName"
+                                                            required
+                                                            value={addressForm.addressName}
+                                                            onChange={handleAddressFormChange}
+                                                        />
+                                                    </div>
+                                                    <div className={styles.formGroup}>
+                                                        <label className={styles.label} htmlFor="addr-full">Full Address</label>
+                                                        <input
+                                                            id="addr-full"
+                                                            className={styles.input}
+                                                            name="fullAddress"
+                                                            required
+                                                            value={addressForm.fullAddress}
+                                                            onChange={handleAddressFormChange}
+                                                        />
+                                                    </div>
+                                                    <div className={styles.formGroup}>
+                                                        <label className={styles.label} htmlFor="addr-pincode">Pincode</label>
+                                                        <input
+                                                            id="addr-pincode"
+                                                            type="text"
+                                                            className={styles.input}
+                                                            name="pincode"
+                                                            required
+                                                            value={addressForm.pincode}
+                                                            onChange={handleAddressFormChange}
+                                                            maxLength={6}
+                                                            pattern="[0-9]{6}"
+                                                            title="Please enter a 6-digit pincode"
+                                                        />
+                                                    </div>
+                                                    <div className={styles.formButtons}>
+                                                        <button type="submit" className={styles.modalButton} disabled={isManagingAddresses}>
+                                                            {isManagingAddresses ? 'Saving...' : 'Save Address'}
+                                                        </button>
+                                                        <button type="button" className={`${styles.modalButton} ${styles.cancel}`} onClick={() => {
+                                                            setShowAddressForm(false);
+                                                            setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' }); // Clear form
+                                                        }}>
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            )}
+                                        </Fragment>
+                                    ) : (
+                                        <p style={{ textAlign: 'center', marginTop: '20px' }}>Please log in to manage your addresses.</p>
+                                    )}
+                                </Fragment>
+                            )}
+
+                            {activeAccountTab === 'feedback' && (
+                                <Fragment>
+                                    <h3>Send Us Your Feedback</h3>
+                                    {feedbackSubmitted ? (
+                                        <p className={styles.feedbackSuccessMessage}>Thank you for your valuable feedback!</p>
+                                    ) : (
+                                        loggedInUser ? (
+                                            <form onSubmit={handleSubmitFeedback} className={styles.feedbackForm}>
+                                                <div className={styles.formGroup}>
+                                                    <label className={styles.label} htmlFor="feedback-text">Your Feedback</label>
+                                                    <textarea
+                                                        id="feedback-text"
+                                                        value={feedbackText}
+                                                        onChange={handleFeedbackTextChange}
+                                                        placeholder="Share your thoughts with us..."
+                                                        required
+                                                        disabled={isSubmittingFeedback}
+                                                    ></textarea>
+                                                </div>
+                                                {accountFeedback.message && accountFeedback.type === 'error' && (
+                                                    <p className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
+                                                        {accountFeedback.message}
+                                                    </p>
+                                                )}
+                                                <button type="submit" disabled={isSubmittingFeedback || !feedbackText.trim()}>
+                                                    {isSubmittingFeedback ? 'Submitting...' : 'Submit Feedback'}
+                                                </button>
+                                            </form>
+                                        ) : (
+                                            <p style={{ textAlign: 'center', marginTop: '20px' }}>Please log in to submit your valuable feedback.</p>
+                                        )
+                                    )}
+                                </Fragment>
+                            )}
+                        </div>
                     </div>
-                </aside>
-            </div>
+                </div>
+            )}
         </div>
     );
+}
+
+// --- getStaticProps: Fetches Lemon Product Data ---
+export async function getStaticProps() {
+    // You MUST replace 'YOUR_LEMONS_API_URL' with the actual URL to your lemons data.
+    // Example: const LEMONS_DATA_URL = 'https://my-json-server.typicode.com/your-username/your-repo/lemons';
+    const LEMONS_DATA_URL = 'https://api.example.com/lemons'; // Placeholder: REPLACE THIS!
+
+    try {
+        const res = await fetch(LEMONS_DATA_URL);
+        if (!res.ok) {
+            console.error(`Failed to fetch lemons: ${res.status} ${res.statusText}`);
+            const errorBody = await res.text();
+            console.error('Lemons API Response Body:', errorBody);
+            return { props: { lemons: [] }, revalidate: 30 }; // Return empty and revalidate to try again
+        }
+        const lemons = await res.json();
+
+        // Ensure lemons is an array, provide dummy data if not
+        if (!Array.isArray(lemons) || lemons.length === 0) {
+            console.warn("Fetched lemons data is empty or not an array. Providing dummy data.");
+            // Dummy data for development/testing if API fails or returns empty
+            return {
+                props: {
+                    lemons: [
+                        { id: 1, name: 'Eureka Lemon', price: 1.50, image: '/lemon-with-leaves.jpg' },
+                        { id: 2, name: 'Meyer Lemon', price: 2.00, image: '/sliced-lemon.jpeg' },
+                        { id: 3, name: 'Lisbon Lemon', price: 1.75, image: '/basket-of-lemons.jpeg' },
+                        { id: 4, name: 'Verna Lemon', price: 1.80, image: '/lemon-tree.jpeg' },
+                    ]
+                },
+                revalidate: 30,
+            };
+        }
+
+        return {
+            props: { lemons },
+            revalidate: 30, // Revalidate every 30 seconds to get fresh data
+        };
+    } catch (error) {
+        console.error("Error in getStaticProps for lemons:", error);
+        // Fallback to dummy data on network error too
+        return {
+            props: {
+                lemons: [
+                    { id: 1, name: 'Eureka Lemon', price: 1.50, image: '/lemon-with-leaves.jpg' },
+                    { id: 2, name: 'Meyer Lemon', price: 2.00, image: '/sliced-lemon.jpeg' },
+                    { id: 3, name: 'Lisbon Lemon', price: 1.75, image: '/basket-of-lemons.jpeg' },
+                    { id: 4, name: 'Verna Lemon', price: 1.80, image: '/lemon-tree.jpeg' },
+                ]
+            },
+            revalidate: 30,
+        };
+    }
 }
