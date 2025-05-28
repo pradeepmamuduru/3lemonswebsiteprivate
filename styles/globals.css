@@ -1,25 +1,29 @@
 /* styles/globals.css */
 
-/* Global CSS Variables (moved from styles.module.css) */
+/* Global CSS Variables - NEW COLOR THEME */
 :root {
-    --primary-green: #2e8b57;
-    --light-green-bg: #e0ffe0;
-    --lighter-green-bg: #f0fff0;
-    --accent-orange: #f7b731;
-    --red-danger: #f44336;
-    --blue-info: #2196F3;
-    --whatsapp-green: #25D366;
-    --text-dark: #333;
-    --text-medium: #555;
-    --text-light: #666;
-    --border-light: #ddd;
-    --border-medium: #ccc;
-    --shadow-light: rgba(0, 0, 0, 0.1);
-    --shadow-medium: rgba(0, 0, 0, 0.2);
+    --primary-green: #4CAF50; /* A fresh, vibrant green for main accents, buttons, titles */
+    --secondary-green: #8BC34A; /* A slightly lighter green for softer accents, form sections */
+    --light-bg-green: #F0F8F0; /* Very light green for the overall page background */
+    --lemon-yellow: #FFEB3B; /* Bright, zesty yellow for highlights */
+    --accent-orange: #FFC107; /* Warm orange/yellow for hero buttons, stars (from original) */
+    --text-dark: #333333; /* Dark charcoal for primary text */
+    --text-medium: #555555; /* Medium gray for secondary text */
+    --card-bg: #FFFFFF; /* Pure white for cards, modals, and other prominent elements */
+    --border-light: #E0E0E0; /* Light gray for borders */
+    --border-medium: #CCCCCC; /* Medium gray for stronger borders */
+    --shadow-color: rgba(0, 0, 0, 0.1); /* Soft shadow */
+    --whatsapp-green-official: #25D366; /* Official WhatsApp green */
+    --whatsapp-green-dark: #128C7E; /* Darker WhatsApp green on hover */
+    --red-danger: #dc3545; /* Standard red for delete/error */
+    --red-danger-dark: #c82333; /* Darker red on hover */
+    --blue-info: #007bff; /* Standard blue for info/add buttons */
+    --blue-info-dark: #0056b3; /* Darker blue on hover */
+
     --transition-ease: all 0.3s ease;
     --border-radius-small: 5px;
     --border-radius-medium: 8px;
-    --border-radius-large: 10px;
+    --border-radius-large: 12px; /* Consistent with hero/card radius */
 }
 
 /* Global Reset and Base Styles */
@@ -35,9 +39,9 @@ html {
 body {
     margin: 0;
     padding: 0;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Inter', sans-serif; /* Changed to Inter for consistency with styles.module.css */
     color: var(--text-dark);
-    background-color: var(--light-green-bg); /* Lite green theme base */
+    background-color: var(--light-bg-green); /* Apply the new light green background globally */
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -49,5 +53,5 @@ a {
 }
 
 button {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Inter', sans-serif; /* Changed to Inter */
 }
