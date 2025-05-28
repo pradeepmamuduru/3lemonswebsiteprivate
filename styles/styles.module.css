@@ -1,55 +1,107 @@
 /* styles/styles.module.css */
 
-/*
-   IMPORTANT: Global styles for 'html, body', etc., are in 'styles/globals.css'.
-   This file is for CSS Modules. Classes defined here are locally scoped
-   when imported into a component (e.g., import styles from '../styles/styles.module.css').
-   You should reference them in your JSX like `className={styles.className}`.
-*/
-
-/* Using CSS variables defined in globals.css */
-
+/* General styles */
 .page {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  background-color: #f7f7f7;
+  overflow-x: hidden; /* Prevent horizontal scroll due to modals/sidebar */
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  flex-grow: 1; /* Allows main content to grow and push footer down */
-  width: 100%;
-  box-sizing: border-box;
 }
 
-/* --- Header --- */
+.sectionTitle {
+  text-align: center;
+  font-size: 2.5em;
+  color: #333;
+  margin-bottom: 40px;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.sectionTitle::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background-color: #ffd700; /* Gold */
+  border-radius: 2px;
+}
+
+.button {
+  background-color: #ffd700; /* Gold */
+  color: #333;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  text-decoration: none; /* For links acting as buttons */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.button:hover {
+  background-color: #ffc107; /* Darker Gold */
+  transform: translateY(-2px);
+}
+
+.button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.buttonIcon {
+    font-size: 1.2em;
+}
+
+.input, .select, .textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box; /* Include padding in element's total width and height */
+  font-size: 1em;
+}
+
+.textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Header */
 .header {
-    background-color: var(--primary-green);
-    color: var(--text-light);
-    padding: 15px 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 4px var(--shadow-light);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    width: 100%;
-    box-sizing: border-box;
+  background-color: #333;
+  color: #fff;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .headerTitle {
-    margin: 0;
-    font-size: 1.8em;
-    font-weight: 700;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-    flex-shrink: 1;
-    min-width: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  margin: 0;
+  font-size: 1.8em;
+  color: #ffd700; /* Gold */
 }
 
 .headerActions {
@@ -58,556 +110,437 @@
     gap: 15px;
 }
 
-.loggedInUser {
-    font-size: 1.1em;
-    font-weight: 600;
-    color: var(--accent-yellow);
-    white-space: nowrap;
-    margin-right: 10px;
-}
-
 .loginButton {
-    background-color: var(--accent-yellow);
-    color: var(--text-dark);
+    background-color: #4CAF50; /* Green for login */
+    color: white;
     padding: 8px 15px;
     border: none;
-    border-radius: 8px;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 1em;
-    font-weight: 600;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 2px 4px var(--shadow-light);
-    white-space: nowrap;
+    transition: background-color 0.3s ease;
+    font-size: 0.95em;
 }
 
 .loginButton:hover {
-    background-color: var(--accent-orange);
-    transform: translateY(-1px);
+    background-color: #45a049;
 }
+
+.loggedInUser {
+    color: white;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
 
 .hamburgerIcon {
-    font-size: 2.5em;
-    cursor: pointer;
-    color: var(--text-light);
-    transition: color 0.3s ease;
-    z-index: 1001;
-    display: block; /* Always show hamburger now for account menu */
-    background: none; /* Ensure no default button styling */
-    border: none;
-    line-height: 1; /* Align icon vertically */
-    padding: 0;
+  background: none;
+  border: none;
+  color: #ffd700;
+  font-size: 2em;
+  cursor: pointer;
+  padding: 5px;
+  margin-left: 10px; /* Space from login button */
+  display: flex; /* Ensures the icon is centered if it's a character */
+  align-items: center;
+  justify-content: center;
 }
 
-.hamburgerIcon:hover {
-    color: #e0e0e0;
-}
-
-
-/* --- Hero Section --- */
+/* Hero Section */
 .hero {
   position: relative;
   width: 100%;
-  height: 450px;
+  height: 400px; /* Adjust as needed */
   overflow: hidden;
-  border-radius: 12px;
-  margin-bottom: 40px;
-  box-shadow: 0 8px 20px var(--shadow-medium);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  text-align: center;
 }
 
 .heroImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: brightness(0.75);
-  transition: transform 0.4s ease-in-out;
-}
-
-.hero:hover .heroImage {
-  transform: scale(1.03);
-}
-
-.heroOverlay {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  color: var(--text-light);
+  filter: brightness(0.6); /* Darken image for text readability */
+}
+
+.heroOverlay {
+  position: relative;
+  z-index: 1;
   padding: 20px;
-  background: rgba(0, 0, 0, 0.3);
 }
 
 .heroTitle {
-  font-size: 4.5em;
-  margin-bottom: 15px;
-  font-weight: 800;
-  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.6);
-  letter-spacing: -1px;
+  font-size: 3.5em;
+  margin-bottom: 10px;
+  color: #ffd700; /* Gold */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
 
 .heroSubtitle {
-  font-size: 1.8em;
-  margin-bottom: 40px;
-  font-weight: 400;
-  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+  font-size: 1.5em;
+  margin-bottom: 30px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
 }
 
 .heroButton {
-  background-color: var(--accent-yellow);
-  color: var(--text-dark);
-  padding: 18px 40px;
-  border-radius: 10px;
+  background-color: #4CAF50; /* Green */
+  color: white;
+  padding: 12px 25px;
+  font-size: 1.2em;
+  border-radius: 8px;
   text-decoration: none;
-  font-weight: 700;
-  font-size: 1.4em;
-  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-  box-shadow: 0 6px 12px var(--shadow-medium);
-  border: none;
-  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .heroButton:hover {
-  background-color: var(--accent-orange);
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  background-color: #45a049;
+  transform: scale(1.05);
 }
 
-/* --- Section Titles --- */
-.sectionTitle {
-  text-align: center;
-  font-size: 3em;
-  margin-top: 60px;
-  margin-bottom: 40px;
-  color: var(--primary-green);
-  position: relative;
-  padding-bottom: 15px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-}
-
-.sectionTitle::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: 0px;
-  transform: translateX(-50%);
-  width: 100px;
-  height: 5px;
-  background-color: var(--secondary-green);
-  border-radius: 3px;
-}
-
-/* --- Lemons Products Section --- */
+/* Lemons Section */
 .lemonsSection {
-  padding: 30px 0;
+  padding: 60px 0;
+  background-color: #fff;
+  border-radius: 8px;
+  margin-top: 40px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 .lemonsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 35px;
+  gap: 30px;
+  padding: 0 20px;
 }
 
 .lemonCard {
-  background-color: var(--bg-light);
-  border-radius: 15px;
-  box-shadow: 0 6px 15px var(--shadow-light);
+  background-color: #fcfcfc;
+  border: 1px solid #eee;
+  border-radius: 10px;
   overflow: hidden;
-  text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  padding-bottom: 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   display: flex;
   flex-direction: column;
 }
 
 .lemonCard:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 25px var(--shadow-medium);
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
 }
 
 .cardImage {
   width: 100%;
-  height: 220px;
+  height: 200px; /* Fixed height for consistency */
   object-fit: cover;
-  display: block;
-  margin-bottom: 18px;
+  border-bottom: 1px solid #eee;
 }
 
 .cardTitle {
-  font-size: 1.8em;
-  font-weight: 700;
-  color: var(--primary-green);
-  margin-bottom: 10px;
-  padding: 0 20px;
+  font-size: 1.5em;
+  color: #333;
+  margin: 15px 15px 5px;
+  font-weight: bold;
 }
 
 .cardDescription {
-  font-size: 1.1em;
+  padding: 0 15px 15px;
   color: #555;
-  line-height: 1.6;
-  padding: 0 20px;
-  flex-grow: 1;
+  font-size: 0.95em;
+  flex-grow: 1; /* Allows description to take up available space */
 }
 
 .noDataMessage {
   text-align: center;
-  font-size: 1.2em;
-  color: #888;
-  grid-column: 1 / -1;
+  grid-column: 1 / -1; /* Span across all columns */
+  color: #777;
+  font-style: italic;
   padding: 30px;
-  background-color: var(--bg-faded-green);
-  border-radius: 10px;
+  font-size: 1.1em;
 }
 
-
-/* --- Order Form Section --- */
+/* Order Form Section */
 .formSection {
-  background-color: var(--bg-light);
-  border-radius: 15px;
-  box-shadow: 0 8px 20px var(--shadow-light);
-  padding: 50px;
-  margin-bottom: 60px;
-}
-
-.statusMessage {
-  padding: 15px 25px;
+  padding: 60px 20px;
+  background-color: #fff;
   border-radius: 8px;
-  margin-bottom: 25px;
-  font-weight: 600;
-  text-align: center;
-  animation: fadeIn 0.5s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.successMessage {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-  border: 1px solid #a5d6a7;
-}
-
-.errorMessage {
-  background-color: #ffebee;
-  color: #c62828;
-  border: 1px solid #ef9a9a;
+  margin-top: 40px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 .form {
-  display: grid;
-  gap: 25px;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  max-width: 700px;
+  margin: 0 auto;
 }
 
 .formGroup {
-  display: flex;
-  flex-direction: column;
+  margin-bottom: 20px;
 }
 
 .label {
-  margin-bottom: 10px;
-  font-weight: 700;
-  color: var(--text-dark);
-  font-size: 1em;
-}
-
-.input, .select {
-  padding: 14px 18px;
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  font-size: 1.1em;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  width: 100%;
-  box-sizing: border-box;
-  color: var(--text-dark);
-}
-
-.input:focus, .select:focus {
-  border-color: var(--secondary-green);
-  box-shadow: 0 0 0 4px rgba(107, 203, 119, 0.4);
-  outline: none;
-}
-
-.input:disabled {
-    background-color: #f0f0f0;
-    cursor: not-allowed;
-    color: #777;
-}
-
-.select {
-  appearance: none;
-  background-image: url("data:image/svg+xml;utf8,<svg fill='%2337A24A' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 15px center;
-  background-size: 24px;
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #555;
 }
 
 .orderVarietyGroup {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
+    display: flex;
     gap: 20px;
-    align-items: flex-start;
-    padding: 15px;
-    background-color: var(--bg-faded-green);
-    border-radius: 10px;
-    border: 1px solid #d0e0d0;
     margin-bottom: 15px;
+    align-items: flex-end; /* Align inputs at the bottom */
 }
 
 .orderVarietyGroup .formGroup {
-    margin-bottom: 0;
+    flex: 1;
+    margin-bottom: 0; /* Remove margin for grouped items */
+}
+
+/* UI Change 1: Add/Remove Button Styles */
+.addVarietyButtonSquare {
+    background-color: #fff9c4; /* Light Yellowish */
+    color: #333;
+    width: 40px; /* Small, square */
+    height: 40px;
+    border: 1px solid #ffd700;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.8em; /* Make the plus sign large */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    margin-top: 10px; /* Space below last variety group */
+    line-height: 1; /* Prevent extra line height */
+    padding: 0;
+}
+
+.addVarietyButtonSquare:hover {
+    background-color: #ffeb3b; /* Slightly darker yellow */
+    border-color: #fbc02d; /* Even darker yellow */
+}
+
+.removeVarietyButtonSquare {
+    background-color: #ffcccb; /* Less intense red/pink */
+    color: #b71c1c; /* Darker red for text */
+    width: 30px; /* Smaller than add, fits next to inputs */
+    height: 30px;
+    border: 1px solid #ef9a9a; /* Less intense red border */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    margin-left: 10px; /* Space from inputs */
+    margin-bottom: 15px; /* Align with input's bottom */
+    line-height: 1;
+    padding: 0;
+}
+
+.removeVarietyButtonSquare:hover {
+    background-color: #ef9a9a; /* Slightly darker */
+    border-color: #e57373; /* Even darker */
 }
 
 
 .discountNote {
-  color: var(--accent-orange);
-  font-size: 0.9em;
-  font-weight: 600;
+  font-size: 0.85em;
+  color: #4CAF50; /* Green */
   margin-top: 5px;
   display: block;
 }
 
-.removeVarietyButton {
-  background-color: #f44336;
-  color: var(--text-light);
-  padding: 8px 15px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9em;
-  font-weight: 600;
-  transition: background-color 0.3s ease;
-  margin-top: 10px;
-  display: block;
-  width: fit-content;
-  align-self: flex-end;
-  grid-column: span 2; /* Ensure it takes full width below its group */
-  margin-left: auto; /* Push to right */
-}
-
-.removeVarietyButton:hover {
-  background-color: #d32f2f;
-}
-
-.button {
-  background-color: var(--primary-green);
-  color: var(--text-light);
-  padding: 16px 30px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 1.15em;
-  font-weight: 600;
-  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 10px var(--shadow-light);
-  width: auto;
-  text-align: center;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  white-space: nowrap;
-}
-
-.button:hover:not(:disabled) {
-  background-color: #2e8b3b;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px var(--shadow-medium);
-}
-
-.button:disabled {
-  background-color: #a5d6a7;
-  cursor: not-allowed;
-  opacity: 0.8;
-}
-
-.whatsappButton {
-  background-color: #25D366;
-}
-
-.whatsappButton:hover:not(:disabled) {
-  background-color: #1DA851;
-}
-
-.buttonIcon {
-  font-size: 1.3em;
-}
-
 .orderSummary {
-  grid-column: 1 / -1;
-  text-align: center;
+  text-align: right;
   margin-top: 30px;
-  padding: 20px;
-  background-color: var(--bg-faded-green);
-  border-radius: 12px;
-  font-size: 2em;
-  color: var(--primary-green);
-  font-weight: 800;
-  border: 1px solid #cfe9d0;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
 }
 
 .orderSummary h3 {
+  font-size: 1.8em;
+  color: #333;
   margin: 0;
 }
 
 .actions {
-  grid-column: 1 / -1;
   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
+  flex-direction: column; /* Stack buttons on small screens */
+  gap: 15px;
   margin-top: 30px;
 }
 
-.loginPrompt {
-    grid-column: 1 / -1;
+.whatsappButton {
+  background-color: #25D366; /* WhatsApp green */
+  color: white;
+}
+
+.whatsappButton:hover {
+  background-color: #1DA851; /* Darker WhatsApp green */
+}
+
+.statusMessage {
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    font-weight: bold;
     text-align: center;
-    padding: 30px;
-    background-color: var(--bg-faded-green);
-    border-radius: 12px;
-    margin-top: 20px;
-    font-size: 1.2em;
-    color: var(--text-dark);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    font-size: 1.1em;
+}
+
+.successMessage {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.errorMessage {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.loginPrompt {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 30px;
 }
 
 .loginPrompt p {
-    margin-bottom: 20px;
-    font-weight: 500;
+    margin-bottom: 15px;
+    font-size: 1.1em;
 }
 
-.loginPrompt .button {
-    margin-top: 15px;
+.authLink {
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.authLink:hover {
+    color: #0056b3;
 }
 
-/* --- Customer Reviews Section --- */
+
+/* Reviews Section */
 .reviewsSection {
-  margin-top: 80px;
-  margin-bottom: 80px;
+  padding: 60px 0;
+  background-color: #fcfcfc;
+  border-radius: 8px;
+  margin-top: 40px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 .reviewsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 30px;
-  padding: 20px 0;
+  padding: 0 20px;
 }
 
 .reviewCard {
-  background-color: var(--bg-faded-green);
-  border-radius: 15px;
-  padding: 30px;
-  box-shadow: 0 5px 12px var(--shadow-light);
-  text-align: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.reviewCard:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 18px var(--shadow-medium);
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
 }
 
 .reviewerRating {
-  color: var(--accent-yellow);
-  font-size: 1.5em;
-  margin-bottom: 15px;
+  color: #ffd700; /* Gold */
+  font-size: 1.2em;
+  margin-bottom: 10px;
 }
 
-.emptyStar {
-    opacity: 0.3;
+.reviewerRating .emptyStar {
+    color: #ddd; /* Lighter color for un-filled stars */
 }
 
 .reviewText {
   font-style: italic;
-  font-size: 1.15em;
+  margin-bottom: 15px;
   color: #444;
-  line-height: 1.6;
-  margin-bottom: 20px;
+  flex-grow: 1; /* Allows text to take up space */
 }
 
 .reviewerName {
-  font-weight: 700;
-  color: var(--primary-green);
-  font-size: 1.05em;
+  font-weight: bold;
+  color: #666;
+  text-align: right;
+  margin-top: auto; /* Pushes name to the bottom */
 }
 
-/* --- Footer Section --- */
+
+/* Footer */
 .footer {
-  background-color: #222;
-  color: var(--text-light);
+  background-color: #333;
+  color: #fff;
   text-align: center;
-  padding: 25px;
-  font-size: 0.95em;
-  margin-top: auto;
-  width: 100%;
-  box-sizing: border-box;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
-}
-
-.footer p {
-    margin: 5px 0;
+  padding: 20px;
+  margin-top: 50px;
+  font-size: 0.9em;
 }
 
 .footer a {
-  color: var(--accent-yellow);
+  color: #ffd700;
   text-decoration: none;
-  margin: 0 8px;
   transition: color 0.3s ease;
 }
 
 .footer a:hover {
-  color: var(--accent-orange);
-  text-decoration: underline;
+  color: #ffc107;
 }
 
-/* --- Modals and Overlays (General) --- */
+/* Modals */
 .modalOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .modalOverlay.visible {
-  opacity: 1;
-  visibility: visible;
+    opacity: 1;
+    visibility: visible;
 }
 
 .modalContent {
-  background-color: var(--bg-light);
-  padding: 40px;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px var(--shadow-medium);
-  max-width: 550px;
-  width: 90%;
-  position: relative;
-  transform: scale(0.95);
-  opacity: 0;
-  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-  box-sizing: border-box;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    max-width: 500px;
+    width: 90%;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
 }
 
 .modalOverlay.visible .modalContent {
-  transform: scale(1);
-  opacity: 1;
+    transform: translateY(0);
 }
+
 
 .modalCloseButton {
     position: absolute;
@@ -615,158 +548,123 @@
     right: 15px;
     background: none;
     border: none;
-    font-size: 2.2em;
-    color: #999;
+    font-size: 1.8em;
+    color: #666;
     cursor: pointer;
-    padding: 5px;
     line-height: 1;
-    transition: color 0.3s ease;
 }
 
 .modalCloseButton:hover {
-    color: var(--primary-green);
+    color: #333;
 }
 
 .modalTitle {
-  font-size: 2.5em;
-  color: var(--primary-green);
-  margin-bottom: 25px;
-  text-align: center;
-  font-weight: 700;
+    font-size: 1.8em;
+    margin-top: 0;
+    margin-bottom: 25px;
+    text-align: center;
+    color: #333;
 }
 
 .modalText {
-  font-size: 1.1em;
-  line-height: 1.7;
-  color: #555;
-  margin-bottom: 25px;
-}
-
-.modalText p strong {
-    color: var(--primary-green);
+    margin-bottom: 25px;
+    line-height: 1.6;
+    color: #555;
 }
 
 .orderSummaryList {
     list-style: none;
     padding: 0;
     margin-top: 15px;
-    border-top: 1px solid #eee;
+    border-top: 1px dashed #eee;
     padding-top: 15px;
 }
-
 .orderSummaryList li {
     margin-bottom: 8px;
-    font-weight: 500;
-    color: #444;
+    font-size: 1.05em;
+    color: #333;
+}
+.totalPayable {
+    font-size: 1.4em;
+    font-weight: bold;
+    text-align: right;
+    margin-top: 20px;
+    color: #4CAF50;
 }
 
-.totalPayable {
-    font-size: 1.3em;
-    font-weight: 700;
-    color: var(--accent-orange);
-    text-align: center;
-    margin-top: 25px;
-    padding-top: 15px;
-    border-top: 2px dashed #eee;
-}
 
 .modalButtons {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 30px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
 }
 
 .modalButton {
-  background-color: var(--primary-green);
-  color: var(--text-light);
-  padding: 14px 28px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 1.1em;
-  font-weight: 600;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  white-space: nowrap;
+    background-color: #4CAF50; /* Green for action */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
 }
 
-.modalButton:hover:not(:disabled) {
-  background-color: #2e8b3b;
-  transform: translateY(-2px);
-}
-
-.modalButton:disabled {
-  background-color: #a5d6a7;
-  cursor: not-allowed;
+.modalButton:hover {
+    background-color: #45a049;
 }
 
 .modalButtonCancel {
-  background-color: #f44336;
+    background-color: #f44336; /* Red for cancel */
 }
 
-.modalButtonCancel:hover:not(:disabled) {
-  background-color: #d32f2f;
+.modalButtonCancel:hover {
+    background-color: #d32f2f;
 }
 
 .successPage {
     text-align: center;
+    padding: 40px;
 }
 
 .successTitle {
-    color: var(--primary-green);
-    font-size: 2.5em;
+    color: #4CAF50;
+    font-size: 2em;
     margin-bottom: 20px;
 }
 
 .successMessageText {
-    font-size: 1.2em;
-    color: #555;
+    font-size: 1.1em;
+    color: #333;
     margin-bottom: 30px;
-    line-height: 1.6;
 }
 
-/* --- Authentication Modal Specific Styles --- */
+/* Authentication Modal (AuthForm) */
 .authForm {
     display: flex;
     flex-direction: column;
-    gap: 15px;
 }
 
 .authSwitch {
     text-align: center;
     margin-top: 20px;
-    font-size: 0.95em;
     color: #666;
 }
 
-.authLink {
-    color: var(--primary-green);
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: underline;
-    transition: color 0.2s ease;
-}
-
-.authLink:hover {
-    color: var(--secondary-green);
-}
-
-
-/* --- Account Sidebar Styles --- */
+/* Account Sidebar */
 .accountSidebarOverlay {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: flex-end;
-    z-index: 1500;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 2000;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
+    display: flex;
+    justify-content: flex-end; /* Pushes sidebar to the right */
 }
 
 .accountSidebarOverlay.visible {
@@ -775,13 +673,13 @@
 }
 
 .accountSidebar {
-    background-color: var(--bg-light);
-    width: 100%;
-    max-width: 450px; /* Slightly wider sidebar */
+    background-color: #fff;
+    width: 350px; /* Adjust width as needed */
     height: 100%;
-    box-shadow: -6px 0 20px var(--shadow-medium); /* Stronger shadow */
-    transform: translateX(100%);
-    transition: transform 0.3s ease-out;
+    position: relative;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+    transform: translateX(100%); /* Start off-screen */
+    transition: transform 0.3s ease;
     display: flex;
     flex-direction: column;
 }
@@ -794,30 +692,28 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 25px; /* More padding */
-    background-color: var(--primary-green);
-    color: var(--text-light);
-    box-shadow: 0 2px 5px var(--shadow-light);
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    background-color: #f8f8f8;
 }
 
 .sidebarTitle {
     margin: 0;
-    font-size: 1.8em; /* Larger title */
-    font-weight: 700;
+    font-size: 1.5em;
+    color: #333;
 }
 
 .sidebarCloseButton {
     background: none;
     border: none;
-    font-size: 2.5em; /* Larger close icon */
-    color: var(--text-light);
+    font-size: 2em;
+    color: #666;
     cursor: pointer;
-    transition: color 0.2s ease;
     line-height: 1;
 }
 
 .sidebarCloseButton:hover {
-    color: var(--accent-yellow);
+    color: #333;
 }
 
 .sidebarTabs {
@@ -827,69 +723,67 @@
 
 .tabButton {
     flex: 1;
-    padding: 18px 10px; /* More padding */
+    padding: 15px 10px;
     background-color: #f0f0f0;
     border: none;
     border-bottom: 3px solid transparent;
     cursor: pointer;
-    font-size: 1.1em;
-    font-weight: 600;
+    font-size: 1em;
     color: #555;
-    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-}
-
-.tabButton:hover {
-    background-color: #e0e0e0;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 .tabButton.active {
-    background-color: var(--bg-light);
-    border-bottom-color: var(--primary-green);
-    color: var(--primary-green);
+    background-color: #fff;
+    border-color: #ffd700; /* Gold active indicator */
+    color: #333;
+    font-weight: bold;
+}
+
+.tabButton:hover:not(.active) {
+    background-color: #e0e0e0;
 }
 
 .tabContent {
-    padding: 25px; /* More padding */
-    flex-grow: 1;
-    overflow-y: auto;
+    padding: 20px;
+    flex-grow: 1; /* Allow content to fill remaining space */
+    overflow-y: auto; /* Enable scrolling for content if it overflows */
 }
 
 .tabContent h3 {
-    color: var(--primary-green);
-    font-size: 1.8em; /* Larger heading */
     margin-top: 0;
-    margin-bottom: 25px;
-    text-align: center;
-    font-weight: 700;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 1.3em;
+    border-bottom: 1px dashed #eee;
+    padding-bottom: 10px;
 }
 
-.accountDetailsForm {
+.accountDetailsForm, .addressForm, .feedbackForm {
     display: flex;
     flex-direction: column;
-    gap: 20px;
 }
 
-.accountDetailsForm .input {
-    width: 100%;
+.accountDetailsForm .formGroup, .addressForm .formGroup, .feedbackForm .formGroup {
+    margin-bottom: 15px;
 }
 
-.saveButton {
-    background-color: #2196F3; /* Blue for save */
-}
-.saveButton:hover {
-    background-color: #1976D2;
+.accountDetailsForm .button, .addressForm .button, .feedbackForm .button {
+    margin-top: 10px;
 }
 
 .logoutButton {
-    background-color: #f44336; /* Red for logout */
-    margin-top: 10px;
+    background-color: #dc3545; /* Bootstrap danger red */
+    margin-top: 15px;
 }
 .logoutButton:hover {
-    background-color: #d32f2f;
+    background-color: #c82333;
 }
 
+.addressList {
+    margin-bottom: 20px;
+}
 
-/* Address List in Sidebar */
 .addressList ul {
     list-style: none;
     padding: 0;
@@ -898,353 +792,107 @@
 .addressItem {
     background-color: #f9f9f9;
     border: 1px solid #eee;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 15px;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
     position: relative;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-.addressItem strong {
-    font-size: 1.1em;
-    color: var(--primary-green);
-    display: block;
-    margin-bottom: 5px;
 }
 
 .addressItem p {
-    margin: 0;
-    color: #666;
-    font-size: 0.95em;
-    line-height: 1.5;
+    margin: 5px 0;
+    color: #555;
 }
 
 .addressActions {
-    margin-top: 15px;
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
+    margin-top: 10px;
+    text-align: right;
 }
 
 .deleteAddressButton {
-    padding: 8px 15px;
+    background-color: #ff9800; /* Orange for delete to be less harsh than red */
+    color: white;
+    padding: 6px 12px;
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 0.9em;
-    font-weight: 600;
-    background-color: #f44336;
-    color: var(--text-light);
-    transition: background-color 0.2s ease;
+    font-size: 0.85em;
+    transition: background-color 0.3s ease;
 }
 
 .deleteAddressButton:hover {
-    background-color: #d32f2f;
+    background-color: #e68900;
 }
 
 .addAddressButton {
-    background-color: #008CBA;
-    margin-top: 20px;
+    background-color: #4CAF50;
+    color: white;
     width: 100%;
+    padding: 12px;
+    font-size: 1em;
+    margin-top: 15px;
 }
 .addAddressButton:hover {
-    background-color: #007bb5;
-}
-
-.addressForm {
-    margin-top: 20px;
-    background-color: #f0f8ff;
-    padding: 25px;
-    border-radius: 10px;
-    border: 1px solid #e0f2f7;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-}
-
-.addressForm h4 {
-    color: var(--primary-green);
-    margin-top: 0;
-    margin-bottom: 20px;
-    text-align: center;
-    font-size: 1.4em;
-}
-
-.addressForm .formButtons {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 25px;
+    background-color: #45a049;
 }
 
 .limitMessage {
-    text-align: center;
-    color: #d32f2f;
     font-size: 0.9em;
+    color: #dc3545; /* Red */
     margin-top: 10px;
-    font-weight: 600;
+    text-align: center;
 }
 
-
-/* --- Responsive Adjustments --- */
-@media (max-width: 1024px) {
-  .container {
-    padding: 15px;
-  }
-  .hero {
-    height: 380px;
-  }
-  .heroTitle {
-    font-size: 3.5em;
-  }
-  .heroSubtitle {
-    font-size: 1.5em;
-  }
-  .heroButton {
-    padding: 15px 35px;
-    font-size: 1.2em;
-  }
-  .sectionTitle {
-    font-size: 2.5em;
-    margin-top: 40px;
-    margin-bottom: 30px;
-  }
-  .lemonsGrid, .reviewsGrid {
-    gap: 25px;
-  }
-  .lemonCard {
-    padding-bottom: 20px;
-  }
-  .cardImage {
-    height: 200px;
-  }
-  .formSection {
-    padding: 40px;
-  }
-  .form {
-    gap: 20px;
-  }
-  .input, .select {
-    padding: 12px 15px;
-    font-size: 1em;
-  }
-  .button {
-    padding: 14px 25px;
-    font-size: 1.05em;
-  }
-  .orderSummary {
-    font-size: 1.8em;
-  }
-  .modalContent {
-    max-width: 500px;
-    padding: 30px;
-  }
-  .modalTitle {
-    font-size: 2em;
-  }
-  .modalText {
-    font-size: 1em;
-  }
-  .modalButton {
-    padding: 12px 20px;
-    font-size: 1em;
-  }
-  .accountSidebar {
-      max-width: 400px;
-  }
-  .sidebarTitle {
-      font-size: 1.6em;
-  }
-  .sidebarCloseButton {
-      font-size: 2.2em;
-  }
-  .tabButton {
-      font-size: 1em;
-      padding: 15px 8px;
-  }
-  .tabContent h3 {
-      font-size: 1.6em;
-  }
+/* Spinner for loading states */
+.spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #fff;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 8px;
 }
 
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Media Queries for Responsiveness */
 @media (max-width: 768px) {
-  .headerTitle {
-      font-size: 1.4em;
-  }
-  .loggedInUser {
-      font-size: 1em;
-  }
-  .loginButton {
-      padding: 6px 12px;
-      font-size: 0.9em;
-  }
-  .hamburgerIcon {
-      font-size: 2em;
-  }
-  .hero {
-    height: 300px;
-    border-radius: 0;
-    margin-bottom: 30px;
-  }
   .heroTitle {
-    font-size: 2.8em;
-    margin-bottom: 10px;
+    font-size: 2.5em;
   }
   .heroSubtitle {
     font-size: 1.2em;
-    margin-bottom: 25px;
-  }
-  .heroButton {
-    padding: 12px 28px;
-    font-size: 1.1em;
   }
   .sectionTitle {
     font-size: 2em;
-    margin-top: 30px;
-    margin-bottom: 25px;
   }
   .lemonsGrid, .reviewsGrid {
-    grid-template-columns: 1fr; /* Single column layout */
-    gap: 20px;
-  }
-  .lemonCard {
-    padding-bottom: 15px;
-  }
-  .cardImage {
-    height: 180px;
-  }
-  .cardTitle {
-    font-size: 1.5em;
-  }
-  .cardDescription {
-    font-size: 0.95em;
-  }
-  .formSection {
-    padding: 30px;
-  }
-  .form {
-    grid-template-columns: 1fr; /* Single column for form fields */
-    gap: 15px;
-  }
-  .orderVarietyGroup {
-    grid-template-columns: 1fr; /* Stack grade and quantity */
-    gap: 10px;
-  }
-  .removeVarietyButton {
-    width: 100%; /* Full width for remove button */
-    margin-left: 0;
-    padding: 10px 15px;
-  }
-  .button {
-    width: 100%;
-    padding: 12px 20px;
-    font-size: 1em;
+    grid-template-columns: 1fr; /* Single column on smaller screens */
   }
   .actions {
-    flex-direction: column;
-    gap: 15px;
+    flex-direction: column; /* Stack buttons */
   }
-  .orderSummary {
-    font-size: 1.6em;
-    padding: 15px;
+  .orderVarietyGroup {
+    flex-direction: column; /* Stack grade and quantity */
+    align-items: stretch; /* Stretch inputs */
+    gap: 0;
   }
-  .modalContent {
-    width: 95%;
-    padding: 25px;
+  .removeVarietyButtonSquare {
+    margin-left: 0; /* Remove side margin */
+    margin-top: 5px; /* Add top margin */
+    width: 100%; /* Full width */
+    height: 35px; /* Slightly taller */
+    font-size: 1.2em;
   }
-  .modalTitle {
-    font-size: 1.8em;
-  }
-  .modalText {
-    font-size: 0.9em;
-  }
-  .modalCloseButton {
-      font-size: 2em;
-      top: 10px;
-      right: 10px;
+  .addVarietyButtonSquare {
+    width: 100%; /* Full width */
   }
   .accountSidebar {
-      max-width: 100%; /* Full width on small screens */
-  }
-  .sidebarHeader {
-      padding: 15px 20px;
-  }
-  .sidebarTitle {
-      font-size: 1.4em;
-  }
-  .sidebarCloseButton {
-      font-size: 2em;
-  }
-  .tabButton {
-      font-size: 0.9em;
-      padding: 12px 5px;
-  }
-  .tabContent {
-      padding: 20px;
-  }
-  .tabContent h3 {
-      font-size: 1.4em;
-  }
-}
-
-@media (max-width: 480px) {
-  .container {
-    padding: 10px;
-  }
-  .hero {
-    height: 250px;
-  }
-  .heroTitle {
-    font-size: 2em;
-  }
-  .heroSubtitle {
-    font-size: 1em;
-  }
-  .heroButton {
-    padding: 10px 20px;
-    font-size: 0.95em;
-  }
-  .sectionTitle {
-    font-size: 1.8em;
-    margin-top: 25px;
-    margin-bottom: 20px;
-  }
-  .cardImage {
-    height: 150px;
-  }
-  .cardTitle {
-    font-size: 1.3em;
-  }
-  .formSection {
-    padding: 20px;
-  }
-  .input, .select {
-    padding: 10px 12px;
-    font-size: 0.9em;
-  }
-  .button {
-    padding: 10px 15px;
-    font-size: 0.9em;
-  }
-  .orderSummary {
-    font-size: 1.4em;
-    padding: 10px;
-  }
-  .modalContent {
-    padding: 20px;
-  }
-  .modalTitle {
-    font-size: 1.6em;
-  }
-  .modalText {
-    font-size: 0.85em;
-  }
-  .modalButton {
-    font-size: 0.9em;
-    padding: 10px 15px;
-  }
-  .reviewerRating {
-      font-size: 1.3em;
-  }
-  .reviewText {
-      font-size: 1em;
+    width: 100%; /* Full width on small screens */
   }
 }
