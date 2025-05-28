@@ -1,82 +1,229 @@
-/* styles/styles.module.css */
+/* styles/styles.module.css - Comprehensive Stylesheet */
 
-/* General styles */
+/* --- Base & Utility Styles --- */
+:root {
+    --primary-green: #2e8b57;
+    --light-green-bg: #e0ffe0;
+    --lighter-green-bg: #f0fff0;
+    --accent-orange: #f7b731;
+    --red-danger: #f44336;
+    --blue-info: #2196F3;
+    --whatsapp-green: #25D366;
+    --text-dark: #333;
+    --text-medium: #555;
+    --text-light: #666;
+    --border-light: #ddd;
+    --border-medium: #ccc;
+    --shadow-light: rgba(0, 0, 0, 0.1);
+    --shadow-medium: rgba(0, 0, 0, 0.2);
+    --transition-ease: all 0.3s ease;
+    --border-radius-small: 5px;
+    --border-radius-medium: 8px;
+    --border-radius-large: 10px;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    color: var(--text-dark);
+    background-color: var(--light-green-bg); /* Lite green theme base */
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
 .page {
-  font-family: Arial, sans-serif;
-  line-height: 1.6;
-  color: #333;
-  margin: 0;
-  padding: 0;
-  background-color: #f7f7f7;
-  overflow-x: hidden; /* Prevent horizontal scroll due to modals/sidebar */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-x: hidden; /* Prevents horizontal scroll from responsive elements */
 }
 
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    flex-grow: 1;
+    width: 100%;
+    box-sizing: border-box; /* Ensures padding doesn't add to overall width */
 }
 
 .sectionTitle {
-  text-align: center;
-  font-size: 2.5em;
-  color: #333;
-  margin-bottom: 40px;
-  position: relative;
-  padding-bottom: 10px;
+    text-align: center;
+    color: var(--primary-green);
+    margin-bottom: 40px;
+    font-size: 2.5em;
+    font-weight: bold;
+    position: relative;
+    padding-bottom: 10px;
+    letter-spacing: 0.5px;
 }
 
 .sectionTitle::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 4px;
-  background-color: #ffd700; /* Gold */
-  border-radius: 2px;
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background-color: var(--primary-green);
+    border-radius: 2px;
 }
 
+/* --- Buttons --- */
 .button {
-  background-color: #ffd700; /* Gold */
-  color: #333;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1em;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  text-decoration: none; /* For links acting as buttons */
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+    background-color: #4CAF50; /* Green - Place Order Default */
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: var(--border-radius-medium);
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: var(--transition-ease);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none; /* For button acting as a link */
 }
 
-.button:hover {
-  background-color: #ffc107; /* Darker Gold */
-  transform: translateY(-2px);
+.button:hover:not(:disabled) {
+    background-color: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-  opacity: 0.7;
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 .buttonIcon {
     font-size: 1.2em;
 }
 
+/* Specific button styles */
+.whatsappButton {
+    background-color: var(--whatsapp-green); /* WhatsApp green */
+}
+
+.whatsappButton:hover:not(:disabled) {
+    background-color: #1DA851;
+}
+
+.loginButton, .logoutButton {
+    background-color: #007bff; /* Blue for login/logout */
+    padding: 8px 15px;
+    font-size: 0.9em;
+    border-radius: var(--border-radius-small);
+}
+.loginButton:hover:not(:disabled), .logoutButton:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+.saveButton {
+    background-color: var(--blue-info); /* Blue for save */
+}
+.saveButton:hover:not(:disabled) {
+    background-color: #0b7dda;
+}
+
+/* Smaller button for 'Add Another Variety' */
+.addVarietyButton { /* Renamed for clarity from .button.small */
+    padding: 8px 15px;
+    font-size: 0.9em;
+    border-radius: var(--border-radius-small);
+    background-color: var(--accent-orange); /* Orange/Yellow for Add Variety */
+}
+.addVarietyButton:hover:not(:disabled) {
+    background-color: #e0a21a;
+    transform: translateY(-1px);
+}
+
+.removeVarietyButton {
+    background-color: var(--red-danger); /* Red for remove */
+    color: white;
+    padding: 8px 15px; /* Smaller padding */
+    border: none;
+    border-radius: var(--border-radius-small);
+    cursor: pointer;
+    font-size: 0.9em; /* Smaller font */
+    font-weight: bold;
+    transition: var(--transition-ease);
+    align-self: flex-end; /* Align to bottom in flex container */
+    margin-bottom: 10px; /* Space from input */
+    line-height: 1; /* Adjust vertical alignment of text */
+}
+
+.removeVarietyButton:hover:not(:disabled) {
+    background-color: #da190b;
+    transform: translateY(-1px);
+}
+
+.removeVarietyButtonSquare { /* For the 'X' button in modals or lists */
+    background-color: var(--red-danger); /* Red */
+    color: white;
+    width: 30px; /* Smaller square size */
+    height: 30px;
+    border-radius: var(--border-radius-small);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em; /* Larger X */
+    padding: 0;
+    transition: var(--transition-ease);
+    border: none;
+    cursor: pointer;
+}
+.removeVarietyButtonSquare:hover:not(:disabled) {
+    background-color: #da190b;
+    transform: scale(1.05);
+}
+
+
+/* --- Forms & Inputs --- */
+.form {
+    background-color: white;
+    padding: 30px;
+    border-radius: var(--border-radius-large);
+    box-shadow: 0 4px 15px var(--shadow-light);
+    margin-bottom: 40px;
+}
+
+.formGroup {
+    margin-bottom: 20px;
+}
+
+.label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--text-medium);
+}
+
 .input, .select, .textarea {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-sizing: border-box; /* Include padding in element's total width and height */
-  font-size: 1em;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius-medium);
+    font-size: 1em;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input:focus, .select:focus, .textarea:focus {
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.2);
+    outline: none;
 }
 
 .textarea {
@@ -84,24 +231,82 @@
     min-height: 80px;
 }
 
-/* Header */
+.orderVarietyGroup {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 20px;
+    align-items: flex-end; /* Align items to the bottom (remove button) */
+    margin-bottom: 20px;
+    border: 1px dashed var(--border-medium);
+    padding: 15px;
+    border-radius: var(--border-radius-medium);
+    background-color: #fcfcfc;
+    position: relative; /* For the remove button positioning */
+}
+
+.orderVarietyGroup .formGroup {
+    flex: 1; /* Each form group takes equal space */
+    min-width: 200px; /* Minimum width before wrapping */
+    margin-bottom: 0; /* Remove extra margin inside group */
+}
+
+.orderVarietyGroup .removeVarietyButton {
+    position: relative; /* Adjust position for removal button */
+    /* Remove align-self: flex-end if you want it aligned with top of inputs */
+    /* Adjust margin to push it to the right/bottom of its row */
+    margin-left: auto; /* Push to the right */
+    margin-right: 0;
+    margin-bottom: 0;
+}
+
+/* Discount note */
+.discountNote {
+    color: var(--primary-green);
+    font-weight: bold;
+    margin-top: 5px;
+    display: block;
+    font-size: 0.9em;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    gap: 15px;
+}
+
+.orderSummary {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: var(--primary-green);
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border-light);
+}
+
+/* --- Header --- */
 .header {
-  background-color: #333;
-  color: #fff;
-  padding: 15px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+    background-color: var(--primary-green);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px var(--shadow-medium);
+    z-index: 500; /* Ensure header is above other content */
+    position: sticky;
+    top: 0;
 }
 
 .headerTitle {
-  margin: 0;
-  font-size: 1.8em;
-  color: #ffd700; /* Gold */
+    margin: 0;
+    font-size: 1.8em;
+    font-weight: bold;
+    letter-spacing: 1px;
 }
 
 .headerActions {
@@ -110,289 +315,339 @@
     gap: 15px;
 }
 
-.loginButton {
-    background-color: #4CAF50; /* Green for login */
-    color: white;
-    padding: 8px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-size: 0.95em;
-}
-
-.loginButton:hover {
-    background-color: #45a049;
-}
-
 .loggedInUser {
-    color: white;
     font-weight: bold;
     font-size: 1.1em;
+    color: white; /* Ensure visibility */
+    margin-right: 10px; /* Space from hamburger */
 }
-
 
 .hamburgerIcon {
-  background: none;
-  border: none;
-  color: #ffd700;
-  font-size: 2em;
-  cursor: pointer;
-  padding: 5px;
-  margin-left: 10px; /* Space from login button */
-  display: flex; /* Ensures the icon is centered if it's a character */
-  align-items: center;
-  justify-content: center;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2em;
+    cursor: pointer;
+    padding: 5px;
+    display: flex; /* For centering icon */
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+.hamburgerIcon:hover {
+    transform: scale(1.1);
 }
 
-/* Hero Section */
+
+/* --- Hero Section --- */
 .hero {
-  position: relative;
-  width: 100%;
-  height: 400px; /* Adjust as needed */
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #fff;
-  text-align: center;
+    position: relative;
+    width: 100%;
+    height: 400px; /* Fixed height for consistency */
+    margin-bottom: 40px;
+    border-radius: var(--border-radius-large);
+    overflow: hidden;
+    box-shadow: 0 6px 15px var(--shadow-light);
 }
 
 .heroImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  position: absolute;
-  top: 0;
-  left: 0;
-  filter: brightness(0.6); /* Darken image for text readability */
+    z-index: 1;
+    object-fit: cover; /* Ensures image covers the area without distortion */
+    filter: brightness(0.7); /* Slightly dim the image for text readability */
 }
 
 .heroOverlay {
-  position: relative;
-  z-index: 1;
-  padding: 20px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4); /* Darker overlay for better contrast */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    z-index: 2;
+    padding: 20px;
 }
 
 .heroTitle {
-  font-size: 3.5em;
-  margin-bottom: 10px;
-  color: #ffd700; /* Gold */
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    font-size: 3.5em;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+    font-weight: 900;
+    letter-spacing: 2px;
 }
 
 .heroSubtitle {
-  font-size: 1.5em;
-  margin-bottom: 30px;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+    font-size: 1.6em;
+    margin-bottom: 30px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+    line-height: 1.4;
 }
 
 .heroButton {
-  background-color: #4CAF50; /* Green */
-  color: white;
-  padding: 12px 25px;
-  font-size: 1.2em;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+    background-color: var(--accent-orange);
+    color: white;
+    padding: 15px 30px;
+    border-radius: var(--border-radius-medium);
+    text-decoration: none;
+    font-size: 1.2em;
+    font-weight: bold;
+    transition: var(--transition-ease);
+    border: none; /* Ensure no default button border */
+    cursor: pointer;
 }
 
 .heroButton:hover {
-  background-color: #45a049;
-  transform: scale(1.05);
+    background-color: #e0a21a;
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* Lemons Section */
+/* --- Lemon Products Section --- */
 .lemonsSection {
-  padding: 60px 0;
-  background-color: #fff;
-  border-radius: 8px;
-  margin-top: 40px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 60px;
 }
 
 .lemonsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 30px;
-  padding: 0 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    justify-content: center;
+    align-items: stretch; /* Ensures cards have same height */
 }
 
 .lemonCard {
-  background-color: #fcfcfc;
-  border: 1px solid #eee;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  display: flex;
-  flex-direction: column;
+    background-color: white;
+    border-radius: var(--border-radius-large);
+    box-shadow: 0 4px 12px var(--shadow-light);
+    overflow: hidden;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
 }
 
 .lemonCard:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-8px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
 }
 
 .cardImage {
-  width: 100%;
-  height: 200px; /* Fixed height for consistency */
-  object-fit: cover;
-  border-bottom: 1px solid #eee;
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-bottom: 1px solid #eee;
+}
+
+.cardContent {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .cardTitle {
-  font-size: 1.5em;
-  color: #333;
-  margin: 15px 15px 5px;
-  font-weight: bold;
+    font-size: 1.8em;
+    color: var(--primary-green);
+    margin: 0 0 10px;
+    font-weight: bold;
 }
 
 .cardDescription {
-  padding: 0 15px 15px;
-  color: #555;
-  font-size: 0.95em;
-  flex-grow: 1; /* Allows description to take up available space */
+    font-size: 1em;
+    color: var(--text-medium);
+    line-height: 1.5;
+    margin-bottom: 15px;
+    flex-grow: 1; /* Allows description to take available space */
+}
+
+.cardPrice {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var(--text-dark);
+    margin-top: 10px;
 }
 
 .noDataMessage {
-  text-align: center;
-  grid-column: 1 / -1; /* Span across all columns */
-  color: #777;
-  font-style: italic;
-  padding: 30px;
-  font-size: 1.1em;
+    text-align: center;
+    color: #888;
+    font-style: italic;
+    padding: 20px;
+    background-color: #f0f0f0;
+    border-radius: var(--border-radius-medium);
+    margin-top: 30px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
-/* Order Form Section */
-.formSection {
-  padding: 60px 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  margin-top: 40px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+/* --- Customer Reviews Section --- */
+.reviewsSection {
+    background-color: var(--lighter-green-bg);
+    padding: 50px 20px;
+    border-radius: var(--border-radius-large);
+    margin-top: 60px;
+    margin-bottom: 60px;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.05);
 }
 
-.form {
-  max-width: 700px;
-  margin: 0 auto;
+.reviewsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    justify-content: center;
 }
 
-.formGroup {
-  margin-bottom: 20px;
-}
-
-.label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: bold;
-  color: #555;
-}
-
-.orderVarietyGroup {
+.reviewCard {
+    background-color: white;
+    padding: 25px;
+    border-radius: var(--border-radius-large);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
     display: flex;
-    gap: 20px;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease;
+}
+
+.reviewCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.reviewerRating {
+    color: #FFD700; /* Gold for stars */
+    font-size: 1.3em;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 2px;
+}
+
+.emptyStar {
+    color: #ccc; /* Color for unselected stars */
+}
+
+.reviewText {
+    font-style: italic;
+    color: var(--text-medium);
     margin-bottom: 15px;
-    align-items: flex-end; /* Align inputs at the bottom */
+    line-height: 1.6;
+    flex-grow: 1;
 }
 
-.orderVarietyGroup .formGroup {
-    flex: 1;
-    margin-bottom: 0; /* Remove margin for grouped items */
+.reviewerName {
+    font-weight: bold;
+    color: var(--text-dark);
+    text-align: right;
+    margin-top: 15px;
+    border-top: 1px dashed #eee;
+    padding-top: 10px;
 }
 
-/* UI Change 1: Add/Remove Button Styles */
-.addVarietyButtonSquare {
-    background-color: #fff9c4; /* Light Yellowish */
-    color: #333;
-    width: 40px; /* Small, square */
-    height: 40px;
-    border: 1px solid #ffd700;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1.8em; /* Make the plus sign large */
+/* --- Modals (Auth, Confirm, Success) --- */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
     display: flex;
-    align-items: center;
     justify-content: center;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-    margin-top: 10px; /* Space below last variety group */
-    line-height: 1; /* Prevent extra line height */
-    padding: 0;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-.addVarietyButtonSquare:hover {
-    background-color: #ffeb3b; /* Slightly darker yellow */
-    border-color: #fbc02d; /* Even darker yellow */
+.modalOverlay.visible {
+    opacity: 1;
+    visibility: visible;
 }
 
-.removeVarietyButtonSquare {
-    background-color: #ffcccb; /* Less intense red/pink */
-    color: #b71c1c; /* Darker red for text */
-    width: 30px; /* Smaller than add, fits next to inputs */
-    height: 30px;
-    border: 1px solid #ef9a9a; /* Less intense red border */
-    border-radius: 5px;
+.modalContent {
+    background-color: white;
+    padding: 30px;
+    border-radius: var(--border-radius-large);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+    position: relative;
+    max-width: 550px;
+    width: 90%;
+    transform: translateY(-30px) scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Springy animation */
+}
+
+.modalOverlay.visible .modalContent {
+    transform: translateY(0) scale(1);
+}
+
+.modalCloseButton {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 2.2em;
+    color: #aaa;
     cursor: pointer;
-    font-size: 1.5em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-    margin-left: 10px; /* Space from inputs */
-    margin-bottom: 15px; /* Align with input's bottom */
     line-height: 1;
-    padding: 0;
+    transition: color 0.2s ease;
 }
 
-.removeVarietyButtonSquare:hover {
-    background-color: #ef9a9a; /* Slightly darker */
-    border-color: #e57373; /* Even darker */
+.modalCloseButton:hover {
+    color: var(--red-danger);
 }
 
-
-.discountNote {
-  font-size: 0.85em;
-  color: #4CAF50; /* Green */
-  margin-top: 5px;
-  display: block;
+.modalTitle {
+    text-align: center;
+    margin-bottom: 25px;
+    color: var(--primary-green);
+    font-size: 2.2em;
+    font-weight: bold;
 }
 
-.orderSummary {
-  text-align: right;
-  margin-top: 30px;
-  padding-top: 20px;
-  border-top: 1px solid #eee;
+.authForm, .addressForm, .accountDetailsForm {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
 }
 
-.orderSummary h3 {
-  font-size: 1.8em;
-  color: #333;
-  margin: 0;
+.modalButtons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+    flex-wrap: wrap;
 }
 
-.actions {
-  display: flex;
-  flex-direction: column; /* Stack buttons on small screens */
-  gap: 15px;
-  margin-top: 30px;
+.modalButton {
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+    padding: 10px 15px; /* Slightly smaller for modal buttons */
+    font-size: 0.95em;
+    border-radius: var(--border-radius-small);
 }
 
-.whatsappButton {
-  background-color: #25D366; /* WhatsApp green */
-  color: white;
+.modalButtonCancel {
+    background-color: #6c757d; /* Gray for cancel */
 }
 
-.whatsappButton:hover {
-  background-color: #1DA851; /* Darker WhatsApp green */
+.modalButtonCancel:hover:not(:disabled) {
+    background-color: #5a6268;
 }
 
 .statusMessage {
     padding: 10px 15px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-    font-weight: bold;
+    border-radius: var(--border-radius-small);
+    margin-bottom: 15px;
     text-align: center;
-    font-size: 1.1em;
+    font-weight: bold;
+    font-size: 0.9em;
+    line-height: 1.4;
 }
 
 .successMessage {
@@ -407,251 +662,112 @@
     border: 1px solid #f5c6cb;
 }
 
-.loginPrompt {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeeba;
-    padding: 20px;
-    border-radius: 8px;
+.authSwitch {
     text-align: center;
-    margin-bottom: 30px;
-}
-
-.loginPrompt p {
-    margin-bottom: 15px;
-    font-size: 1.1em;
+    margin-top: 20px;
+    font-size: 0.9em;
+    color: var(--text-light);
 }
 
 .authLink {
-    color: #007bff;
+    color: var(--primary-green);
+    cursor: pointer;
+    font-weight: bold;
     text-decoration: underline;
-    cursor: pointer;
+    margin-left: 5px;
 }
+
 .authLink:hover {
-    color: #0056b3;
-}
-
-
-/* Reviews Section */
-.reviewsSection {
-  padding: 60px 0;
-  background-color: #fcfcfc;
-  border-radius: 8px;
-  margin-top: 40px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-}
-
-.reviewsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 30px;
-  padding: 0 20px;
-}
-
-.reviewCard {
-  background-color: #fff;
-  border: 1px solid #eee;
-  border-radius: 10px;
-  padding: 25px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  display: flex;
-  flex-direction: column;
-}
-
-.reviewerRating {
-  color: #ffd700; /* Gold */
-  font-size: 1.2em;
-  margin-bottom: 10px;
-}
-
-.reviewerRating .emptyStar {
-    color: #ddd; /* Lighter color for un-filled stars */
-}
-
-.reviewText {
-  font-style: italic;
-  margin-bottom: 15px;
-  color: #444;
-  flex-grow: 1; /* Allows text to take up space */
-}
-
-.reviewerName {
-  font-weight: bold;
-  color: #666;
-  text-align: right;
-  margin-top: auto; /* Pushes name to the bottom */
-}
-
-
-/* Footer */
-.footer {
-  background-color: #333;
-  color: #fff;
-  text-align: center;
-  padding: 20px;
-  margin-top: 50px;
-  font-size: 0.9em;
-}
-
-.footer a {
-  color: #ffd700;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.footer a:hover {
-  color: #ffc107;
-}
-
-/* Modals */
-.modalOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.modalOverlay.visible {
-    opacity: 1;
-    visibility: visible;
-}
-
-.modalContent {
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    position: relative;
-    max-width: 500px;
-    width: 90%;
-    transform: translateY(20px);
-    transition: transform 0.3s ease;
-}
-
-.modalOverlay.visible .modalContent {
-    transform: translateY(0);
-}
-
-
-.modalCloseButton {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: none;
-    border: none;
-    font-size: 1.8em;
-    color: #666;
-    cursor: pointer;
-    line-height: 1;
-}
-
-.modalCloseButton:hover {
-    color: #333;
-}
-
-.modalTitle {
-    font-size: 1.8em;
-    margin-top: 0;
-    margin-bottom: 25px;
-    text-align: center;
-    color: #333;
-}
-
-.modalText {
-    margin-bottom: 25px;
-    line-height: 1.6;
-    color: #555;
+    color: #45a049;
 }
 
 .orderSummaryList {
-    list-style: none;
+    list-style-type: none;
     padding: 0;
     margin-top: 15px;
-    border-top: 1px dashed #eee;
+    border-top: 1px dashed var(--border-light);
     padding-top: 15px;
 }
 .orderSummaryList li {
-    margin-bottom: 8px;
-    font-size: 1.05em;
-    color: #333;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    color: var(--text-medium);
+}
+.orderSummaryList ul { /* Nested list for items */
+    list-style-type: disc;
+    margin-left: 25px;
+    margin-top: 8px;
+    color: var(--text-dark);
+}
+.orderSummaryList ul li {
+    font-size: 0.95em;
+    margin-bottom: 5px;
 }
 .totalPayable {
-    font-size: 1.4em;
+    font-size: 2em;
     font-weight: bold;
-    text-align: right;
+    text-align: center;
+    color: var(--primary-green);
     margin-top: 20px;
-    color: #4CAF50;
-}
-
-
-.modalButtons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 15px;
-}
-
-.modalButton {
-    background-color: #4CAF50; /* Green for action */
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-    transition: background-color 0.3s ease;
-}
-
-.modalButton:hover {
-    background-color: #45a049;
-}
-
-.modalButtonCancel {
-    background-color: #f44336; /* Red for cancel */
-}
-
-.modalButtonCancel:hover {
-    background-color: #d32f2f;
+    padding-top: 15px;
+    border-top: 2px solid var(--primary-green);
 }
 
 .successPage {
     text-align: center;
-    padding: 40px;
+    padding: 40px 20px;
+    background-color: white;
+    border-radius: var(--border-radius-large);
+    box-shadow: 0 4px 15px var(--shadow-light);
+    margin: 40px auto;
+    max-width: 600px;
 }
 
 .successTitle {
-    color: #4CAF50;
-    font-size: 2em;
-    margin-bottom: 20px;
+    color: var(--primary-green);
+    margin-bottom: 15px;
+    font-size: 2.5em;
+    font-weight: bold;
 }
 
 .successMessageText {
+    color: var(--text-medium);
+    line-height: 1.6;
+    margin-bottom: 20px;
     font-size: 1.1em;
-    color: #333;
-    margin-bottom: 30px;
 }
 
-/* Authentication Modal (AuthForm) */
-.authForm {
-    display: flex;
-    flex-direction: column;
-}
-
-.authSwitch {
+.loginPrompt {
+    background-color: #fff8e1; /* Light yellow */
+    color: #856404;
+    padding: 25px;
+    border: 1px solid #ffeeba;
+    border-radius: var(--border-radius-medium);
     text-align: center;
-    margin-top: 20px;
-    color: #666;
+    margin-top: 40px;
+    font-size: 1.2em;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-/* Account Sidebar */
+.loginPrompt button {
+    margin-top: 20px;
+    background-color: #007bff;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: var(--border-radius-medium);
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1em;
+    transition: var(--transition-ease);
+}
+
+.loginPrompt button:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+}
+
+/* --- Account Sidebar --- */
 .accountSidebarOverlay {
     position: fixed;
     top: 0;
@@ -659,12 +775,10 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.6);
-    z-index: 2000;
+    z-index: 999;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
-    display: flex;
-    justify-content: flex-end; /* Pushes sidebar to the right */
 }
 
 .accountSidebarOverlay.visible {
@@ -673,226 +787,342 @@
 }
 
 .accountSidebar {
-    background-color: #fff;
-    width: 350px; /* Adjust width as needed */
+    position: fixed;
+    top: 0;
+    right: -380px; /* Hidden by default, slightly wider */
+    width: 380px;
     height: 100%;
-    position: relative;
-    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
-    transform: translateX(100%); /* Start off-screen */
-    transition: transform 0.3s ease;
+    background-color: white;
+    box-shadow: -8px 0 20px rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    transition: right 0.3s ease-out;
     display: flex;
     flex-direction: column;
 }
 
 .accountSidebarOverlay.visible .accountSidebar {
-    transform: translateX(0);
+    right: 0; /* Slide in */
 }
 
 .sidebarHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
-    border-bottom: 1px solid #eee;
-    background-color: #f8f8f8;
+    padding: 18px 25px;
+    background-color: var(--primary-green);
+    color: white;
+    border-bottom: 1px solid #ddd;
 }
 
 .sidebarTitle {
     margin: 0;
-    font-size: 1.5em;
-    color: #333;
+    font-size: 1.8em;
+    font-weight: bold;
 }
 
 .sidebarCloseButton {
     background: none;
     border: none;
-    font-size: 2em;
-    color: #666;
+    font-size: 2.5em;
+    color: white;
     cursor: pointer;
     line-height: 1;
+    transition: transform 0.2s ease;
 }
-
 .sidebarCloseButton:hover {
-    color: #333;
+    transform: rotate(90deg);
 }
 
 .sidebarTabs {
     display: flex;
     border-bottom: 1px solid #eee;
+    background-color: #f8f8f8;
 }
 
 .tabButton {
     flex: 1;
     padding: 15px 10px;
-    background-color: #f0f0f0;
+    background-color: transparent;
     border: none;
     border-bottom: 3px solid transparent;
     cursor: pointer;
-    font-size: 1em;
-    color: #555;
-    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-}
-
-.tabButton.active {
-    background-color: #fff;
-    border-color: #ffd700; /* Gold active indicator */
-    color: #333;
+    font-size: 1.05em;
     font-weight: bold;
+    color: var(--text-light);
+    transition: var(--transition-ease);
+    text-align: center;
 }
 
 .tabButton:hover:not(.active) {
-    background-color: #e0e0e0;
+    background-color: #eef;
+    color: var(--text-dark);
+}
+
+.tabButton.active {
+    background-color: white;
+    border-bottom-color: var(--primary-green);
+    color: var(--primary-green);
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .tabContent {
-    padding: 20px;
-    flex-grow: 1; /* Allow content to fill remaining space */
-    overflow-y: auto; /* Enable scrolling for content if it overflows */
+    flex-grow: 1;
+    padding: 25px;
+    overflow-y: auto; /* Enable scrolling for content */
+    background-color: white;
 }
 
 .tabContent h3 {
+    color: var(--primary-green);
     margin-top: 0;
-    margin-bottom: 20px;
-    color: #333;
-    font-size: 1.3em;
-    border-bottom: 1px dashed #eee;
-    padding-bottom: 10px;
+    margin-bottom: 25px;
+    font-size: 1.8em;
+    text-align: center;
+    font-weight: bold;
 }
 
-.accountDetailsForm, .addressForm, .feedbackForm {
-    display: flex;
-    flex-direction: column;
-}
-
-.accountDetailsForm .formGroup, .addressForm .formGroup, .feedbackForm .formGroup {
-    margin-bottom: 15px;
-}
-
-.accountDetailsForm .button, .addressForm .button, .feedbackForm .button {
-    margin-top: 10px;
-}
-
-.logoutButton {
-    background-color: #dc3545; /* Bootstrap danger red */
-    margin-top: 15px;
-}
-.logoutButton:hover {
-    background-color: #c82333;
-}
-
-.addressList {
-    margin-bottom: 20px;
+.accountDetailsForm, .addressForm {
+    gap: 20px; /* Spacing between form groups */
 }
 
 .addressList ul {
     list-style: none;
     padding: 0;
+    margin-bottom: 25px;
 }
 
 .addressItem {
-    background-color: #f9f9f9;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 10px;
+    background-color: #fdfdfd;
+    border: 1px solid var(--border-light);
+    padding: 18px;
+    border-radius: var(--border-radius-medium);
+    margin-bottom: 15px;
     position: relative;
-}
-
-.addressItem p {
-    margin: 5px 0;
-    color: #555;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
 .addressActions {
-    margin-top: 10px;
+    margin-top: 15px;
     text-align: right;
 }
 
 .deleteAddressButton {
-    background-color: #ff9800; /* Orange for delete to be less harsh than red */
+    background-color: #dc3545; /* Bootstrap danger red */
     color: white;
-    padding: 6px 12px;
     border: none;
-    border-radius: 4px;
+    padding: 8px 12px;
+    border-radius: var(--border-radius-small);
     cursor: pointer;
-    font-size: 0.85em;
-    transition: background-color 0.3s ease;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
 }
 
 .deleteAddressButton:hover {
-    background-color: #e68900;
+    background-color: #c82333;
+    transform: translateY(-1px);
 }
 
 .addAddressButton {
-    background-color: #4CAF50;
-    color: white;
+    background-color: #17a2b8; /* Info blue */
+    margin-top: 20px;
     width: 100%;
     padding: 12px;
     font-size: 1em;
-    margin-top: 15px;
 }
+
 .addAddressButton:hover {
-    background-color: #45a049;
+    background-color: #138496;
 }
 
 .limitMessage {
-    font-size: 0.9em;
-    color: #dc3545; /* Red */
-    margin-top: 10px;
+    color: var(--red-danger);
     text-align: center;
+    font-weight: bold;
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #ffe0e0;
+    border-radius: var(--border-radius-small);
 }
 
-/* Spinner for loading states */
-.spinner {
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-top: 4px solid #fff;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    animation: spin 1s linear infinite;
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 8px;
+.formButtons {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 25px;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+/* --- Footer --- */
+.footer {
+    background-color: var(--primary-green);
+    color: white;
+    text-align: center;
+    padding: 25px;
+    font-size: 0.95em;
+    margin-top: auto; /* Push footer to the bottom */
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
 }
 
-/* Media Queries for Responsiveness */
+.footer a {
+    color: var(--accent-orange);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 992px) {
+    .container {
+        padding: 15px;
+    }
+    .hero {
+        height: 350px;
+    }
+    .heroTitle {
+        font-size: 3em;
+    }
+    .heroSubtitle {
+        font-size: 1.4em;
+    }
+    .heroButton {
+        padding: 12px 25px;
+        font-size: 1.1em;
+    }
+    .lemonsGrid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+    }
+    .reviewsGrid {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 20px;
+    }
+    .accountSidebar {
+        width: 320px;
+        right: -320px;
+    }
+}
+
 @media (max-width: 768px) {
-  .heroTitle {
-    font-size: 2.5em;
-  }
-  .heroSubtitle {
-    font-size: 1.2em;
-  }
-  .sectionTitle {
-    font-size: 2em;
-  }
-  .lemonsGrid, .reviewsGrid {
-    grid-template-columns: 1fr; /* Single column on smaller screens */
-  }
-  .actions {
-    flex-direction: column; /* Stack buttons */
-  }
-  .orderVarietyGroup {
-    flex-direction: column; /* Stack grade and quantity */
-    align-items: stretch; /* Stretch inputs */
-    gap: 0;
-  }
-  .removeVarietyButtonSquare {
-    margin-left: 0; /* Remove side margin */
-    margin-top: 5px; /* Add top margin */
-    width: 100%; /* Full width */
-    height: 35px; /* Slightly taller */
-    font-size: 1.2em;
-  }
-  .addVarietyButtonSquare {
-    width: 100%; /* Full width */
-  }
-  .accountSidebar {
-    width: 100%; /* Full width on small screens */
-  }
+    .header {
+        padding: 10px 15px;
+    }
+    .headerTitle {
+        font-size: 1.5em;
+    }
+    .hero {
+        height: 300px;
+        margin-bottom: 30px;
+    }
+    .heroTitle {
+        font-size: 2.5em;
+    }
+    .heroSubtitle {
+        font-size: 1.2em;
+        margin-bottom: 20px;
+    }
+    .heroButton {
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+    .sectionTitle {
+        font-size: 2em;
+        margin-bottom: 30px;
+    }
+    .form {
+        padding: 20px;
+    }
+    .orderVarietyGroup {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    .orderVarietyGroup .removeVarietyButton {
+        margin-left: 0; /* Reset margin */
+        width: 100%; /* Make remove button full width */
+        margin-top: 10px; /* Add some space above it */
+    }
+
+    .actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .button, .whatsappButton {
+        width: 100%; /* Full width for main buttons */
+        padding: 10px 15px;
+    }
+    .orderSummary {
+        font-size: 1.3em;
+    }
+    .accountSidebar {
+        width: 100%; /* Full width on smaller screens */
+        right: -100%;
+    }
+    .modalContent {
+        width: 95%;
+        padding: 20px;
+    }
+    .modalTitle {
+        font-size: 1.8em;
+    }
+    .modalButtons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .modalButton {
+        min-width: unset;
+        width: 100%;
+    }
+    .loginPrompt {
+        font-size: 1em;
+        padding: 15px;
+    }
+    .loginPrompt button {
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero {
+        height: 250px;
+    }
+    .heroTitle {
+        font-size: 1.8em;
+    }
+    .heroSubtitle {
+        font-size: 1em;
+    }
+    .headerTitle {
+        font-size: 1.3em;
+    }
+    .sectionTitle {
+        font-size: 1.7em;
+    }
+    .lemonsGrid, .reviewsGrid {
+        gap: 15px;
+    }
+    .cardTitle {
+        font-size: 1.5em;
+    }
+    .modalTitle {
+        font-size: 1.5em;
+    }
+    .tabButton {
+        font-size: 0.9em;
+        padding: 12px 5px;
+    }
+    .sidebarHeader {
+        padding: 15px 15px;
+    }
+    .sidebarTitle {
+        font-size: 1.5em;
+    }
+    .sidebarCloseButton {
+        font-size: 2em;
+    }
 }
