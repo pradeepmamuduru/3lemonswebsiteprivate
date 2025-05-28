@@ -31,6 +31,59 @@
     font-weight: 700; /* Bold font */
 }
 
+/* Header */
+.header {
+    background-color: #ffffff; /* White background */
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 500;
+}
+
+.headerTitle {
+    font-size: 1.8rem;
+    color: #00796b;
+    margin: 0;
+}
+
+.headerActions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.loginButton {
+    background-color: #ffc107; /* Matches hero button */
+    color: #333;
+    padding: 8px 18px;
+    border-radius: 25px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+    display: flex; /* For icon alignment */
+    align-items: center;
+    gap: 5px;
+}
+
+.loginButton:hover {
+    background-color: #ffb300;
+}
+
+.hamburgerIcon {
+    font-size: 1.8rem;
+    color: #333;
+    cursor: pointer;
+    display: none; /* Hidden by default on large screens */
+}
+
+
 /* Hero Section Styles */
 .hero {
     position: relative;
@@ -318,21 +371,17 @@
     vertical-align: middle; /* Aligns icon with text baseline */
 }
 
-/* Status Message (Success/Error) */
-.statusMessage {
-    text-align: center;
-    margin-top: 20px;
-    padding: 10px;
-    border-radius: 8px;
-    font-weight: bold;
-    /* Colors are set inline in JS based on success/error */
-}
+/* Feedback Message Display styles */
 .feedbackMessage {
     text-align: center;
     margin-top: 15px;
     padding: 10px;
     border-radius: 5px;
     font-weight: bold;
+    display: flex; /* For icon alignment */
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Space between icon and text */
 }
 
 .feedbackSuccess {
@@ -345,6 +394,12 @@
     background-color: #f8d7da;
     color: #721c24;
     border: 1px solid #f5c6cb;
+}
+
+.feedbackInfo {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
 }
 
 
@@ -811,6 +866,7 @@
     font-weight: bold;
 }
 
+
 /* Responsive Adjustments using Media Queries */
 
 /* For tablets and larger phones (min-width: 768px) */
@@ -851,6 +907,10 @@
     .modalContent {
         padding: 40px;
     }
+
+    .hamburgerIcon {
+        display: none; /* Hide hamburger on larger screens */
+    }
 }
 
 /* For large desktops (min-width: 1024px) */
@@ -861,5 +921,29 @@
 
     .heroTitle {
         font-size: 5.5rem;
+    }
+}
+
+/* Mobile specific adjustments */
+@media (max-width: 767px) {
+    .headerTitle {
+        font-size: 1.5rem;
+    }
+
+    .loginButton {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+
+    .hamburgerIcon {
+        display: block; /* Show hamburger on small screens */
+    }
+
+    .headerActions {
+        gap: 10px;
+    }
+
+    .accountSidebar {
+        max-width: 100%; /* Full width on small screens */
     }
 }
