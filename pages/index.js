@@ -4,7 +4,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { FaWhatsapp, FaStar } from 'react-icons/fa';
 import { IoCloseCircleOutline } from 'react-icons/io5';
-import styles from '../styles/styles.module.css';
+import styles from '../styles/styles.module.css'; // Assuming styles.module.css exists and is used
 import { AuthContext } from './_app'; // Import AuthContext
 
 // SheetDB URLs
@@ -12,7 +12,7 @@ const LEMONS_API_URL = "https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Lemons";
 const ORDERS_API_URL = "https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=orders";
 const SIGNUP_API_URL = "https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=signup";
 const ADDRESSES_API_URL = "https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Addresses";
-const FEEDBACK_API_URL = "https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Feedback"; // Placeholder for future use
+const FEEDBACK_API_URL = "https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Feedback";
 
 // --- Static Customer Reviews Data ---
 const customerReviews = [
@@ -82,6 +82,12 @@ export default function Home({ lemons }) {
   const [isSavingAddress, setIsSavingAddress] = useState(false);
   const [selectedDeliveryAddress, setSelectedDeliveryAddress] = useState(''); // For dropdown in order form
 
+  // Feedback State
+  const [feedbackText, setFeedbackText] = useState('');
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+
+
   // --- Effects ---
 
   // Update order form 'name' and 'contact' if user is logged in
@@ -93,10 +99,10 @@ export default function Home({ lemons }) {
         contact: currentUser.phone || ''
       }));
       // If user has saved addresses, set the first one as default
-      if (userAddresses.length > 0) {
+      if (userAddresses.length > 0 && selectedDeliveryAddress === '') { // Only set default if nothing selected yet
           setSelectedDeliveryAddress(userAddresses[0].fullAddress);
           setForm(prevForm => ({ ...prevForm, delivery: userAddresses[0].fullAddress }));
-      } else {
+      } else if (userAddresses.length === 0) { // If no addresses, ensure delivery is empty
           setSelectedDeliveryAddress('');
           setForm(prevForm => ({ ...prevForm, delivery: '' }));
       }
@@ -139,35 +145,61 @@ export default function Home({ lemons }) {
       try {
         // Fetch addresses associated with the current user's phone number
         const res = await fetch(`${ADDRESSES_API_URL}?phone=${currentUser.phone}`);
-        if (!res.ok) throw new Error('Failed to fetch addresses');
+        if (!res.ok) {
+            // If the sheetdb response is 404 (no data found), it's not an error, just no addresses.
+            // Check for specific SheetDB 'not found' message if available, otherwise assume no addresses.
+            const errorText = await res.text();
+            if (res.status === 404 && errorText.includes("Not Found")) {
+                 setUserAddresses([]); // No addresses found
+                 return;
+            }
+            throw new Error(`Failed to fetch addresses: ${res.status} ${res.statusText}`);
+        }
         const data = await res.json();
-        const formattedAddresses = data.map(addr => ({
-            ...addr,
-            fullAddress: `${addr.street}, ${addr.city}, ${addr.state} - ${addr.pincode}`
-        }));
-        setUserAddresses(formattedAddresses || []);
+        // SheetDB returns an empty array if no data found for query, or an array of objects.
+        if (Array.isArray(data)) {
+            // Filter out any rows that might somehow not belong or are incomplete, though unlikely with SheetDB queries.
+            const validAddresses = data.filter(addr => addr.street && addr.city && addr.state && addr.pincode);
+            const formattedAddresses = validAddresses.map((addr, index) => ({
+                id: addr.id || `${addr.phone}-${index}`, // Use SheetDB's internal ID if available, otherwise generate
+                ...addr,
+                fullAddress: `${addr.street}, ${addr.city}, ${addr.state} - ${addr.pincode}`
+            }));
+            setUserAddresses(formattedAddresses);
+             // If a saved address is still selected and not in the list, clear it.
+            if (selectedDeliveryAddress && !formattedAddresses.some(addr => addr.fullAddress === selectedDeliveryAddress)) {
+                setSelectedDeliveryAddress('');
+                setForm(prevForm => ({ ...prevForm, delivery: '' }));
+            } else if (userAddresses.length > 0 && selectedDeliveryAddress === '') {
+                // If there are addresses but none selected, select the first
+                 setSelectedDeliveryAddress(formattedAddresses[0].fullAddress);
+                 setForm(prevForm => ({ ...prevForm, delivery: formattedAddresses[0].fullAddress }));
+            }
+        } else {
+            console.warn("Fetched addresses data is not an array:", data);
+            setUserAddresses([]);
+        }
       } catch (error) {
         console.error("Error fetching addresses:", error);
-        // Optionally show a message to the user
+        setUserAddresses([]);
       }
     };
     fetchAddresses();
-  }, [isLoggedIn, currentUser?.phone, showAccountSidebar]); // Refetch when sidebar opens or user changes
+  }, [isLoggedIn, currentUser?.phone]); // Refetch when user logs in/out or phone changes
+
+  // Clear feedback message after a delay
+  useEffect(() => {
+    if (feedbackMessage) {
+      const timer = setTimeout(() => setFeedbackMessage(''), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [feedbackMessage]);
 
 
   // --- General UI Functions ---
 
   const showFeedback = (message, type = 'info') => {
     setSubmissionMessage(message);
-    // Using a class for success/error messages
-    if (type === 'success') {
-        // The success message will be handled by the success modal
-    } else if (type === 'error') {
-        // The error message will be displayed above the form
-        setSubmissionMessage(message);
-    } else {
-        setSubmissionMessage(message); // Default info message
-    }
     // Clear message after a few seconds if it's not a modal
     if (type !== 'success') {
         const timer = setTimeout(() => setSubmissionMessage(''), 5000);
@@ -216,11 +248,11 @@ export default function Home({ lemons }) {
 
     try {
       // Fetch all users from signup sheet
-      const res = await fetch(SIGNUP_API_URL);
+      const res = await fetch(`${SIGNUP_API_URL}?phone=${phone}`); // Query by phone for efficiency
       if (!res.ok) throw new Error('Failed to fetch user data');
       const users = await res.json();
 
-      const user = users.find(u => u.name === name && u.phone === phone);
+      const user = Array.isArray(users) ? users.find(u => u.name === name && u.phone === phone) : null;
 
       if (user) {
         login(user); // Set user in context
@@ -244,7 +276,7 @@ export default function Home({ lemons }) {
     setAuthMessage('');
     const name = e.target.name.value.trim();
     const phone = e.target.phone.value.trim();
-    const address = e.target.address.value.trim();
+    const address = e.target.address.value.trim(); // This is the main address from signup
     const pincode = e.target.pincode.value.trim();
 
     if (!name || !phone || !address || !pincode) {
@@ -264,7 +296,7 @@ export default function Home({ lemons }) {
       // Check if user already exists
       const checkRes = await fetch(`${SIGNUP_API_URL}?phone=${phone}`);
       const existingUsers = await checkRes.json();
-      if (existingUsers && existingUsers.length > 0) {
+      if (Array.isArray(existingUsers) && existingUsers.length > 0) {
         setAuthMessage('This mobile number is already registered. Please log in.');
         setAuthModalType('login'); // Suggest login
         return;
@@ -279,6 +311,20 @@ export default function Home({ lemons }) {
       if (res.ok) {
         const newUser = { name, phone, address, pincode };
         login(newUser); // Log user in immediately
+
+        // Also add the primary signup address to the Addresses sheet
+        await fetch(ADDRESSES_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data: [{
+                phone: phone,
+                street: address, // Using the main address field as street for initial signup
+                city: 'N/A', // You might want to ask for city/state/pincode separately on signup
+                state: 'N/A',
+                pincode: pincode
+            }]}),
+        });
+
         setAuthMessage(`🎉 Thank you, ${name}, for signing up! Let's start ordering! 😊`);
         setTimeout(() => {
           closeAuthModal();
@@ -306,6 +352,18 @@ export default function Home({ lemons }) {
 
   const handleOrderChange = (index, field, value) => {
     const updated = [...orders];
+
+    if (field === 'grade') {
+        // Functionality 1: Prevent duplicate varieties in the same order
+        const selectedGrades = updated.map((order, i) => (i === index ? value : order.grade));
+        const hasDuplicate = selectedGrades.filter(g => g !== '').some((g, i, arr) => arr.indexOf(g) !== i);
+
+        if (hasDuplicate) {
+            showFeedback(`The variety "${value}" is already selected in another row. Please choose a unique variety.`, 'error');
+            return; // Prevent setting the duplicate grade
+        }
+    }
+
     if (field === 'quantity') {
       value = value === '' ? '' : String(Math.max(1, parseInt(value) || 1));
     }
@@ -358,11 +416,11 @@ export default function Home({ lemons }) {
         const quantity = parseInt(order.quantity);
         let itemCalculatedPrice = pricePerKg * quantity;
         const discountApplied = quantity > 50 ? '10%' : '0%';
-        
+
         if (quantity > 50) {
-            itemCalculatedPrice *= 0.90; 
+            itemCalculatedPrice *= 0.90;
         }
-        
+
         return {
             grade: order.grade,
             quantity: quantity,
@@ -416,7 +474,11 @@ export default function Home({ lemons }) {
         setShowSuccessModal(true);
         // Reset form and orders on main page
         setOrders([{ grade: '', quantity: '' }]);
-        setForm({ name: '', delivery: '', contact: '' });
+        setForm(prevForm => ({
+            ...prevForm,
+            delivery: userAddresses.length > 0 ? userAddresses[0].fullAddress : '', // Reset delivery to default or empty
+        }));
+        setSelectedDeliveryAddress(userAddresses.length > 0 ? userAddresses[0].fullAddress : '');
         setTotal(0);
         setConfirmedOrderDetails(null);
       } else {
@@ -464,7 +526,7 @@ export default function Home({ lemons }) {
 
     const whatsappContact = `918500130926`; // Your WhatsApp number
     const whatsappMessage = `Hi, I'm ${form.name}.\n\nI want to order: ${orderDetails}.\n\nDelivery Address: ${form.delivery}.\nContact: ${form.contact}\n\nTotal estimated price: ₹${total.toFixed(2)}\n\nPlease confirm availability and final amount.`;
-    
+
     return `https://wa.me/${whatsappContact}?text=${encodeURIComponent(whatsappMessage)}`;
   };
 
@@ -512,7 +574,7 @@ export default function Home({ lemons }) {
             // This is already done by handleAccountDetailChange, but ensure it's persisted
             // The AuthContext useEffect handles localStorage update
             showFeedback('Account details saved successfully!', 'success');
-            setShowAccountSidebar(false); // Close sidebar
+            // No need to close sidebar immediately, user might want to check addresses
         } else {
             const errorData = await res.json();
             console.error('Account update error:', res.status, errorData);
@@ -571,14 +633,23 @@ export default function Home({ lemons }) {
         });
 
         if (res.ok) {
-            // Refetch addresses to update the list
+            // SheetDB post returns a success message, not the new row.
+            // We need to refetch to get the updated list, including the new item's ID.
             const updatedRes = await fetch(`${ADDRESSES_API_URL}?phone=${currentUser.phone}`);
+            if (!updatedRes.ok) throw new Error('Failed to refetch addresses after adding.');
             const updatedData = await updatedRes.json();
-            const formattedAddresses = updatedData.map(addr => ({
+            const formattedAddresses = updatedData.map((addr, index) => ({
+                id: addr.id || `${addr.phone}-${index}`, // Ensure id is set for deletion
                 ...addr,
                 fullAddress: `${addr.street}, ${addr.city}, ${addr.state} - ${addr.pincode}`
             }));
             setUserAddresses(formattedAddresses || []);
+            // After adding, set the newly added address as the selected one in the order form
+            if (formattedAddresses.length > 0) {
+                 setSelectedDeliveryAddress(formattedAddresses[formattedAddresses.length - 1].fullAddress);
+                 setForm(prevForm => ({ ...prevForm, delivery: formattedAddresses[formattedAddresses.length - 1].fullAddress }));
+            }
+
 
             setNewAddress({ street: '', city: '', state: '', pincode: '' });
             setIsAddingAddress(false);
@@ -601,33 +672,32 @@ export default function Home({ lemons }) {
         showFeedback('Please log in to delete addresses.', 'error');
         return;
     }
-    // SheetDB doesn't have a direct DELETE by ID for specific rows easily.
-    // The most robust way is to fetch all, filter, and then re-upload or use a specific SheetDB feature.
-    // For simplicity, we'll simulate deletion from UI and provide a message.
-    // In a real scenario, you'd use a backend API route to handle this securely.
 
-    // A more robust SheetDB DELETE would be:
-    // DELETE https://sheetdb.io/api/v1/YOUR_API_ID/column/id/ID_TO_DELETE
-    // However, your sheet doesn't have a unique 'id' column for addresses, only the auto-generated SheetDB row ID.
-    // We'll rely on the client-side filter for now and provide a message.
-    // If you add a unique 'AddressID' column to your SheetDB 'Addresses' tab, we can use that.
-
-    // For now, we'll just remove from UI and give feedback.
-    // If you want actual SheetDB deletion, you need a unique ID column in your 'Addresses' sheet.
     if (window.confirm('Are you sure you want to delete this address?')) {
         try {
-            // Assuming 'id' in userAddresses refers to SheetDB's internal row ID or a unique ID you add.
-            // If it's SheetDB's internal row ID, direct deletion might not be straightforward client-side without a specific column.
-            // For now, we'll filter client-side and show success.
-            // To actually delete from SheetDB, you'd need a unique identifier in your sheet and use:
-            // await fetch(`${ADDRESSES_API_URL}/column_name/${value_to_delete}`, { method: 'DELETE' });
-            // For example, if you add an 'AddressID' column and generate unique IDs:
-            // await fetch(`${ADDRESSES_API_URL}/AddressID/${idToDelete}`, { method: 'DELETE' });
+            // SheetDB's DELETE endpoint works directly on a column value.
+            // Assuming `id` is a unique identifier you've added to your SheetDB 'Addresses' sheet
+            // OR if it's the auto-generated SheetDB row ID (which is more complex to get reliably for client-side delete).
+            // For a robust solution, it's best to have a unique ID column in your sheet (e.g., 'AddressID').
+            // If you have `id` as a column in your SheetDB:
+            const res = await fetch(`${ADDRESSES_API_URL}/id/${idToDelete}`, {
+                method: 'DELETE',
+            });
 
-            // Simulating success for now
-            await new Promise(resolve => setTimeout(resolve, 500));
-            setUserAddresses(prev => prev.filter(addr => addr.id !== idToDelete));
-            showFeedback('Address deleted successfully!', 'success');
+            if (res.ok) {
+                 // Update the UI immediately by filtering the state
+                setUserAddresses(prev => prev.filter(addr => addr.id !== idToDelete));
+                showFeedback('Address deleted successfully!', 'success');
+                 // If the deleted address was selected for delivery, clear the selection
+                if (selectedDeliveryAddress === userAddresses.find(addr => addr.id === idToDelete)?.fullAddress) {
+                    setSelectedDeliveryAddress('');
+                    setForm(prevForm => ({ ...prevForm, delivery: '' }));
+                }
+            } else {
+                const errorData = await res.json();
+                console.error('Delete address error:', res.status, errorData);
+                showFeedback(`Failed to delete address: ${errorData.message || 'Server error'}`, 'error');
+            }
         } catch (error) {
             console.error("Error deleting address:", error);
             showFeedback('Failed to delete address. Please try again.', 'error');
@@ -642,6 +712,54 @@ export default function Home({ lemons }) {
         setForm(prevForm => ({ ...prevForm, delivery: '' })); // Clear delivery for new input
     } else {
         setForm(prevForm => ({ ...prevForm, delivery: selectedValue }));
+    }
+  };
+
+  // --- Feedback Logic ---
+  const handleFeedbackSubmit = async (e) => {
+    e.preventDefault();
+    setFeedbackMessage('');
+    setIsSubmittingFeedback(true);
+
+    if (!isLoggedIn || !currentUser?.name || !currentUser?.phone) {
+        setFeedbackMessage('Please log in to submit feedback.');
+        setIsSubmittingFeedback(false);
+        return;
+    }
+
+    if (!feedbackText.trim()) {
+        setFeedbackMessage('Please enter your feedback before submitting.');
+        setIsSubmittingFeedback(false);
+        return;
+    }
+
+    try {
+        const res = await fetch(FEEDBACK_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data: [{
+                name: currentUser.name,
+                phone: currentUser.phone,
+                // Assuming 'address' from signup sheet can be used as a general address
+                address: currentUser.address || 'N/A',
+                feedback: feedbackText.trim(),
+                'Submission Date': new Date().toLocaleString(),
+            }]}),
+        });
+
+        if (res.ok) {
+            setFeedbackMessage('Thank you for your valuable feedback! 😊');
+            setFeedbackText(''); // Clear feedback input
+        } else {
+            const errorData = await res.json();
+            console.error('Feedback submission error:', res.status, errorData);
+            setFeedbackMessage(`Failed to submit feedback: ${errorData.message || 'Server error'}. Please try again.`);
+        }
+    } catch (error) {
+        console.error("Error submitting feedback:", error);
+        setFeedbackMessage('Error submitting feedback. Please check your internet connection and try again.');
+    } finally {
+        setIsSubmittingFeedback(false);
     }
   };
 
@@ -808,12 +926,13 @@ export default function Home({ lemons }) {
                   <p>No addresses added yet.</p>
                 ) : (
                   <ul>
-                    {userAddresses.map((address, index) => (
-                      <li key={index} className={styles.addressItem}>
-                        <strong>Address {index + 1}:</strong>
-                        <p>{address.street}</p>
+                    {userAddresses.map((address) => ( // Use address.id for key if available, otherwise index is fallback
+                      <li key={address.id || `${address.phone}-${address.street}`} className={styles.addressItem}>
+                        <strong>{address.street}</strong>
                         <p>{address.city}, {address.state} - {address.pincode}</p>
                         <div className={styles.addressActions}>
+                          {/* SheetDB DELETE by column value 'id' is more robust if you set one up. */}
+                          {/* Using phone+street as a makeshift identifier if id not present */}
                           <button onClick={() => handleDeleteAddress(address.id)} className={styles.deleteAddressButton}>Delete</button>
                         </div>
                       </li>
@@ -859,8 +978,33 @@ export default function Home({ lemons }) {
 
           {activeSidebarTab === 'feedback' && (
             <div>
-              <h3>Feedback</h3>
-              <p>This section is under development. You will be able to submit your feedback here soon!</p>
+              <h3>Share Your Feedback</h3>
+              {!isLoggedIn ? (
+                  <p>Please log in to submit your feedback.</p>
+              ) : (
+                  <form onSubmit={handleFeedbackSubmit} className={styles.feedbackForm}>
+                      <div className={styles.formGroup}>
+                          <label className={styles.label} htmlFor="feedback-text">Your Feedback</label>
+                          <textarea
+                              id="feedback-text"
+                              className={styles.textarea}
+                              value={feedbackText}
+                              onChange={(e) => setFeedbackText(e.target.value)}
+                              placeholder="Tell us what you think..."
+                              rows="5"
+                              required
+                          ></textarea>
+                      </div>
+                      <button type="submit" className={styles.button} disabled={isSubmittingFeedback}>
+                          {isSubmittingFeedback ? <span className="spinner"></span> : 'Submit Feedback'}
+                      </button>
+                      {feedbackMessage && (
+                          <p className={`${styles.statusMessage} ${feedbackMessage.includes('Thank you') ? styles.successMessage : styles.errorMessage}`}>
+                              {feedbackMessage}
+                          </p>
+                      )}
+                  </form>
+              )}
             </div>
           )}
         </div>
@@ -1008,7 +1152,7 @@ export default function Home({ lemons }) {
                     >
                         <option value="">-- Select Address --</option>
                         {userAddresses.map((addr, idx) => (
-                            <option key={idx} value={addr.fullAddress}>{addr.fullAddress}</option>
+                            <option key={addr.id || idx} value={addr.fullAddress}>{addr.fullAddress}</option>
                         ))}
                         <option value="new">-- Enter New Address --</option>
                     </select>
@@ -1079,16 +1223,16 @@ export default function Home({ lemons }) {
                       <button
                           type="button"
                           onClick={() => setOrders(orders.filter((_, i) => i !== index))}
-                          className={styles.removeVarietyButton}
+                          className={styles.removeVarietyButtonSquare} {/* Changed class */}
                       >
-                          &times; Remove
+                          &times;
                       </button>
                   )}
                 </Fragment>
               ))}
 
-              <button type="button" onClick={handleAddVariety} className={styles.button}>
-                ➕ Add Another Variety
+              <button type="button" onClick={handleAddVariety} className={styles.addVarietyButtonSquare}> {/* Changed class */}
+                ➕
               </button>
 
               <div className={styles.orderSummary}>
