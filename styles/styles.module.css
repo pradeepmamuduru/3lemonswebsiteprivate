@@ -1,42 +1,6 @@
-/* styles/styles.module.css - Comprehensive Stylesheet */
+/* styles/styles.module.css - Component-specific Stylesheet */
 
-/* --- Base & Utility Styles --- */
-:root {
-    --primary-green: #2e8b57;
-    --light-green-bg: #e0ffe0;
-    --lighter-green-bg: #f0fff0;
-    --accent-orange: #f7b731;
-    --red-danger: #f44336;
-    --blue-info: #2196F3;
-    --whatsapp-green: #25D366;
-    --text-dark: #333;
-    --text-medium: #555;
-    --text-light: #666;
-    --border-light: #ddd;
-    --border-medium: #ccc;
-    --shadow-light: rgba(0, 0, 0, 0.1);
-    --shadow-medium: rgba(0, 0, 0, 0.2);
-    --transition-ease: all 0.3s ease;
-    --border-radius-small: 5px;
-    --border-radius-medium: 8px;
-    --border-radius-large: 10px;
-}
-
-html {
-    scroll-behavior: smooth;
-}
-
-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Arial', sans-serif;
-    color: var(--text-dark);
-    background-color: var(--light-green-bg); /* Lite green theme base */
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
+/* --- Base & Utility Styles (using global variables) --- */
 .page {
     display: flex;
     flex-direction: column;
@@ -50,7 +14,7 @@ body {
     padding: 20px;
     flex-grow: 1;
     width: 100%;
-    box-sizing: border-box; /* Ensures padding doesn't add to overall width */
+    box-sizing: border-box;
 }
 
 .sectionTitle {
@@ -73,7 +37,7 @@ body {
     width: 80px;
     height: 4px;
     background-color: var(--primary-green);
-    border-radius: 2px;
+    border-radius: var(--border-radius-small);
 }
 
 /* --- Buttons --- */
@@ -252,8 +216,6 @@ body {
 
 .orderVarietyGroup .removeVarietyButton {
     position: relative; /* Adjust position for removal button */
-    /* Remove align-self: flex-end if you want it aligned with top of inputs */
-    /* Adjust margin to push it to the right/bottom of its row */
     margin-left: auto; /* Push to the right */
     margin-right: 0;
     margin-bottom: 0;
