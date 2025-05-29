@@ -39,9 +39,10 @@ export default function Home({ lemons }) {
     // Access AuthContext for global user state
     const { isLoggedIn, currentUser, login, logout, setCurrentUser } = useContext(AuthContext);
 
+    // --- State Variables ---
     // Order form states
     const [orders, setOrders] = useState([{ grade: '', quantity: '' }]);
-    const [form, setForm] = useState({ name: '', delivery: '', contact: '' }); // <-- RE-INTRODUCED FORM STATE HERE
+    const [form, setForm] = useState({ name: '', delivery: '', contact: '' }); // <-- ESSENTIAL: This state is used in JSX
     const [total, setTotal] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -78,62 +79,190 @@ export default function Home({ lemons }) {
     const [userOrders, setUserOrders] = useState([]);
     const [isFetchingOrders, setIsFetchingOrders] = useState(false);
 
-
-    // Added Hardcoded customer reviews - keep it here as it's static data
+    // Hardcoded customer reviews - kept separate as static data
     const customerReviews = useMemo(() => [
         { id: 1, text: "The freshest lemons I've ever tasted! Perfect for my morning lemonade. Delivery was super fast too.", name: "Priya Sharma", rating: 5 },
         { id: 2, text: "Excellent quality and consistent supply. My restaurant relies on these lemons. Highly recommended!", name: "Chef Anand Rao", rating: 5 },
         { id: 3, text: "So convenient to get fresh lemons delivered home. They truly are farm fresh. My family loves them!", name: "Rajesh Kumar", rating: 5 },
     ], []);
 
-    // --- All Function Definitions (Moved to top for scope) ---
+    // --- All Function Definitions (IMPORTANT: Defined BEFORE first use in JSX or effects) ---
 
-    // --- Modal & Sidebar Helper Functions ---
-    const openLoginModal = () => {
-        setShowLoginModal(true);
-        setLoginForm({ name: '', phone: '' }); // Clear login form fields on open
-        setFeedback({ message: '', type: '' });
-    };
+    // --- Calculation and Order Form Logic ---
+    const calculateTotal = useCallback(() => {
+        let totalPrice = 0;
+        orders.forEach(order => {
+            const lemon = lemons.find(l => l.Grade === order.grade);
+            if (lemon) {
+                const pricePerKg = parseFloat(lemon['Price Per Kg'] || lemon.Price || 0);
+                const quantity = parseFloat(order.quantity);
 
-    const closeLoginModal = () => {
-        setShowLoginModal(false);
-        setLoginForm({ name: '', phone: '' }); // Clear login form fields on close
-        setFeedback({ message: '', type: '' });
-    };
-
-    const openSignUpModal = () => {
-        setShowSignUpModal(true);
-        setSignUpForm({ name: '', phone: '', address: '', pincode: '' }); // Clear signup form fields on open
-        setFeedback({ message: '', type: '' });
-    };
-
-    const closeSignUpModal = () => {
-        setShowSignUpModal(false);
-        setSignUpForm({ name: '', phone: '', address: '', pincode: '' }); // Clear signup form fields on close
-        setFeedback({ message: '', type: '' });
-    };
-
-    const toggleSidebar = () => {
-        if (isLoggedIn) {
-            setIsSidebarOpen(!isSidebarOpen);
-            if (!isSidebarOpen) { // If opening, reset to default tab and clear messages
-                setActiveAccountTab('accountDetails');
-                setFeedback({ message: '', type: '' });
-                if (currentUser) {
-                    setAccountDetailsForm(currentUser);
+                if (!isNaN(pricePerKg) && !isNaN(quantity) && quantity > 0) {
+                    let itemPrice = pricePerKg * quantity;
+                    if (quantity > 50) {
+                        itemPrice *= 0.90; // 10% discount for quantity > 50
+                    }
+                    totalPrice += itemPrice;
                 }
-                setShowAddressForm(false);
-                setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' });
-                setFeedbackText('');
-                setUserOrders([]); // Clear orders when opening sidebar or switching tabs
             }
-        } else {
+        });
+        setTotal(totalPrice);
+    }, [orders, lemons]); // Dependencies for useCallback
+
+    const handleOrderChange = (index, field, value) => {
+        const updated = [...orders];
+        if (field === 'quantity') {
+            value = value === '' ? '' : String(Math.max(0.5, parseFloat(value) || 0.5));
+        }
+
+        if (field === 'grade') {
+            const selectedGrades = updated.map((order, i) => (i === index ? value : order.grade));
+            const isDuplicate = selectedGrades.filter(g => g === value && g !== '').length > 1;
+            if (isDuplicate) {
+                showTemporaryFeedback(`${currentUser?.name || 'You'}, are selecting the same variety again! 🧐`, 'error');
+                return;
+            }
+        }
+
+        updated[index][field] = value;
+        setOrders(updated);
+        // calculateTotal is called via useEffect based on orders dependency
+    };
+
+    const addAnotherVariety = () => {
+        const lastOrder = orders[orders.length - 1];
+        if (orders.length > 0 && (lastOrder.grade === '' || lastOrder.quantity === '')) {
+            showTemporaryFeedback('Please complete the current variety selection before adding a new one.', 'info');
+            return;
+        }
+        setOrders([...orders, { grade: '', quantity: '' }]);
+    };
+
+    const removeVariety = (index) => {
+        const updated = orders.filter((_, i) => i !== index);
+        setOrders(updated.length > 0 ? updated : [{ grade: '', quantity: '' }]);
+        showTemporaryFeedback('Variety removed.', 'info');
+        // calculateTotal is called via useEffect based on orders dependency
+    };
+
+    const handlePlaceOrder = async (orderType) => {
+        if (!isLoggedIn) {
+            showTemporaryFeedback('Please log in to place an order.', 'error');
             openLoginModal();
-            showTemporaryFeedback('Please log in to access your account.', 'info');
+            return;
+        }
+
+        const validOrders = orders.filter(order => order.grade && order.quantity && parseFloat(order.quantity) > 0);
+        if (validOrders.length === 0) {
+            showTemporaryFeedback('Please add at least one lemon variety with a valid quantity (must be 0.5kg or more).', 'error');
+            return;
+        }
+
+        const hasInvalidQuantity = orders.some(order => {
+            return (order.grade && (order.quantity === '' || isNaN(parseFloat(order.quantity)) || parseFloat(order.quantity) <= 0));
+        });
+        if (hasInvalidQuantity) {
+            showTemporaryFeedback('Please ensure all selected varieties have a valid quantity (0.5kg or more).', 'error');
+            return;
+        }
+
+        if (total === 0) {
+            showTemporaryFeedback('Your order total is zero. Please add items to your cart.', 'error');
+            return;
+        }
+
+        const orderDetails = validOrders.map(order => {
+            const lemon = lemons.find(l => l.Grade === order.grade);
+            const quantity = parseFloat(order.quantity);
+            const pricePerKg = parseFloat(lemon?.['Price Per Kg'] || lemon.Price || 0);
+            let itemPrice = pricePerKg * quantity;
+            let discountMsg = '';
+            if (quantity > 50) {
+                itemPrice *= 0.90;
+                discountMsg = ` (10% bulk discount applied)`;
+            }
+            return `${quantity} kg of ${order.grade} (Approx. ₹${itemPrice.toFixed(2)})${discountMsg}`;
+        }).join('; ');
+
+        const orderData = {
+            Name: currentUser.name,
+            Phone: currentUser.phone,
+            Address: currentUser.address || 'N/A',
+            Pincode: currentUser.pincode || 'N/A',
+            OrderDetails: orderDetails,
+            TotalAmount: total.toFixed(2),
+            Timestamp: new Date().toLocaleString(),
+            OrderType: orderType
+        };
+
+        setIsSubmitting(true);
+        try {
+            const res = await fetch(ORDERS_SHEET_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: orderData }),
+            });
+
+            if (res.ok) {
+                showTemporaryFeedback('Order placed successfully! We will contact you soon.', 'success');
+                setShowSuccessModal(true);
+                setOrders([{ grade: '', quantity: '' }]);
+                setTotal(0);
+                if (activeAccountTab === 'yourOrders' && isLoggedIn) {
+                    fetchUserOrders();
+                }
+            } else {
+                const errorData = await res.json();
+                console.error('SheetDB order submission error:', res.status, errorData);
+                showTemporaryFeedback('Failed to place order. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Error placing order:', error);
+            showTemporaryFeedback('An error occurred while placing your order. Please check your internet connection.', 'error');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
-    // --- Auth Form Handlers ---
+    const generateWhatsAppLink = () => {
+        const whatsappPhoneNumber = '919539304300';
+
+        let message = `Hello! I'd like to place an order from 3 Lemons Traders.\n\n`;
+        if (isLoggedIn && currentUser) {
+            message += `Name: ${currentUser.name}\n`;
+            message += `Phone: ${currentUser.phone}\n`;
+            message += `Delivery Address: ${currentUser.address || 'Not provided'}\n`;
+            message += `Pincode: ${currentUser.pincode || 'Not provided'}\n\n`;
+        } else {
+            message += `(Please provide your Name, Phone Number, Delivery Address, and Pincode in the chat)\n\n`;
+        }
+
+        const validOrders = orders.filter(order => order.grade && order.quantity && parseFloat(order.quantity) > 0);
+        if (validOrders.length > 0) {
+            message += `My Order Details:\n`;
+            validOrders.forEach((order) => {
+                const lemon = lemons.find(l => l.Grade === order.grade);
+                if (lemon) {
+                    const quantity = parseFloat(order.quantity);
+                    const pricePerKg = parseFloat(lemon['Price Per Kg'] || lemon.Price || 0);
+                    let itemCalculatedPrice = pricePerKg * quantity;
+                    if (quantity > 50) {
+                        itemCalculatedPrice *= 0.90;
+                        message += `- ${quantity} kg of ${order.grade} (with 10% bulk discount) - Approx. ₹${itemCalculatedPrice.toFixed(2)}\n`;
+                    } else {
+                        message += `- ${quantity} kg of ${order.grade} - Approx. ₹${itemCalculatedPrice.toFixed(2)}\n`;
+                    }
+                }
+            });
+            message += `\nTotal Estimated Price: ₹${total.toFixed(2)}\n\n`;
+            message += `Please confirm availability and final amount.`;
+        } else {
+            message += `I'm interested in knowing more about your lemons.`;
+        }
+        return `https://wa.me/${whatsappPhoneNumber}?text=${encodeURIComponent(message)}`;
+    };
+
+    // --- Auth Form Handlers (also moved to top) ---
     const handleLoginFormChange = (e) => {
         const { name, value } = e.target;
         if (name === 'phone') {
@@ -166,7 +295,6 @@ export default function Home({ lemons }) {
         }
 
         try {
-            // CORRECTED URL for SheetDB search for signup sheet
             const searchUrl = `https://sheetdb.io/api/v1/wm0oxtmmfkndt/search?sheet=Signup&search={"Phone":"${trimmedPhone}"}`;
             const res = await fetch(searchUrl);
 
@@ -188,14 +316,13 @@ export default function Home({ lemons }) {
             );
 
             if (foundUser) {
-                // Ensure the user object stored in context has consistent keys (lowercase name, phone, address, pincode)
                 const userForContext = {
                     name: foundUser.Name,
                     phone: foundUser.Phone,
                     address: foundUser.Address,
                     pincode: foundUser.Pincode
                 };
-                login(userForContext); // Use login from AuthContext
+                login(userForContext);
                 showTemporaryFeedback(`Welcome back, ${foundUser.Name}! 😊`, 'success');
                 closeLoginModal();
             } else {
@@ -211,8 +338,8 @@ export default function Home({ lemons }) {
 
     const handleSignUpFormChange = (e) => {
         const { name, value } = e.target;
-        if (name === 'phone' || name === 'pincode') { // Apply validation for both
-            if (!/^\d*$/.test(value)) return; // Only allow digits
+        if (name === 'phone' || name === 'pincode') {
+            if (!/^\d*$/.test(value)) return;
             if (name === 'phone' && value.length > 10) return;
             if (name === 'pincode' && value.length > 6) return;
         }
@@ -249,7 +376,6 @@ export default function Home({ lemons }) {
         }
 
         try {
-            // CORRECTED URL for SheetDB search for signup sheet
             const existingUserSearchUrl = `https://sheetdb.io/api/v1/wm0oxtmmfkndt/search?sheet=Signup&search={"Phone":"${trimmedPhone}"}`;
             const existingUserRes = await fetch(existingUserSearchUrl);
 
@@ -265,12 +391,9 @@ export default function Home({ lemons }) {
                 return;
             }
 
-            // Add new user
-            const res = await fetch(SIGNUP_SHEET_URL, { // This URL is correct for POST (adding a new row)
+            const res = await fetch(SIGNUP_SHEET_URL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     data: {
                         Name: trimmedName,
@@ -283,14 +406,13 @@ export default function Home({ lemons }) {
             });
 
             if (res.ok) {
-                // Ensure the user object stored in context has consistent keys (lowercase name, phone, address, pincode)
                 const newUserForContext = {
                     name: trimmedName,
                     phone: trimmedPhone,
                     address: trimmedAddress,
                     pincode: trimmedPincode
                 };
-                login(newUserForContext); // Log in the new user immediately
+                login(newUserForContext);
                 showTemporaryFeedback('Account created successfully! Welcome! 🎉', 'success');
                 closeSignUpModal();
             } else {
@@ -305,22 +427,20 @@ export default function Home({ lemons }) {
     };
 
     const handleLogout = () => {
-        logout(); // Use logout from AuthContext
-        setUserAddresses([]); // Clear addresses on logout
-        setUserOrders([]); // Clear orders on logout
-        setOrders([{ grade: '', quantity: '' }]); // Reset orders as well
-        setTotal(0); // Reset total
+        logout();
+        setUserAddresses([]);
+        setUserOrders([]);
+        setOrders([{ grade: '', quantity: '' }]);
+        setTotal(0);
         showTemporaryFeedback('You have been logged out.', 'info');
-        setIsSidebarOpen(false); // Close sidebar on logout
+        setIsSidebarOpen(false);
     };
 
     // --- Account Details Update ---
-    // Make sure accountDetailsForm is defined in state
-    const [accountDetailsForm, setAccountDetailsForm] = useState({ name: '', phone: '', address: '', pincode: '' });
+    const [accountDetailsForm, setAccountDetailsForm] = useState({ name: '', phone: '', address: '', pincode: '' }); // Declare here
 
     const handleAccountDetailChange = (e) => {
         const { name, value } = e.target;
-        // Basic validation for phone and pincode
         if (name === 'phone' || name === 'pincode') {
             if (!/^\d*$/.test(value)) return;
             if (name === 'phone' && value.length > 10) return;
@@ -337,7 +457,7 @@ export default function Home({ lemons }) {
         }
 
         setIsUpdatingAccount(true);
-        setFeedback({ message: '', type: '' }); // Clear feedback
+        setFeedback({ message: '', type: '' });
 
         const { name, address, pincode } = accountDetailsForm;
         const trimmedName = name.trim();
@@ -356,14 +476,10 @@ export default function Home({ lemons }) {
         }
 
         try {
-            // CORRECTED URL for SheetDB PUT (update) operation
-            // Update by Phone is more robust for user profiles
             const updateUrl = `https://sheetdb.io/api/v1/wm0oxtmmfkndt/Phone/${currentUser.phone}?sheet=Signup`;
             const res = await fetch(updateUrl, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     data: {
                         Name: trimmedName,
@@ -374,7 +490,6 @@ export default function Home({ lemons }) {
             });
 
             if (res.ok) {
-                // Update the currentUser in context so it's fresh everywhere
                 setCurrentUser(prevUser => ({
                     ...prevUser,
                     name: trimmedName,
@@ -399,8 +514,8 @@ export default function Home({ lemons }) {
     // --- Address Management Functions ---
     const handleAddressFormChange = (e) => {
         const { name, value } = e.target;
-        if (name === 'phone' || name === 'pincode') { // Apply validation for both
-            if (!/^\d*$/.test(value)) return; // Only allow digits
+        if (name === 'phone' || name === 'pincode') {
+            if (!/^\d*$/.test(value)) return;
             if (name === 'phone' && value.length > 10) return;
             if (name === 'pincode' && value.length > 6) return;
         }
@@ -434,7 +549,7 @@ export default function Home({ lemons }) {
             return;
         }
 
-        if (userAddresses.length >= 5 && !id) { // Max 5 addresses, only for new additions
+        if (userAddresses.length >= 5 && !id) {
             showTemporaryFeedback('You can save a maximum of 5 addresses.', 'error');
             setIsManagingAddresses(false);
             return;
@@ -450,7 +565,6 @@ export default function Home({ lemons }) {
         try {
             let response;
             if (id) {
-                // CORRECTED URL for SheetDB PUT (update) operation for addresses
                 const updateUrl = `https://sheetdb.io/api/v1/wm0oxtmmfkndt/id/${id}?sheet=Addresses`;
                 response = await fetch(updateUrl, {
                     method: 'PUT',
@@ -458,8 +572,7 @@ export default function Home({ lemons }) {
                     body: JSON.stringify({ data: addressData }),
                 });
             } else {
-                // POST operation for adding new address
-                response = await fetch(ADDRESSES_SHEET_URL, { // This URL is correct for POST
+                response = await fetch(ADDRESSES_SHEET_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ data: addressData }),
@@ -470,7 +583,7 @@ export default function Home({ lemons }) {
                 showTemporaryFeedback(`Address ${id ? 'updated' : 'added'} successfully!`, 'success');
                 setShowAddressForm(false);
                 setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' });
-                fetchUserAddresses(); // Re-fetch to update list and get actual SheetDB ID
+                fetchUserAddresses();
             } else {
                 const errorData = await response.json();
                 console.error('SheetDB address save error:', response.status, errorData);
@@ -489,14 +602,13 @@ export default function Home({ lemons }) {
         setIsManagingAddresses(true);
         setFeedback({ message: '', type: '' });
         try {
-            // CORRECTED URL for SheetDB DELETE operation for addresses
             const deleteUrl = `https://sheetdb.io/api/v1/wm0oxtmmfkndt/id/${addressId}?sheet=Addresses`;
             const response = await fetch(deleteUrl, {
                 method: 'DELETE',
             });
             if (response.ok) {
                 showTemporaryFeedback('Address deleted successfully!', 'success');
-                fetchUserAddresses(); // Re-fetch to update list
+                fetchUserAddresses();
             } else {
                 const errorData = await response.json();
                 console.error('SheetDB address delete error:', response.status, errorData);
@@ -515,17 +627,16 @@ export default function Home({ lemons }) {
         setShowAddressForm(true);
     };
 
-
     // --- Feedback Submission ---
     const handleFeedbackTextChange = (e) => {
         setFeedbackText(e.target.value);
-        setFeedback({ message: '', type: '' }); // Clear feedback messages on typing
+        setFeedback({ message: '', type: '' });
     };
 
     const handleSubmitFeedback = async (e) => {
         e.preventDefault();
         setIsSubmittingFeedback(true);
-        setFeedback({ message: '', type: '' }); // Clear previous feedback
+        setFeedback({ message: '', type: '' });
 
         if (!feedbackText.trim()) {
             showTemporaryFeedback('Please enter your feedback before submitting.', 'error');
@@ -548,7 +659,6 @@ export default function Home({ lemons }) {
         };
 
         try {
-            // FEEDBACK_SHEET_URL is correct for POST
             const res = await fetch(FEEDBACK_SHEET_URL, {
                 method: 'POST',
                 headers: {
@@ -575,6 +685,32 @@ export default function Home({ lemons }) {
     };
 
 
+    // --- Effects for loading data (placed after all functions they might call) ---
+    useEffect(() => {
+        calculateTotal();
+    }, [orders, lemons, calculateTotal]);
+
+    useEffect(() => {
+        if (currentUser) {
+            setAccountDetailsForm({
+                name: currentUser.name || '',
+                phone: currentUser.phone || '',
+                address: currentUser.address || '',
+                pincode: currentUser.pincode || ''
+            });
+            setForm(prevForm => ({
+                ...prevForm,
+                name: currentUser.name || prevForm.name,
+                contact: currentUser.phone || prevForm.contact,
+                delivery: currentUser.address || prevForm.delivery,
+            }));
+        } else {
+            setAccountDetailsForm({ name: '', phone: '', address: '', pincode: '' });
+            setForm({ name: '', delivery: '', contact: '' });
+        }
+    }, [currentUser]); // Dependencies for this effect
+
+    // --- Main Render ---
     return (
         <div className={styles.page}>
             <Head>
@@ -582,7 +718,6 @@ export default function Home({ lemons }) {
                 <meta name="description" content="Buy premium quality lemons at affordable prices across India. Direct farm to home delivery. Discounts on bulk orders!" />
                 <meta property="og:title" content="Buy Fresh Lemons Online – 3 Lemons Traders" />
                 <meta property="og:description" content="Get premium lemons delivered to your door at unbeatable prices. Farm fresh quality. Offering discounts on bulk purchases!" />
-                {/* Image paths should be relative to the public folder */}
                 <meta property="og:image" content="/lemons-hero.jpg" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="canonical" href="https://3lemons.in" />
@@ -602,13 +737,10 @@ export default function Home({ lemons }) {
                             Login / Signup
                         </button>
                     )}
-                    {/* Hamburger menu for small screens - can be shown/hidden via CSS media queries */}
-                    {/* <FaBars className={styles.hamburgerIcon} onClick={toggleSidebar} /> */} {/* Changed to FaBars if needed */}
                 </div>
             </header>
 
             <main className={styles.container}>
-                {/* Feedback Message Display */}
                 {feedback.message && (
                     <div className={`${styles.feedbackMessage} ${styles[`feedback${feedback.type.charAt(0).toUpperCase() + feedback.type.slice(1)}`]}`}>
                         {feedback.message}
@@ -618,11 +750,11 @@ export default function Home({ lemons }) {
                 {/* --- Hero Section --- */}
                 <section className={styles.hero}>
                     <Image
-                        src="/lemons-hero.jpg" // Assuming this is a local image in your public folder
+                        src="/lemons-hero.jpg"
                         alt="Fresh Lemons"
-                        layout="fill" // Use layout="fill" for background images in hero
+                        layout="fill"
                         objectFit="cover"
-                        priority // Load eagerly for LCP (Largest Contentful Paint)
+                        priority
                         className={styles.heroImage}
                     />
                     <div className={styles.heroOverlay}>
@@ -641,10 +773,9 @@ export default function Home({ lemons }) {
                         {Array.isArray(lemons) && lemons.length > 0 ? (
                             lemons.map((lemon, index) => (
                                 <div key={lemon.id || lemon.Grade || index} className={styles.lemonCard}>
-                                    {/* Ensure image src matches what's in your public folder or accessible path */}
                                     {lemon.Image && (
                                         <Image
-                                            src={`/${lemon.Image}`} // Assuming images like 'lemon-eureka.jpg' are in public/
+                                            src={`/${lemon.Image}`}
                                             alt={lemon.Grade || 'Lemon'}
                                             width={300}
                                             height={220}
@@ -669,16 +800,15 @@ export default function Home({ lemons }) {
                 {/* --- Order Form Section --- */}
                 <section id="buy-now" className={styles.formSection}>
                     <h2 className={styles.sectionTitle}>Place Your Order</h2>
-                    <form onSubmit={(e) => e.preventDefault()} className={styles.form}> {/* Prevent default form submission directly here */}
-                        {/* Personal Details Inputs (pre-filled if logged in) */}
+                    <form onSubmit={(e) => e.preventDefault()} className={styles.form}>
                         <div className={styles.formGroup}>
                             <label className={styles.label} htmlFor="name">Your Name</label>
                             <input
                                 id="name"
                                 className={styles.input}
                                 required
-                                value={currentUser?.name || ''} // Use currentUser.name
-                                readOnly={isLoggedIn} // Make read-only if logged in
+                                value={currentUser?.name || ''}
+                                readOnly={isLoggedIn}
                                 style={isLoggedIn ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
                                 placeholder="Enter your name"
                             />
@@ -691,8 +821,8 @@ export default function Home({ lemons }) {
                                     id="delivery"
                                     className={styles.input}
                                     required
-                                    value={currentUser.address || ''} // Use currentUser.address
-                                    readOnly={true} // Read-only if logged in
+                                    value={currentUser.address || ''}
+                                    readOnly={true}
                                     style={{ backgroundColor: '#f0f0f0', cursor: 'not-allowed' }}
                                 />
                             ) : (
@@ -700,7 +830,7 @@ export default function Home({ lemons }) {
                                     id="delivery"
                                     className={styles.input}
                                     required
-                                    value={form.delivery} // Use form.delivery for non-logged-in
+                                    value={form.delivery}
                                     onChange={(e) => setForm({ ...form, delivery: e.target.value })}
                                     placeholder="Enter your full delivery address"
                                 />
@@ -714,8 +844,8 @@ export default function Home({ lemons }) {
                                 type="tel"
                                 className={styles.input}
                                 required
-                                value={currentUser?.phone || ''} // Use currentUser.phone
-                                readOnly={isLoggedIn} // Read-only if logged in
+                                value={currentUser?.phone || ''}
+                                readOnly={isLoggedIn}
                                 style={isLoggedIn ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
                                 maxLength={10}
                                 pattern="[0-9]{10}"
@@ -724,7 +854,6 @@ export default function Home({ lemons }) {
                             />
                         </div>
 
-                        {/* Dynamic Order Varieties Inputs */}
                         {orders.map((order, index) => (
                             <Fragment key={index}>
                                 <div className={styles.formGroup}>
@@ -741,7 +870,6 @@ export default function Home({ lemons }) {
                                             <option
                                                 key={idx}
                                                 value={lemon.Grade}
-                                                // Disable already selected grades, except for the current row
                                                 disabled={orders.some(o => o.grade === lemon.Grade && orders.indexOf(order) !== index)}
                                             >
                                                 {lemon.Grade} – ₹{parseFloat(lemon['Price Per Kg'] || lemon.Price).toFixed(2)}/kg
@@ -799,7 +927,6 @@ export default function Home({ lemons }) {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className={`${styles.button} ${styles.whatsappButton}`}
-                                // Disable WhatsApp button if validation fails or data missing
                                 style={{
                                     pointerEvents: (orders.filter(o => o.grade && o.quantity && parseFloat(o.quantity) > 0).length === 0) ? 'none' : 'auto',
                                     opacity: (orders.filter(o => o.grade && o.quantity && parseFloat(o.quantity) > 0).length === 0) ? 0.6 : 1
@@ -845,7 +972,6 @@ export default function Home({ lemons }) {
             </div>
 
             {/* --- Order Confirmation Modal (can be repurposed or removed) --- */}
-            {/* Keeping it for now, but confirmAndSubmitOrder is not directly called from main flow */}
             {showConfirmModal && confirmedOrderDetails && (
                 <div className={`${styles.modalOverlay} ${showConfirmModal ? styles.visible : ''}`}>
                     <div className={styles.modalContent}>
@@ -1028,7 +1154,7 @@ export default function Home({ lemons }) {
                                 </button>
                                 <button type="button" className={`${styles.modalButton} ${styles.cancel}`} onClick={() => {
                                     closeLoginModal();
-                                    openSignUpModal(); // Offer signup if login fails
+                                    openSignUpModal();
                                 }}>
                                     New User? Sign Up
                                 </button>
@@ -1261,7 +1387,9 @@ export default function Home({ lemons }) {
                                                 <p style={{ textAlign: 'center' }}><FaSpinner className={styles.spinner} /> Loading orders...</p>
                                             ) : userOrders.length > 0 ? ( // Check if userOrders is not empty
                                                 <div className={styles.ordersList}>
-                                                    {userOrders.map((order, index) => ( // Loop directly through userOrders
+                                                    {/* The sorting and grouping logic for userOrders is handled in fetchUserOrders */}
+                                                    {/* Loop through each order */}
+                                                    {userOrders.map((order, index) => (
                                                         <div key={`${order.timestamp}-${index}`} className={styles.orderCard}>
                                                             <p><strong>Order Time:</strong> {new Date(order.timestamp).toLocaleString()}</p>
                                                             <p><strong>Delivery Address:</strong> {order.address || 'N/A'}</p>
@@ -1342,10 +1470,9 @@ export async function getStaticProps() {
     }
 
     // Ensure 'Price Per Kg' is consistent, if some data uses 'Price'
-    // This loop ensures that the 'Price Per Kg' property always exists for consistency
     lemons = lemons.map(lemon => ({
         ...lemon,
-        'Price Per Kg': parseFloat(lemon['Price Per Kg'] || lemon.Price || 0) // Prioritize 'Price Per Kg', fallback to 'Price'
+        'Price Per Kg': parseFloat(lemon['Price Per Kg'] || lemon.Price || 0)
     }));
 
 
