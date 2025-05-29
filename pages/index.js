@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback, useMemo, Fragment, useContext 
 import Head from 'next/head';
 import Image from 'next/image';
 import styles from '../styles/styles.module.css';
-import { FaWhatsapp, FaStar, FaUserCircle, FaPlus, FaMinus, FaCheckCircle, FaExclamationCircle, FaInfoCircle, FaSpinner, FaBox } from 'react-icons/fa'; // Added FaBox for orders tab
+// Added FaBox for orders tab, ensured FaSpinner is correctly imported
+import { FaWhatsapp, FaStar, FaUserCircle, FaPlus, FaMinus, FaCheckCircle, FaExclamationCircle, FaInfoCircle, FaSpinner, FaBox } from 'react-icons/fa';
 import { IoCloseCircleOutline, IoMenu } from 'react-icons/io5';
 import { AuthContext } from './_app'; // Import AuthContext
 
@@ -134,7 +135,8 @@ export default function Home({ lemons }) {
             }
 
             if (Array.isArray(addresses)) {
-                setUserAddresses(addresses.map(addr => ({ ...addr, id: addr.id || Date.now() + Math.random() }))); // Fallback ID
+                // Assign a unique ID if not present, useful for React keys
+                setUserAddresses(addresses.map(addr => ({ ...addr, id: addr.id || Date.now() + Math.random() })));
             } else {
                 setUserAddresses([]);
             }
@@ -170,42 +172,46 @@ export default function Home({ lemons }) {
                 ordersData = await res.json();
             }
 
-            if (Array.isArray(ordersData)) {
-                // Filter results client-side for the specific user's name (case-insensitive)
-                const relevantOrders = ordersData.filter(item =>
-                    item.name && item.name.toLowerCase() === userName.toLowerCase() && item.contact === userPhone
-                );
-
-                // Group orders by unique order identifier (e.g., combination of name, contact, and order date)
-                const groupedOrders = relevantOrders.reduce((acc, item) => {
-                    const orderKey = `${item.name}-${item.contact}-${item['Order Date']}`; // This assumes 'Order Date' includes time for uniqueness
-                    if (!acc[orderKey]) {
-                        acc[orderKey] = {
-                            id: orderKey, // Unique ID for the grouped order
-                            name: item.name,
-                            contact: item.contact,
-                            delivery: item.delivery,
-                            orderDate: item['Order Date'],
-                            items: [],
-                            total: 0, // Will sum up items
-                        };
-                    }
-                    acc[orderKey].items.push({
-                        grade: item.quality,
-                        quantity: item.quantity,
-                        pricePerKg: item['Price Per Kg'],
-                        itemTotalPrice: item['Item Total Price'],
-                        discount: item.discount,
-                    });
-                    acc[orderKey].total += parseFloat(item['Item Total Price'] || 0); // Sum up item totals
-                    return acc;
-                }, {});
-
-                // Convert grouped object back to array and sort by date descending
-                setUserOrders(Object.values(groupedOrders).sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate)));
-            } else {
-                setUserOrders([]);
+            if (!Array.isArray(ordersData)) {
+                ordersData = []; // Ensure it's an array for filtering
             }
+
+            // Filter results client-side for the specific user's name (case-insensitive)
+            // Ensure all necessary fields exist before using them
+            const relevantOrders = ordersData.filter(item =>
+                item.name && item.name.toLowerCase() === userName.toLowerCase() && item.contact === userPhone
+            );
+
+            // Group orders by unique order identifier (e.g., combination of name, contact, and order date)
+            // This relies on 'Order Date' being unique enough per order.
+            const groupedOrders = relevantOrders.reduce((acc, item) => {
+                // Create a unique key for each order, assuming 'Order Date' includes time
+                const orderKey = `${item.name}-${item.contact}-${item['Order Date']}`;
+                if (!acc[orderKey]) {
+                    acc[orderKey] = {
+                        id: orderKey, // Unique ID for the grouped order
+                        name: item.name,
+                        contact: item.contact,
+                        delivery: item.delivery, // Assuming delivery is same for all items in one order
+                        orderDate: item['Order Date'],
+                        items: [],
+                        total: 0,
+                    };
+                }
+                acc[orderKey].items.push({
+                    grade: item.quality,
+                    quantity: item.quantity,
+                    pricePerKg: item['Price Per Kg'],
+                    itemTotalPrice: item['Item Total Price'],
+                    discount: item.discount,
+                });
+                // Ensure parsing to float for summing up totals
+                acc[orderKey].total += parseFloat(item['Item Total Price'] || 0);
+                return acc;
+            }, {});
+
+            // Convert grouped object back to array and sort by date descending
+            setUserOrders(Object.values(groupedOrders).sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate)));
         } catch (error) {
             console.error("Error fetching user orders:", error);
             showTemporaryFeedback('Failed to load your orders.', 'error');
@@ -215,8 +221,13 @@ export default function Home({ lemons }) {
     }, [showTemporaryFeedback]);
 
     useEffect(() => {
+        // Only fetch orders if the tab is active, user is logged in, and user info is available
         if (isLoggedIn && currentUser?.name && currentUser?.phone && activeAccountTab === 'yourOrders') {
             fetchUserOrders(currentUser.name, currentUser.phone);
+        }
+        // If tab changes away from 'yourOrders' or user logs out, clear orders
+        if (activeAccountTab !== 'yourOrders' || !isLoggedIn) {
+            setUserOrders([]);
         }
     }, [isLoggedIn, currentUser?.name, currentUser?.phone, activeAccountTab, fetchUserOrders]);
 
@@ -226,12 +237,14 @@ export default function Home({ lemons }) {
         const updated = [...orders];
 
         if (field === 'quantity') {
+            // Ensure quantity is at least 1, or empty string if cleared
             value = value === '' ? '' : String(Math.max(1, parseInt(value) || 1));
         }
 
         // Handle unique variety selection
         if (field === 'grade') {
             const selectedGrades = updated.map((order, i) => (i === index ? value : order.grade));
+            // Check if the new value is a duplicate among other selected grades
             const isDuplicate = selectedGrades.filter(g => g === value && g !== '').length > 1;
 
             if (isDuplicate) {
@@ -269,11 +282,16 @@ export default function Home({ lemons }) {
         setFeedback({ message: '', type: '' }); // Clear any previous messages immediately
 
         // --- Client-Side Form Validation ---
-        if (!form.name.trim() || !form.delivery.trim() || !form.contact.trim()) {
+        // Trim inputs from the main order form for validation and submission
+        const trimmedName = form.name.trim();
+        const trimmedDelivery = form.delivery.trim();
+        const trimmedContact = form.contact.trim();
+
+        if (!trimmedName || !trimmedDelivery || !trimmedContact) {
             showTemporaryFeedback('Please fill in all your personal details (Name, Delivery Address, Contact).', 'error');
             return;
         }
-        if (!/^\d{10}$/.test(form.contact)) {
+        if (!/^\d{10}$/.test(trimmedContact)) {
             showTemporaryFeedback('Please enter a valid 10-digit contact number.', 'error');
             return;
         }
@@ -296,7 +314,8 @@ export default function Home({ lemons }) {
         if (!isLoggedIn) {
             setIsSubmitting(true); // Show loading state while checking user
             try {
-                const checkRes = await fetch(`${SIGNUP_SHEET_URL}?searchField=phone&searchValue=${form.contact}`);
+                // Check if user with this contact exists (no name check here, as they might be new)
+                const checkRes = await fetch(`${SIGNUP_SHEET_URL}?searchField=phone&searchValue=${trimmedContact}`);
                 if (!checkRes.ok && checkRes.status !== 404 && checkRes.status !== 204) {
                     throw new Error(`Failed to check existing users: ${checkRes.status} ${checkRes.statusText}`);
                 }
@@ -311,15 +330,24 @@ export default function Home({ lemons }) {
                 }
 
                 if (existingUsers.length > 0) {
-                    // User exists, "log them in" via AuthContext
-                    const user = existingUsers[0];
-                    login(user); // Use login from AuthContext
-                    showTemporaryFeedback(`Welcome back, ${user.name}! 😊`, 'success');
-                    setIsSubmitting(false);
-                    // Now that user is logged in, re-trigger handleSubmit to proceed to confirmation modal
-                    const dummyEvent = { preventDefault: () => { } };
-                    handleSubmit(dummyEvent);
-                    return;
+                    // If user exists, but not logged in, prompt to log in (or auto-login if name matches)
+                    const userByPhone = existingUsers.find(user => user.phone === trimmedContact); // Should find one
+                    if (userByPhone && userByPhone.name.toLowerCase() === trimmedName.toLowerCase()) {
+                        // Auto-login if name matches (case-insensitive)
+                        login(userByPhone);
+                        showTemporaryFeedback(`Welcome back, ${userByPhone.name}! 😊`, 'success');
+                        setIsSubmitting(false);
+                        // Re-trigger submit to proceed with order
+                        const dummyEvent = { preventDefault: () => { } };
+                        handleSubmit(dummyEvent);
+                        return;
+                    } else {
+                        // Phone exists, but name doesn't match or other user. Prompt for specific login.
+                        setIsSubmitting(false);
+                        showTemporaryFeedback('Account with this phone number exists, but name does not match. Please log in.', 'info');
+                        openLoginModal(); // Offer login modal
+                        return;
+                    }
                 } else {
                     // User does not exist, prompt for signup
                     setIsSubmitting(false);
@@ -357,7 +385,11 @@ export default function Home({ lemons }) {
         });
 
         setConfirmedOrderDetails({
-            personal: form,
+            personal: {
+                name: trimmedName,
+                delivery: trimmedDelivery,
+                contact: trimmedContact
+            },
             items: preparedOrderRows,
             total: total.toFixed(2),
         });
@@ -386,7 +418,7 @@ export default function Home({ lemons }) {
             delivery: personal.delivery,
             contact: personal.contact,
             discount: item.discount,
-            'Order Date': new Date().toLocaleString(),
+            'Order Date': new Date().toLocaleString(), // Use current date/time for the order
         }));
         try {
             const response = await fetch(ORDERS_SUBMISSION_URL, {
@@ -466,24 +498,30 @@ export default function Home({ lemons }) {
         setFeedback({ message: '', type: '' });
 
         const { name, phone, address, pincode } = signUpForm;
-        if (!name.trim() || !phone.trim() || !address.trim() || !pincode.trim()) {
+        // Trim inputs for signup submission
+        const trimmedName = name.trim();
+        const trimmedPhone = phone.trim();
+        const trimmedAddress = address.trim();
+        const trimmedPincode = pincode.trim();
+
+        if (!trimmedName || !trimmedPhone || !trimmedAddress || !trimmedPincode) {
             showTemporaryFeedback('Please fill in all signup details.', 'error');
             setIsSigningUp(false);
             return;
         }
-        if (!/^\d{10}$/.test(phone)) {
+        if (!/^\d{10}$/.test(trimmedPhone)) {
             showTemporaryFeedback('Please enter a valid 10-digit phone number.', 'error');
             setIsSigningUp(false);
             return;
         }
-        if (!/^\d{6}$/.test(pincode)) {
+        if (!/^\d{6}$/.test(trimmedPincode)) {
             showTemporaryFeedback('Please enter a valid 6-digit pincode.', 'error');
             setIsSigningUp(false);
             return;
         }
 
         try {
-            const checkRes = await fetch(`${SIGNUP_SHEET_URL}?searchField=phone&searchValue=${phone}`);
+            const checkRes = await fetch(`${SIGNUP_SHEET_URL}?searchField=phone&searchValue=${trimmedPhone}`);
             if (!checkRes.ok && checkRes.status !== 404 && checkRes.status !== 204) {
                 throw new Error(`Failed to check existing users during signup: ${checkRes.status} ${checkRes.statusText}`);
             }
@@ -508,16 +546,16 @@ export default function Home({ lemons }) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     data: {
-                        name: name.trim(),
-                        phone: phone.trim(),
-                        address: address.trim(),
-                        pincode: pincode.trim(),
+                        name: trimmedName,
+                        phone: trimmedPhone,
+                        address: trimmedAddress,
+                        pincode: trimmedPincode,
                         'Signup Date': new Date().toLocaleString(),
                     }
                 }),
             });
             if (response.ok) {
-                const newUser = { name: name.trim(), phone: phone.trim(), address: address.trim(), pincode: pincode.trim() };
+                const newUser = { name: trimmedName, phone: trimmedPhone, address: trimmedAddress, pincode: trimmedPincode };
                 login(newUser); // Use login from AuthContext
                 showTemporaryFeedback(`Thank you, ${newUser.name}, for signing up. Let's start ordering! 😊`, 'success');
                 closeSignUpModal();
@@ -544,13 +582,13 @@ export default function Home({ lemons }) {
     // --- Login Modal Handlers ---
     const openLoginModal = () => {
         setShowLoginModal(true);
-        setLoginForm({ name: '', phone: '' });
+        setLoginForm({ name: '', phone: '' }); // Clear login form fields on open
         setFeedback({ message: '', type: '' });
     };
 
     const closeLoginModal = () => {
         setShowLoginModal(false);
-        setLoginForm({ name: '', phone: '' });
+        setLoginForm({ name: '', phone: '' }); // Clear login form fields on close
         setFeedback({ message: '', type: '' });
     };
 
@@ -564,58 +602,7 @@ export default function Home({ lemons }) {
         setLoginForm(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleLoginSubmit = async (e) => {
-        e.preventDefault();
-        setIsLoggingIn(true);
-        setFeedback({ message: '', type: '' });
-
-        const { name, phone } = loginForm;
-        if (!name.trim() || !phone.trim()) {
-            showTemporaryFeedback('Please enter both name and phone number.', 'error');
-            setIsLoggingIn(false);
-            return;
-        }
-        if (!/^\d{10}$/.test(phone)) {
-            showTemporaryFeedback('Please enter a valid 10-digit phone number.', 'error');
-            setIsLoggingIn(false);
-            return;
-        }
-
-        try {
-            // Step 1: Search by phone number first
-            const checkRes = await fetch(`${SIGNUP_SHEET_URL}?searchField=phone&searchValue=${phone}`);
-            if (!checkRes.ok && checkRes.status !== 404 && checkRes.status !== 204) {
-                throw new Error(`Failed to check existing users during login: ${checkRes.status} ${checkRes.statusText}`);
-            }
-
-            let existingUsers = [];
-            if (checkRes.status !== 204 && checkRes.status !== 404) {
-                existingUsers = await checkRes.json();
-            }
-
-            if (!Array.isArray(existingUsers)) {
-                existingUsers = [];
-            }
-
-            // Step 2: Filter the results for a case-insensitive name match
-            const foundUser = existingUsers.find(user =>
-                user.phone === phone && user.name.toLowerCase() === name.toLowerCase()
-            );
-
-            if (foundUser) {
-                login(foundUser); // Use login from AuthContext
-                showTemporaryFeedback(`Welcome back, ${foundUser.name}! 😊`, 'success');
-                closeLoginModal();
-            } else {
-                showTemporaryFeedback('Account not found with provided name and phone number. Please try again or sign up.', 'error');
-            }
-        } catch (error) {
-            console.error("Error during login:", error);
-            showTemporaryFeedback('Failed to log in. Please try again later.', 'error');
-        } finally {
-            setIsLoggingIn(false);
-        }
-    };
+    // handleLoginSubmit is defined above as part of the overall component structure.
 
     // --- Logout Function ---
     const handleLogout = () => {
@@ -642,6 +629,7 @@ export default function Home({ lemons }) {
                 setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' });
                 setFeedbackText('');
                 setFeedbackSubmittedMessage('');
+                setUserOrders([]); // Clear orders when closing sidebar or switching tabs
             }
         } else {
             openLoginModal();
@@ -669,12 +657,16 @@ export default function Home({ lemons }) {
         setFeedback({ message: '', type: '' });
 
         const { name, address, pincode } = accountDetailsForm;
-        if (!name.trim() || !address.trim() || !pincode.trim()) {
+        const trimmedName = name.trim();
+        const trimmedAddress = address.trim();
+        const trimmedPincode = pincode.trim();
+
+        if (!trimmedName || !trimmedAddress || !trimmedPincode) {
             showTemporaryFeedback('Please fill in all account details.', 'error');
             setIsUpdatingAccount(false);
             return;
         }
-        if (!/^\d{6}$/.test(pincode)) {
+        if (!/^\d{6}$/.test(trimmedPincode)) {
             showTemporaryFeedback('Please enter a valid 6-digit pincode.', 'error');
             setIsUpdatingAccount(false);
             return;
@@ -686,14 +678,14 @@ export default function Home({ lemons }) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     data: {
-                        name: name.trim(),
-                        address: address.trim(),
-                        pincode: pincode.trim(),
+                        name: trimmedName,
+                        address: trimmedAddress,
+                        pincode: trimmedPincode,
                     }
                 }),
             });
             if (response.ok) {
-                const updatedUser = { ...currentUser, name: name.trim(), address: address.trim(), pincode: pincode.trim() };
+                const updatedUser = { ...currentUser, name: trimmedName, address: trimmedAddress, pincode: trimmedPincode };
                 setCurrentUser(updatedUser); // Update context and localStorage via _app.js
                 showTemporaryFeedback('Account details updated successfully!', 'success');
             } else {
@@ -729,12 +721,16 @@ export default function Home({ lemons }) {
         setFeedback({ message: '', type: '' });
 
         const { addressName, fullAddress, pincode, id } = addressForm;
-        if (!addressName.trim() || !fullAddress.trim() || !pincode.trim()) {
+        const trimmedAddressName = addressName.trim();
+        const trimmedFullAddress = fullAddress.trim();
+        const trimmedPincode = pincode.trim();
+
+        if (!trimmedAddressName || !trimmedFullAddress || !trimmedPincode) {
             showTemporaryFeedback('Please fill all address fields.', 'error');
             setIsManagingAddresses(false);
             return;
         }
-        if (!/^\d{6}$/.test(pincode)) {
+        if (!/^\d{6}$/.test(trimmedPincode)) {
             showTemporaryFeedback('Please enter a valid 6-digit pincode.', 'error');
             setIsManagingAddresses(false);
             return;
@@ -748,9 +744,9 @@ export default function Home({ lemons }) {
 
         const addressData = {
             userPhone: currentUser.phone,
-            addressName: addressName.trim(),
-            fullAddress: fullAddress.trim(),
-            pincode: pincode.trim(),
+            addressName: trimmedAddressName,
+            fullAddress: trimmedFullAddress,
+            pincode: trimmedPincode,
         };
         try {
             let response;
@@ -841,10 +837,10 @@ export default function Home({ lemons }) {
 
         try {
             const feedbackData = {
-                Name: currentUser.name,
-                Phone: currentUser.phone,
-                Address: currentUser.address || 'N/A',
-                Feedback: feedbackText,
+                Name: currentUser.name.trim(),
+                Phone: currentUser.phone.trim(),
+                Address: (currentUser.address || 'N/A').trim(),
+                Feedback: feedbackText.trim(),
                 'Feedback Date': new Date().toLocaleString(),
             };
 
@@ -876,7 +872,7 @@ export default function Home({ lemons }) {
 
     const getWhatsappLink = () => {
         const validOrders = orders.filter(order => order.grade && order.quantity && parseInt(order.quantity) > 0);
-        if (validOrders.length === 0 || !form.contact || !/^\d{10}$/.test(form.contact)) {
+        if (validOrders.length === 0 || !form.contact || !/^\d{10}$/.test(form.contact.trim())) { // Trim contact here too
             return '#'; // Disable link if essential data is missing or invalid
         }
 
@@ -893,8 +889,8 @@ export default function Home({ lemons }) {
             return `${quantity} kg of ${order.grade} (Approx. ₹${itemPrice.toFixed(2)})${discountMsg}`;
         }).join(', ');
 
-        const whatsappContact = `91${form.contact}`; // Assuming Indian numbers for WhatsApp
-        const whatsappMessage = `Hi, I'm ${form.name}.\n\nI want to order: ${orderDetails}.\n\nDelivery Address: ${form.delivery}.\nContact: ${form.contact}\n\nTotal estimated price: ₹${total.toFixed(2)}\n\nPlease confirm availability and final amount.`;
+        const whatsappContact = `91${form.contact.trim()}`; // Trim contact here
+        const whatsappMessage = `Hi, I'm ${form.name.trim()}.\n\nI want to order: ${orderDetails}.\n\nDelivery Address: ${form.delivery.trim()}.\nContact: ${form.contact.trim()}\n\nTotal estimated price: ₹${total.toFixed(2)}\n\nPlease confirm availability and final amount.`;
         return `https://wa.me/${whatsappContact}?text=${encodeURIComponent(whatsappMessage)}`;
     };
 
@@ -1128,7 +1124,8 @@ export default function Home({ lemons }) {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className={`${styles.button} ${styles.whatsappButton}`}
-                                style={{ pointerEvents: (!form.contact || orders.filter(o => o.grade && o.quantity && parseInt(o.quantity) > 0).length === 0) ? 'none' : 'auto', opacity: (!form.contact || orders.filter(o => o.grade && o.quantity && parseInt(o.quantity) > 0).length === 0) ? 0.6 : 1 }}
+                                // Disable WhatsApp button if validation fails or data missing
+                                style={{ pointerEvents: (!form.contact.trim() || orders.filter(o => o.grade && o.quantity && parseInt(o.quantity) > 0).length === 0) ? 'none' : 'auto', opacity: (!form.contact.trim() || orders.filter(o => o.grade && o.quantity && parseInt(o.quantity) > 0).length === 0) ? 0.6 : 1 }}
                             >
                                 <FaWhatsapp className={styles.whatsappIcon} /> Place Order on WhatsApp
                             </a>
