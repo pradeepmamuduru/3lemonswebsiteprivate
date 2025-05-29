@@ -154,16 +154,14 @@ export default function Home({ lemons }) {
         }
     }, [isLoggedIn, currentUser?.phone, fetchUserAddresses]);
 
-    // NEW: Effect to fetch orders when user logs in or currentUser changes
+    // NEW: Effect to fetch orders when user logs in or currentUser changes to 'yourOrders' tab
     const fetchUserOrders = useCallback(async (userName, userPhone) => {
         if (!userName || !userPhone) return;
         setIsFetchingOrders(true);
         setUserOrders([]); // Clear previous orders
         try {
-            // SheetDB supports searching by multiple fields, but it's an OR operation.
-            // For AND, we might need to fetch all and filter client-side, or make two calls.
-            // Let's assume name and contact are unique enough for this demo.
-            const res = await fetch(`${ORDERS_SUBMISSION_URL}?searchField=name&searchValue=${userName}&searchField=contact&searchValue=${userPhone}`);
+            // Fetch orders associated with the user's phone number
+            const res = await fetch(`${ORDERS_SUBMISSION_URL}?searchField=contact&searchValue=${userPhone}`);
             if (!res.ok && res.status !== 404 && res.status !== 204) {
                 throw new Error(`Failed to fetch orders: ${res.status} ${res.statusText}`);
             }
@@ -173,11 +171,14 @@ export default function Home({ lemons }) {
             }
 
             if (Array.isArray(ordersData)) {
-                // Group orders by a unique identifier (e.g., combination of name, contact, and order date)
-                // Since SheetDB returns individual line items, we'll group them into "orders"
-                // This is a simplified grouping. A robust backend would return grouped orders.
-                const groupedOrders = ordersData.reduce((acc, item) => {
-                    const orderKey = `${item.name}-${item.contact}-${item['Order Date']}`;
+                // Filter results client-side for the specific user's name (case-insensitive)
+                const relevantOrders = ordersData.filter(item =>
+                    item.name && item.name.toLowerCase() === userName.toLowerCase() && item.contact === userPhone
+                );
+
+                // Group orders by unique order identifier (e.g., combination of name, contact, and order date)
+                const groupedOrders = relevantOrders.reduce((acc, item) => {
+                    const orderKey = `${item.name}-${item.contact}-${item['Order Date']}`; // This assumes 'Order Date' includes time for uniqueness
                     if (!acc[orderKey]) {
                         acc[orderKey] = {
                             id: orderKey, // Unique ID for the grouped order
@@ -186,7 +187,7 @@ export default function Home({ lemons }) {
                             delivery: item.delivery,
                             orderDate: item['Order Date'],
                             items: [],
-                            total: 0,
+                            total: 0, // Will sum up items
                         };
                     }
                     acc[orderKey].items.push({
@@ -200,8 +201,8 @@ export default function Home({ lemons }) {
                     return acc;
                 }, {});
 
-                // Convert grouped object back to array
-                setUserOrders(Object.values(groupedOrders).sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate))); // Sort by date descending
+                // Convert grouped object back to array and sort by date descending
+                setUserOrders(Object.values(groupedOrders).sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate)));
             } else {
                 setUserOrders([]);
             }
@@ -581,6 +582,7 @@ export default function Home({ lemons }) {
         }
 
         try {
+            // Step 1: Search by phone number first
             const checkRes = await fetch(`${SIGNUP_SHEET_URL}?searchField=phone&searchValue=${phone}`);
             if (!checkRes.ok && checkRes.status !== 404 && checkRes.status !== 204) {
                 throw new Error(`Failed to check existing users during login: ${checkRes.status} ${checkRes.statusText}`);
@@ -595,7 +597,11 @@ export default function Home({ lemons }) {
                 existingUsers = [];
             }
 
-            const foundUser = existingUsers.find(user => user.phone === phone && user.name.toLowerCase() === name.toLowerCase());
+            // Step 2: Filter the results for a case-insensitive name match
+            const foundUser = existingUsers.find(user =>
+                user.phone === phone && user.name.toLowerCase() === name.toLowerCase()
+            );
+
             if (foundUser) {
                 login(foundUser); // Use login from AuthContext
                 showTemporaryFeedback(`Welcome back, ${foundUser.name}! 😊`, 'success');
@@ -1410,7 +1416,7 @@ export default function Home({ lemons }) {
                                 className={`${styles.tabButton} ${activeAccountTab === 'yourOrders' ? styles.active : ''}`}
                                 onClick={() => setActiveAccountTab('yourOrders')}
                             >
-                                Your Orders
+                                <FaBox style={{marginRight: '5px'}}/> Your Orders
                             </button>
                             <button
                                 className={`${styles.tabButton} ${activeAccountTab === 'feedback' ? styles.active : ''}`}
@@ -1660,6 +1666,11 @@ export default function Home({ lemons }) {
                             {activeAccountTab === 'feedback' && (
                                 <Fragment>
                                     <h3>Send Us Your Feedback</h3>
+                                    {feedback.message && (feedback.type === 'success' || feedback.type === 'error' || feedback.type === 'info') && (
+                                        <p className={`${styles.feedbackMessage} ${styles[`feedback${feedback.type.charAt(0).toUpperCase() + feedback.type.slice(1)}`]}`}>
+                                            {feedback.message}
+                                        </p>
+                                    )}
                                     {feedbackSubmittedMessage ? (
                                         <p className={styles.feedbackSuccessMessage}>{feedbackSubmittedMessage}</p>
                                     ) : (
@@ -1676,11 +1687,6 @@ export default function Home({ lemons }) {
                                                         disabled={isSubmittingFeedback}
                                                     ></textarea>
                                                 </div>
-                                                {feedback.message && feedback.type === 'error' && (
-                                                    <p className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
-                                                        {feedback.message}
-                                                    </p>
-                                                )}
                                                 <button type="submit" disabled={isSubmittingFeedback || !feedbackText.trim()}>
                                                     {isSubmittingFeedback ? 'Submitting...' : 'Submit Feedback'}
                                                 </button>
@@ -1731,7 +1737,7 @@ export async function getStaticProps() {
                         { id: 2, Grade: 'Meyer Lemon', 'Price Per Kg': 2.00, 'Image url': '/sliced-lemon.jpeg', Description: 'Sweeter, less acidic, ideal for desserts and garnishes.' },
                         { id: 3, Grade: 'Lisbon Lemon', 'Price Per Kg': 1.75, 'Image url': '/basket-of-lemons.jpeg', Description: 'Tart and tangy, great for cooking and zest.' },
                         { id: 4, Grade: 'Verna Lemon', 'Price Per Kg': 1.80, 'Image url': '/lemon-tree.jpeg', Description: 'Large and flavorful, excellent for juicing.' },
-                    ]
+                ]
                 },
                 revalidate: 30,
             };
