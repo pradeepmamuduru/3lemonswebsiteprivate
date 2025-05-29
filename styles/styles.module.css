@@ -3,89 +3,89 @@
     background-color: var(--light-bg-green);
     color: var(--text-dark);
     line-height: 1.6;
-    font-family: 'Inter', sans-serif; /* */
+    font-family: 'Inter', sans-serif;
     padding: 0;
     margin: 0;
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* */
+    min-height: 100vh;
 }
 
 /* Container for main content, centered with max-width */
 .container {
     max-width: 1200px;
-    margin: 0 auto; /* */
+    margin: 0 auto;
     padding: 40px 20px; /* Increased vertical padding */
     box-sizing: border-box;
-    flex-grow: 1; /* */
+    flex-grow: 1;
 }
 
 /* Section Titles - consistent styling for h2 tags */
 .sectionTitle {
     text-align: center;
     color: var(--primary-green);
-    font-size: 3rem; /* */
+    font-size: 3rem;
     margin-bottom: 50px; /* More space */
-    margin-top: 80px; /* */
-    font-weight: 800; /* Bolder */
-    letter-spacing: -0.5px; /* */
+    margin-top: 80px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
 }
 
 /* Header */
 .header {
     background-color: var(--card-bg);
-    padding: 20px 30px; /* */
+    padding: 20px 30px;
     border-bottom: 1px solid var(--border-light);
     display: flex;
     justify-content: space-between;
-    align-items: center; /* */
-    box-shadow: 0 4px 12px var(--shadow-color); /* Stronger shadow */
+    align-items: center;
+    box-shadow: 0 4px 12px var(--shadow-color);
     position: sticky;
     top: 0;
-    z-index: 500; /* */
+    z-index: 500;
 }
 
 .headerTitle {
-    font-size: 2rem; /* Slightly larger */
+    font-size: 2rem;
     color: var(--primary-green);
     margin: 0;
-    font-weight: 700; /* */
+    font-weight: 700;
 }
 
 .headerActions {
     display: flex;
     align-items: center;
-    gap: 20px; /* */
+    gap: 20px;
 }
 
 .loginButton {
     background-color: var(--accent-orange);
     color: var(--text-dark);
-    padding: 10px 22px; /* */
-    border-radius: 30px; /* More rounded */
+    padding: 10px 22px;
+    border-radius: 30px;
     border: none;
-    cursor: pointer; /* */
+    cursor: pointer;
     font-weight: bold;
-    font-size: 1rem; /* Slightly larger font */
+    font-size: 1rem;
     transition: background-color var(--transition-ease), transform var(--transition-ease);
-    display: flex; /* */
+    display: flex;
     align-items: center;
     gap: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Added button shadow */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 .loginButton:hover {
-    background-color: var(--accent-orange-dark); /* */
-    transform: translateY(-3px) scale(1.02); /* More noticeable hover */
-    box-shadow: 0 6px 12px rgba(0,0,0,0.3); /* */
+    background-color: var(--accent-orange-dark);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
 }
 
 .hamburgerIcon {
-    font-size: 2rem; /* Larger icon */
+    font-size: 2rem;
     color: var(--text-dark);
     cursor: pointer;
-    display: none; /* */
+    display: none;
 }
 
 
@@ -93,233 +93,233 @@
 .hero {
     position: relative;
     width: 100%;
-    height: 450px; /* */
+    height: 450px;
     overflow: hidden;
     border-radius: var(--border-radius-large);
     display: flex;
     align-items: center;
     justify-content: center;
-    text-align: center; /* */
-    margin-bottom: 60px; /* More space below hero */
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2); /* */
+    text-align: center;
+    margin-bottom: 60px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
 .heroImage {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: brightness(0.65); /* */
+    filter: brightness(0.65);
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 1; /* */
+    z-index: 1;
 }
 
 .heroOverlay {
     position: relative;
     z-index: 2;
     color: white;
-    padding: 30px; /* */
-    max-width: 900px; /* Wider text area */
+    padding: 30px;
+    max-width: 900px;
 }
 
 .heroTitle {
-    font-size: 4.5rem; /* */
+    font-size: 4.5rem;
     margin-bottom: 20px;
-    font-weight: 900; /* */
-    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.6); /* */
+    font-weight: 900;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.6);
 }
 
 .heroSubtitle {
-    font-size: 1.8rem; /* Larger subtitle */
-    margin-bottom: 40px; /* */
+    font-size: 1.8rem;
+    margin-bottom: 40px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .heroButton {
     background-color: var(--accent-orange);
     color: var(--text-dark);
-    padding: 15px 35px; /* */
+    padding: 15px 35px;
     border-radius: 50px;
     text-decoration: none;
     font-weight: bold;
-    font-size: 1.2rem; /* */
+    font-size: 1.2rem;
     transition: background-color var(--transition-ease), transform var(--transition-ease), box-shadow var(--transition-ease);
-    display: inline-block; /* */
-    box-shadow: 0 6px 12px rgba(0,0,0,0.3); /* Button shadow */
+    display: inline-block;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
 }
 
 .heroButton:hover {
     background-color: var(--accent-orange-dark);
-    transform: translateY(-4px) scale(1.03); /* */
-    box-shadow: 0 8px 16px rgba(0,0,0,0.4); /* */
+    transform: translateY(-4px) scale(1.03);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.4);
 }
 
 /* Lemon Products Section */
 .lemonsSection {
-    padding: 60px 0; /* */
+    padding: 60px 0;
 }
 
 .lemonsGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 40px; /* */
+    gap: 40px;
     padding: 0 20px;
 }
 
 .lemonCard {
     background-color: var(--card-bg);
-    border-radius: var(--border-radius-large); /* */
-    box-shadow: 0 6px 20px var(--shadow-color); /* Stronger shadow */
-    overflow: hidden; /* */
+    border-radius: var(--border-radius-large);
+    box-shadow: 0 6px 20px var(--shadow-color);
+    overflow: hidden;
     transition: transform var(--transition-ease), box-shadow var(--transition-ease), border-color var(--transition-ease);
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding-bottom: 25px; /* */
-    border: 2px solid transparent; /* */
+    padding-bottom: 25px;
+    border: 2px solid transparent;
 }
 
 .lemonCard:hover {
-    transform: translateY(-8px); /* */
-    box-shadow: 0 12px 25px var(--shadow-strong); /* Enhances shadow on hover */
-    border-color: var(--primary-green); /* Green border on hover */
+    transform: translateY(-8px);
+    box-shadow: 0 12px 25px var(--shadow-strong);
+    border-color: var(--primary-green);
 }
 
 .cardImage {
     width: 100%;
-    height: 220px; /* */
+    height: 220px;
     object-fit: cover;
     border-bottom: 1px solid var(--border-light);
-    margin-bottom: 20px; /* */
-    border-top-left-radius: var(--border-radius-medium); /* Rounded image top corners */
-    border-top-right-radius: var(--border-radius-medium); /* */
+    margin-bottom: 20px;
+    border-top-left-radius: var(--border-radius-medium);
+    border-top-right-radius: var(--border-radius-medium);
 }
 
 .cardTitle {
-    font-size: 1.6rem; /* Larger title */
+    font-size: 1.6rem;
     font-weight: bold;
     color: var(--primary-green);
-    margin-bottom: 12px; /* */
+    margin-bottom: 12px;
     padding: 0 20px;
 }
 
 .cardDescription {
-    font-size: 1rem; /* Slightly larger description */
-    color: var(--text-medium); /* */
+    font-size: 1rem;
+    color: var(--text-medium);
     padding: 0 20px;
 }
 
 /* Adjustments for "Add Another Variety" button in form */
 .addVarietyButton {
-    background-color: var(--lemon-yellow); /* */
+    background-color: var(--lemon-yellow);
     color: var(--text-dark);
     border: 1px solid var(--border-medium);
-    padding: 10px 15px; /* Slightly larger */
+    padding: 10px 15px;
     font-size: 1em;
-    border-radius: var(--border-radius-medium); /* */
+    border-radius: var(--border-radius-medium);
     cursor: pointer;
     transition: background-color var(--transition-ease), transform var(--transition-ease);
     display: flex;
     align-items: center;
-    justify-content: center; /* */
-    height: 44px; /* More substantial */
-    width: auto; /* */
-    min-width: 180px; /* Minimum width */
-    margin-left: 0; /* */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* */
+    justify-content: center;
+    height: 44px;
+    width: auto;
+    min-width: 180px;
+    margin-left: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .addVarietyButton:hover {
-    background-color: #FFD220; /* Slightly darker yellow */
-    transform: translateY(-2px); /* */
+    background-color: #FFD220;
+    transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
 /* Adjustments for "Remove" button in form */
 .removeVarietyButton {
-    background-color: var(--red-danger); /* */
+    background-color: var(--red-danger);
     color: white;
     border: none;
-    padding: 10px; /* */
-    font-size: 1.1em; /* Larger icon */
-    border-radius: var(--border-radius-medium); /* */
+    padding: 10px;
+    font-size: 1.1em;
+    border-radius: var(--border-radius-medium);
     cursor: pointer;
     transition: background-color var(--transition-ease), transform var(--transition-ease);
     display: flex;
     align-items: center;
-    justify-content: center; /* */
+    justify-content: center;
     height: 44px;
     width: 44px;
-    margin-left: 15px; /* More space */
+    margin-left: 15px;
     flex-shrink: 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .removeVarietyButton:hover {
     background-color: var(--red-danger-dark);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
 /* For square buttons with only an icon, ensure the icon is centered */
 .addVarietyButton svg,
 .removeVarietyButton svg {
-    font-size: 1.2em; /* */
+    font-size: 1.2em;
 }
 
 
 /* Form Section - UPDATED BACKGROUND FOR CONTRAST */
 .formSection {
-    background-color: var(--lemon-cream); /* */
-    padding: 60px 40px; /* */
+    background-color: var(--lemon-cream);
+    padding: 60px 40px;
     border-radius: var(--border-radius-large);
-    margin-top: 80px; /* */
-    box-shadow: 0 10px 30px var(--shadow-strong); /* */
+    margin-top: 80px;
+    box-shadow: 0 10px 30px var(--shadow-strong);
 }
 
 .form {
     max-width: 700px;
-    margin: 0 auto; /* */
+    margin: 0 auto;
 }
 
 /* Grid for grouping personal details inputs */
 .inputGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 25px; /* */
+    gap: 25px;
     margin-bottom: 35px;
 }
 
 .formGroup {
-    margin-bottom: 25px; /* */
+    margin-bottom: 25px;
 }
 
 .label {
     display: block;
     font-weight: bold;
-    margin-bottom: 10px; /* */
+    margin-bottom: 10px;
     color: var(--text-dark);
-    font-size: 1.15rem; /* */
+    font-size: 1.15rem;
 }
 
 .input,
 .select {
     width: 100%;
-    padding: 14px; /* */
+    padding: 14px;
     border: 1px solid var(--border-medium);
     border-radius: var(--border-radius-medium);
-    font-size: 1.05rem; /* */
+    font-size: 1.05rem;
     box-sizing: border-box;
-    transition: border-color var(--transition-ease), box-shadow var(--transition-ease); /* */
+    transition: border-color var(--transition-ease), box-shadow var(--transition-ease);
 }
 
 .input:focus,
 .select:focus {
     border-color: var(--primary-green);
-    box-shadow: 0 0 0 4px rgba(102, 187, 106, 0.3); /* */
-    outline: none; /* */
+    box-shadow: 0 0 0 4px rgba(102, 187, 106, 0.3);
+    outline: none;
 }
 
 /* Discount Note specific styling */
@@ -327,20 +327,20 @@
     color: var(--red-danger);
     font-weight: bold;
     margin-left: 10px;
-    font-size: 0.95em; /* */
+    font-size: 0.95em;
 }
 
 /* Order Summary (Total Price) */
 .orderSummary {
-    margin: 40px 0; /* */
+    margin: 40px 0;
     font-weight: bold;
-    font-size: 28px; /* Larger total */
-    text-align: right; /* */
+    font-size: 28px;
+    text-align: right;
     color: var(--text-dark); /* Changed for better contrast against lemon-cream background */
 }
 
 .orderSummary h3 {
-    margin: 0; /* */
+    margin: 0;
 }
 
 /* Common Button Styles */
@@ -349,37 +349,37 @@
     width: 100%;
     background-color: var(--primary-green);
     color: white;
-    border: none; /* */
-    padding: 14px 25px; /* Larger padding */
+    border: none;
+    padding: 14px 25px;
     border-radius: var(--border-radius-medium);
     cursor: pointer;
-    margin-bottom: 20px; /* */
-    font-size: 1.15rem; /* Larger font */
-    font-weight: bold; /* */
+    margin-bottom: 20px;
+    font-size: 1.15rem;
+    font-weight: bold;
     text-decoration: none;
     text-align: center;
     transition: background-color var(--transition-ease), transform var(--transition-ease), box-shadow var(--transition-ease);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 .button:hover {
     background-color: var(--primary-green-dark);
-    transform: translateY(-3px) scale(1.01); /* */
-    box-shadow: 0 6px 12px rgba(0,0,0,0.3); /* */
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
 }
 
 .button:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
     opacity: 0.7;
-    box-shadow: none; /* */
-    transform: none; /* */
+    box-shadow: none;
+    transform: none;
 }
 
 /* Specific WhatsApp Button Styling */
 .whatsappButton {
     background-color: var(--whatsapp-green-official);
-    display: flex; /* */
+    display: flex;
     align-items: center;
     justify-content: center;
 }
@@ -389,28 +389,28 @@
 }
 
 .whatsappIcon {
-    margin-right: 10px; /* */
+    margin-right: 10px;
     font-size: 1.3em;
-    vertical-align: middle; /* */
+    vertical-align: middle;
 }
 
 /* Feedback Message Display styles */
 .feedbackMessage {
     text-align: center;
-    margin-top: 20px; /* */
+    margin-top: 20px;
     margin-bottom: 20px;
-    padding: 15px; /* More padding */
-    border-radius: var(--border-radius-medium); /* */
+    padding: 15px;
+    border-radius: var(--border-radius-medium);
     font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px; /* */
+    gap: 10px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .feedbackSuccess {
-    background-color: #D4EDDA; /* */
+    background-color: #D4EDDA;
     color: #155724;
     border: 1px solid #C3E6CB;
 }
@@ -418,78 +418,78 @@
 .feedbackError {
     background-color: #F8D7DA;
     color: #721C24;
-    border: 1px solid #F5C6CB; /* */
+    border: 1px solid #F5C6CB;
 }
 
 .feedbackInfo {
     background-color: #D1ECF1;
     color: #0C5460;
-    border: 1px solid #BEE5EB; /* */
+    border: 1px solid #BEE5EB;
 }
 
 
 /* Customer Reviews Section */
 .reviewsSection {
-    background-color: var(--secondary-green); /* */
-    padding: 80px 20px; /* */
-    margin-top: 80px; /* More space */
-    border-radius: var(--border-radius-large); /* */
+    background-color: var(--secondary-green);
+    padding: 80px 20px;
+    margin-top: 80px;
+    border-radius: var(--border-radius-large);
     box-shadow: 0 10px 30px var(--shadow-strong);
 }
 
 .reviewsGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 40px; /* */
+    gap: 40px;
     padding: 0 20px;
 }
 
 .reviewCard {
     background-color: var(--card-bg);
-    padding: 35px; /* */
+    padding: 35px;
     border-radius: var(--border-radius-large);
     box-shadow: 0 6px 20px var(--shadow-color);
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* */
+    justify-content: space-between;
     text-align: center;
     transition: transform var(--transition-ease), box-shadow var(--transition-ease), border-color var(--transition-ease);
     border: 2px solid transparent;
 }
 
 .reviewCard:hover {
-    transform: translateY(-8px); /* */
+    transform: translateY(-8px);
     box-shadow: 0 12px 25px var(--shadow-strong);
-    border-color: var(--accent-orange); /* Orange border on hover */
+    border-color: var(--accent-orange);
 }
 
 .reviewText {
-    font-style: italic; /* */
+    font-style: italic;
     margin-bottom: 25px;
     color: var(--text-medium);
-    font-size: 1.1rem; /* Slightly larger text */
+    font-size: 1.1rem;
 }
 
 .reviewerName {
     font-weight: bold;
-    color: var(--primary-green); /* */
-    font-size: 1.2rem; /* Larger name */
+    color: var(--primary-green);
+    font-size: 1.2rem;
     margin-top: 15px;
 }
 
 .reviewerRating {
     color: var(--accent-orange);
-    font-size: 1.4rem; /* */
+    font-size: 1.4rem;
     margin-bottom: 12px;
 }
 
 /* Footer Styles */
 .footer {
-    text-align: center; /* */
-    margin-top: 60px; /* More space */
-    padding: 40px 20px; /* */
-    font-size: 1rem; /* Slightly larger font */
-    color: var(--text-medium); /* */
+    text-align: center;
+    margin-top: 60px;
+    padding: 40px 20px;
+    font-size: 1rem;
+    color: var(--text-medium);
     background-color: var(--secondary-green);
     border-top: 1px solid var(--border-medium);
 }
@@ -497,7 +497,7 @@
 .footer a {
     color: var(--primary-green);
     text-decoration: none;
-    font-weight: bold; /* */
+    font-weight: bold;
 }
 
 .footer a:hover {
@@ -507,37 +507,37 @@
 /* MODAL STYLES */
 .modalOverlay {
     position: fixed;
-    top: 0; /* */
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.75); /* */
+    background-color: rgba(0, 0, 0, 0.75);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
     opacity: 0;
-    visibility: hidden; /* */
+    visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .modalOverlay.visible {
     opacity: 1;
-    visibility: visible; /* */
+    visibility: visible;
 }
 
 .modalContent {
     background-color: var(--card-bg);
-    padding: 40px; /* More padding */
-    border-radius: var(--border-radius-large); /* */
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); /* Stronger shadow */
-    max-width: 550px; /* */
+    padding: 40px;
+    border-radius: var(--border-radius-large);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    max-width: 550px;
     width: 90%;
     text-align: center;
     position: relative;
-    transform: translateY(30px); /* */
+    transform: translateY(30px);
     opacity: 0;
-    transition: transform 0.4s ease-out, opacity 0.4s ease-out; /* */
+    transition: transform 0.4s ease-out, opacity 0.4s ease-out;
 }
 
 .modalOverlay.visible .modalContent {
@@ -547,16 +547,16 @@
 
 .modalTitle {
     color: var(--primary-green);
-    font-size: 2.5rem; /* */
+    font-size: 2.5rem;
     margin-bottom: 25px;
 }
 
 .modalText {
-    font-size: 1.15rem; /* */
+    font-size: 1.15rem;
     line-height: 1.8;
     color: var(--text-medium);
     margin-bottom: 30px;
-    text-align: left; /* */
+    text-align: left;
 }
 
 .modalText strong {
@@ -566,60 +566,60 @@
 .modalText ul {
     list-style: none;
     padding: 0;
-    margin-top: 15px; /* */
+    margin-top: 15px;
 }
 
 .modalText ul li {
     margin-bottom: 8px;
-    color: var(--text-dark); /* */
+    color: var(--text-dark);
 }
 
 .modalButtons {
     display: flex;
     justify-content: center;
-    gap: 20px; /* */
+    gap: 20px;
     margin-top: 35px;
 }
 
 .modalButton {
     background-color: var(--primary-green);
-    color: white; /* */
-    padding: 14px 30px; /* Larger padding */
+    color: white;
+    padding: 14px 30px;
     border-radius: var(--border-radius-medium);
     border: none;
     cursor: pointer;
-    font-size: 1.1rem; /* */
+    font-size: 1.1rem;
     font-weight: bold;
-    transition: background-color var(--transition-ease), transform var(--transition-ease), box-shadow var(--transition-ease); /* */
+    transition: background-color var(--transition-ease), transform var(--transition-ease), box-shadow var(--transition-ease);
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 .modalButton:hover {
     background-color: var(--primary-green-dark);
     transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.3); /* */
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
 }
 
 .modalButton.cancel {
     background-color: var(--border-medium);
     color: var(--text-dark);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.15); /* */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
 
 .modalButton.cancel:hover {
-    background-color: #A0A0A0; /* Darker gray */
+    background-color: #A0A0A0;
 }
 
 .modalCloseButton {
     position: absolute;
-    top: 20px; /* */
-    right: 20px; /* More inward */
+    top: 20px;
+    right: 20px;
     background: none;
-    border: none; /* */
-    font-size: 2.2rem; /* Larger icon */
+    border: none;
+    font-size: 2.2rem;
     cursor: pointer;
     color: var(--text-medium);
-    transition: color 0.2s ease; /* */
+    transition: color 0.2s ease;
 }
 
 .modalCloseButton:hover {
@@ -628,10 +628,10 @@
 
 /* Specific styles for the success page/modal */
 .successPage {
-    background-color: var(--light-bg-green); /* */
-    padding: 60px 40px; /* More padding */
+    background-color: var(--light-bg-green);
+    padding: 60px 40px;
     border-radius: var(--border-radius-large);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25); /* */
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
     max-width: 650px;
     width: 90%;
     text-align: center;
@@ -641,16 +641,16 @@
 }
 
 .successTitle {
-    color: var(--primary-green); /* */
-    font-size: 3.2rem; /* Larger title */
+    color: var(--primary-green);
+    font-size: 3.2rem;
     margin-bottom: 30px;
     font-weight: 800;
 }
 
 .successMessage {
-    font-size: 1.6rem; /* */
+    font-size: 1.6rem;
     color: var(--text-dark);
-    margin-bottom: 35px; /* */
+    margin-bottom: 35px;
 }
 
 /* Account Sidebar Styles */
@@ -659,30 +659,30 @@
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0; /* */
+    bottom: 0;
     background-color: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: flex-end;
     z-index: 1000;
     opacity: 0;
-    visibility: hidden; /* */
+    visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .accountSidebarOverlay.visible {
     opacity: 1;
-    visibility: visible; /* */
+    visibility: visible;
 }
 
 .accountSidebar {
     background-color: var(--card-bg);
     width: 100%;
-    max-width: 480px; /* */
-    box-shadow: -8px 0 20px rgba(0, 0, 0, 0.3); /* */
+    max-width: 480px;
+    box-shadow: -8px 0 20px rgba(0, 0, 0, 0.3);
     transform: translateX(100%);
     transition: transform 0.3s ease-out;
     display: flex;
-    flex-direction: column; /* */
+    flex-direction: column;
 }
 
 .accountSidebar.open {
@@ -693,23 +693,23 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 25px; /* */
+    padding: 25px;
     border-bottom: 1px solid var(--border-light);
 }
 
 .sidebarTitle {
     margin: 0;
-    color: var(--primary-green); /* */
-    font-size: 2rem; /* Larger title */
+    color: var(--primary-green);
+    font-size: 2rem;
 }
 
 .sidebarCloseButton {
     background: none;
     border: none;
-    font-size: 2.2rem; /* */
+    font-size: 2.2rem;
     cursor: pointer;
     color: var(--text-medium);
-    transition: color 0.2s ease; /* */
+    transition: color 0.2s ease;
 }
 
 .sidebarCloseButton:hover {
@@ -718,41 +718,41 @@
 
 .sidebarTabs {
     display: flex;
-    border-bottom: 1px solid var(--border-light); /* */
+    border-bottom: 1px solid var(--border-light);
 }
 
 .tabButton {
     flex: 1;
-    padding: 18px 0; /* More padding */
-    background-color: transparent; /* */
+    padding: 18px 0;
+    background-color: transparent;
     border: none;
-    border-bottom: 4px solid transparent; /* Thicker active indicator */
+    border-bottom: 4px solid transparent;
     cursor: pointer;
-    font-size: 1.15rem; /* */
+    font-size: 1.15rem;
     font-weight: bold;
     color: var(--text-medium);
     transition: all 0.3s ease;
-    display: flex; /* */
+    display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px; /* */
+    gap: 8px;
 }
 
 .tabButton:hover {
     color: var(--primary-green);
-    background-color: #f8f8f8; /* */
+    background-color: #f8f8f8;
 }
 
 .tabButton.active {
     color: var(--primary-green);
     border-bottom-color: var(--primary-green);
-    background-color: var(--light-bg-green); /* */
+    background-color: var(--light-bg-green);
 }
 
 .tabContent {
-    padding: 30px; /* More padding */
+    padding: 30px;
     flex-grow: 1;
-    overflow-y: auto; /* */
+    overflow-y: auto;
 }
 
 /* Account Details Form */
@@ -761,7 +761,7 @@
 }
 
 .accountDetailsForm .input {
-    margin-bottom: 20px; /* */
+    margin-bottom: 20px;
 }
 
 .accountDetailsForm .button {
@@ -770,7 +770,7 @@
 
 /* Address List */
 .addressList {
-    margin-top: 25px; /* */
+    margin-top: 25px;
 }
 
 .addressList ul {
@@ -780,47 +780,47 @@
 }
 
 .addressItem {
-    background-color: #f9f9f9; /* */
+    background-color: #f9f9f9;
     border: 1px solid var(--border-light);
     border-radius: var(--border-radius-medium);
-    padding: 20px; /* More padding */
-    margin-bottom: 15px; /* */
+    padding: 20px;
+    margin-bottom: 15px;
     position: relative;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .addressItem strong {
     color: var(--text-dark);
-    font-size: 1.15em; /* */
+    font-size: 1.15em;
     display: block;
     margin-bottom: 8px;
 }
 
 .addressItem p {
-    margin: 4px 0; /* */
+    margin: 4px 0;
     color: var(--text-medium);
     line-height: 1.5;
 }
 
 .addressActions {
-    margin-top: 15px; /* More space */
-    display: flex; /* */
-    gap: 10px; /* More space */
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
 }
 
 .addressActions button {
-    padding: 8px 15px; /* */
+    padding: 8px 15px;
     border: none;
     border-radius: var(--border-radius-small);
     cursor: pointer;
     font-size: 0.95em;
-    transition: background-color var(--transition-ease); /* */
+    transition: background-color var(--transition-ease);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .addressActions button:nth-child(1) { /* Edit button */
     background-color: var(--primary-green);
-    color: white; /* */
+    color: white;
 }
 
 .addressActions button:nth-child(1):hover {
@@ -828,7 +828,7 @@
 }
 
 .addressActions button:nth-child(2) { /* Delete button */
-    background-color: var(--red-danger); /* */
+    background-color: var(--red-danger);
     color: white;
 }
 
@@ -838,61 +838,61 @@
 
 .addAddressButton {
     background-color: var(--blue-info);
-    color: white; /* */
-    padding: 12px 18px; /* More padding */
+    color: white;
+    padding: 12px 18px;
     border-radius: var(--border-radius-medium);
     border: none;
     cursor: pointer;
     display: flex;
-    align-items: center; /* */
-    gap: 8px; /* More space */
-    font-size: 1rem; /* Slightly larger */
-    margin-top: 25px; /* */
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    margin-top: 25px;
     width: fit-content;
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 .addAddressButton:hover {
     background-color: var(--blue-info-dark);
-    transform: translateY(-2px) scale(1.01); /* */
+    transform: translateY(-2px) scale(1.01);
     box-shadow: 0 6px 12px rgba(0,0,0,0.3);
 }
 
 .addressForm {
     margin-top: 25px;
     padding-top: 25px;
-    border-top: 1px solid var(--border-light); /* */
+    border-top: 1px solid var(--border-light);
 }
 
 .addressForm .formButtons {
     display: flex;
     justify-content: flex-end;
     gap: 15px;
-    margin-top: 20px; /* */
+    margin-top: 20px;
 }
 
 /* Feedback Section */
 .feedbackForm {
     display: flex;
     flex-direction: column;
-    gap: 20px; /* */
+    gap: 20px;
     margin-top: 25px;
 }
 
 .feedbackForm textarea {
     width: 100%;
-    padding: 12px; /* */
+    padding: 12px;
     border: 1px solid var(--border-medium);
     border-radius: var(--border-radius-medium);
-    min-height: 120px; /* Taller textarea */
+    min-height: 120px;
     resize: vertical;
-    box-sizing: border-box; /* */
+    box-sizing: border-box;
     font-size: 1rem;
 }
 
 .feedbackForm textarea:focus {
     border-color: var(--primary-green);
-    box-shadow: 0 0 0 4px rgba(102, 187, 106, 0.3); /* */
+    box-shadow: 0 0 0 4px rgba(102, 187, 106, 0.3);
     outline: none;
 }
 
@@ -901,17 +901,17 @@
     padding: 12px 25px;
     background-color: var(--blue-info);
     color: white;
-    border: none; /* */
+    border: none;
     border-radius: var(--border-radius-medium);
     cursor: pointer;
     transition: background-color var(--transition-ease), transform var(--transition-ease);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 .feedbackForm button:hover {
     background-color: var(--blue-info-dark);
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.3); /* */
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
 }
 
 .feedbackSuccessMessage {
@@ -919,7 +919,7 @@
     color: var(--primary-green);
     margin-top: 25px;
     font-weight: bold;
-    font-size: 1.1rem; /* */
+    font-size: 1.1rem;
 }
 
 /* Orders List (New) */
@@ -928,55 +928,55 @@
 }
 
 .orderCard {
-    background-color: #f9f9f9; /* */
+    background-color: #f9f9f9;
     border: 1px solid var(--border-light);
     border-radius: var(--border-radius-medium);
     padding: 20px;
-    margin-bottom: 20px; /* */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* */
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     transition: transform var(--transition-ease), box-shadow var(--transition-ease);
 }
 
 .orderCard:hover {
-    transform: translateY(-4px); /* */
+    transform: translateY(-4px);
     box-shadow: 0 6px 15px rgba(0,0,0,0.12);
 }
 
 .orderCard h4 {
-    color: var(--primary-green); /* */
+    color: var(--primary-green);
     margin-top: 0;
-    margin-bottom: 12px; /* More space */
-    font-size: 1.3rem; /* */
-    border-bottom: 2px solid var(--primary-green); /* Green underline */
-    padding-bottom: 8px; /* */
+    margin-bottom: 12px;
+    font-size: 1.3rem;
+    border-bottom: 2px solid var(--primary-green);
+    padding-bottom: 8px;
 }
 
 .orderCard p {
-    margin: 6px 0; /* */
+    margin: 6px 0;
     color: var(--text-medium);
     line-height: 1.5;
 }
 
 .orderCard ul {
-    list-style: none; /* */
+    list-style: none;
     padding: 0;
-    margin: 15px 0; /* More vertical spacing */
-    border-top: 1px dashed var(--border-medium); /* */
-    padding-top: 15px; /* */
+    margin: 15px 0;
+    border-top: 1px dashed var(--border-medium);
+    padding-top: 15px;
 }
 
 .orderCard ul li {
     margin-bottom: 8px;
     color: var(--text-dark);
-    font-size: 0.95rem; /* */
+    font-size: 0.95rem;
 }
 
 .orderCard .totalPrice {
     font-weight: bold;
     color: var(--primary-green);
-    font-size: 1.25rem; /* */
+    font-size: 1.25rem;
     margin-top: 15px;
-    text-align: right; /* */
+    text-align: right;
 }
 
 /* Responsive Adjustments using Media Queries */
@@ -984,66 +984,66 @@
 /* For tablets and larger phones (min-width: 768px) */
 @media (min-width: 768px) {
     .hero {
-        height: 550px; /* */
+        height: 550px;
     }
 
     .heroTitle {
-        font-size: 5.5rem; /* */
+        font-size: 5.5rem;
     }
 
     .heroSubtitle {
-        font-size: 2rem; /* */
+        font-size: 2rem;
     }
 
     .lemonsGrid, .reviewsGrid {
-        grid-template-columns: repeat(3, 1fr); /* */
+        grid-template-columns: repeat(3, 1fr);
     }
 
     .actions {
         display: flex;
         justify-content: center;
-        gap: 20px; /* */
+        gap: 20px;
     }
 
     .actions .button {
-        width: auto; /* */
+        width: auto;
         display: inline-flex;
         margin-bottom: 0;
     }
 
     .form {
-        padding: 40px; /* */
+        padding: 40px;
     }
 
     .modalContent {
-        padding: 50px; /* */
+        padding: 50px;
     }
 
     .hamburgerIcon {
-        display: none; /* */
+        display: none;
     }
 }
 
 /* For large desktops (min-width: 1024px) */
 @media (min-width: 1024px) {
     .hero {
-        height: 650px; /* */
+        height: 650px;
     }
 
     .heroTitle {
-        font-size: 6.5rem; /* */
+        font-size: 6.5rem;
     }
 }
 
 /* Mobile specific adjustments */
 @media (max-width: 767px) {
     .headerTitle {
-        font-size: 1.8rem; /* */
+        font-size: 1.8rem;
     }
 
     .loginButton {
         padding: 8px 15px;
-        font-size: 0.9rem; /* */
+        font-size: 0.9rem;
     }
 
     .hamburgerIcon {
@@ -1051,22 +1051,22 @@
     }
 
     .headerActions {
-        gap: 15px; /* */
+        gap: 15px;
     }
 
     .accountSidebar {
-        max-width: 100%; /* */
+        max-width: 100%;
     }
 
     .formSection {
-        padding: 40px 20px; /* */
+        padding: 40px 20px;
     }
 
     .orderCard h4 {
-        font-size: 1.1rem; /* */
+        font-size: 1.1rem;
     }
 
     .orderCard p {
-        font-size: 0.9rem; /* */
+        font-size: 0.9rem;
     }
 }
