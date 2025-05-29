@@ -5,7 +5,8 @@
     --primary-green: #4CAF50; /* A fresh, vibrant green for main accents, buttons, titles */
     --secondary-green: #8BC34A; /* A slightly lighter green for softer accents, form sections */
     --light-bg-green: #F0F8F0; /* Very light green for the overall page background */
-    --lemon-yellow: #FFEB3B; /* Bright, zesty yellow for highlights */
+    --lemon-yellow: #FFEB3B; /* Bright, zesty yellow for highlights, "add variety" button */
+    --lemon-cream: #FFFDD0; /* NEW: A soft, creamy yellow for contrasting backgrounds like the order form */
     --accent-orange: #FFC107; /* Warm orange/yellow for hero buttons, stars (from original) */
     --text-dark: #333333; /* Dark charcoal for primary text */
     --text-medium: #555555; /* Medium gray for secondary text */
