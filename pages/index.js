@@ -21,7 +21,7 @@ const useTemporaryFeedback = () => {
     const feedbackTimeoutRef = useRef(null);
 
     const showTemporaryFeedback = useCallback((message, type = 'info', duration = 3000) => {
-        setFeedback({ message, type });
+        setFeedback({ message, type }); // This setFeedback is local to the hook
         if (feedbackTimeoutRef.current) {
             clearTimeout(feedbackTimeoutRef.current);
         }
@@ -30,7 +30,8 @@ const useTemporaryFeedback = () => {
         }, duration);
     }, []);
 
-    return [feedback, showTemporaryFeedback];
+    // FIX: Return setFeedback as well, so it can be directly used for clearing/resetting from parent
+    return [feedback, showTemporaryFeedback, setFeedback]; // <--- CRITICAL CHANGE 1: EXPOSE setFeedback
 };
 
 
@@ -45,7 +46,8 @@ export default function Home({ lemons }) {
     const [total, setTotal] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const [feedback, showTemporaryFeedback] = useTemporaryFeedback();
+    // FIX: Destructure setFeedback from the hook
+    const [feedback, showTemporaryFeedback, setFeedback] = useTemporaryFeedback(); // <--- CRITICAL CHANGE 2: DESTRUCTURE setFeedback
 
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [confirmedOrderDetails, setConfirmedOrderDetails] = useState(null);
@@ -66,7 +68,8 @@ export default function Home({ lemons }) {
     const [addressForm, setAddressForm] = useState({ id: null, addressName: '', fullAddress: '', pincode: '' });
     const [showAddressForm, setShowAddressForm] = useState(false);
 
-    const [feedbackText, setFeedbackText] = useState('');
+    // Renamed to avoid direct conflict, though with the fix above, it's less critical now
+    const [feedbackText, setFeedbackText_Local] = useState('');
     const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
 
     const [userOrders, setUserOrders] = useState([]);
@@ -90,27 +93,27 @@ export default function Home({ lemons }) {
     const openLoginModal = () => {
         setShowLoginModal(true);
         setLoginForm({ name: '', phone: '' });
-        setFeedback({ message: '', type: '' }); // Clear any previous feedback
+        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
     };
 
     const closeLoginModal = () => {
         setShowLoginModal(false);
         setLoginForm({ name: '', phone: '' });
-        setFeedback({ message: '', type: '' });
+        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
     };
 
     const openSignUpModal = () => {
         console.log('openSignUpModal called. Setting showSignUpModal to true.'); // DEBUG LOG
         setShowSignUpModal(true);
         setSignUpForm({ name: '', phone: '', address: '', pincode: '' });
-        setFeedback({ message: '', type: '' });
+        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
     };
 
     const closeSignUpModal = () => {
         console.log('closeSignUpModal called. Setting showSignUpModal to false.'); // DEBUG LOG
         setShowSignUpModal(false);
         setSignUpForm({ name: '', phone: '', address: '', pincode: '' });
-        setFeedback({ message: '', type: '' });
+        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
     };
 
     const toggleSidebar = () => {
@@ -119,13 +122,13 @@ export default function Home({ lemons }) {
             if (!isSidebarOpen) {
                 // When closing sidebar, reset tab and other states
                 setActiveAccountTab('accountDetails');
-                setFeedback({ message: '', type: '' });
+                setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
                 if (currentUser) {
                     setAccountDetailsForm(currentUser);
                 }
                 setShowAddressForm(false);
                 setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' });
-                setFeedbackText('');
+                setFeedbackText_Local(''); // Use local setFeedbackText
                 setUserOrders([]);
             }
         } else {
@@ -148,7 +151,7 @@ export default function Home({ lemons }) {
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
         setIsLoggingIn(true);
-        setFeedback({ message: '', type: '' }); // Clear feedback before new attempt
+        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
 
         const { name, phone } = loginForm;
         const trimmedName = name.trim();
@@ -232,7 +235,7 @@ export default function Home({ lemons }) {
     const handleSignUpSubmit = async (e) => {
         e.preventDefault();
         setIsSigningUp(true);
-        setFeedback({ message: '', type: '' });
+        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
 
         const { name, phone, address, pincode } = signUpForm;
         const trimmedName = name.trim();
@@ -362,7 +365,7 @@ export default function Home({ lemons }) {
         }
 
         setIsUpdatingAccount(true);
-        setFeedback({ message: '', type: '' });
+        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
 
         const { name, address, pincode } = accountDetailsForm;
         const trimmedName = name.trim();
@@ -483,7 +486,7 @@ export default function Home({ lemons }) {
     const handleSaveAddress = async (e) => {
         e.preventDefault();
         setIsManagingAddresses(true);
-        setFeedback({ message: '', type: '' });
+        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
 
         if (!currentUser || !currentUser.phone) {
             showTemporaryFeedback('Please log in to save addresses.', 'error');
@@ -569,7 +572,7 @@ export default function Home({ lemons }) {
     const handleDeleteAddress = async (addressId) => {
         if (!window.confirm('Are you sure you want to delete this address?')) return;
         setIsManagingAddresses(true);
-        setFeedback({ message: '', type: '' });
+        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
         try {
             // Delete by 'id' in Addresses sheet
             const deleteUrl = `${ADDRESSES_SHEET_URL.split('?')[0]}/id/${addressId}?sheet=Addresses`;
@@ -607,14 +610,14 @@ export default function Home({ lemons }) {
 
     // --- Feedback Submission ---
     const handleFeedbackTextChange = (e) => {
-        setFeedbackText(e.target.value);
-        setFeedback({ message: '', type: '' });
+        setFeedbackText_Local(e.target.value); // Use local setFeedbackText
+        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
     };
 
     const handleSubmitFeedback = async (e) => {
         e.preventDefault();
         setIsSubmittingFeedback(true);
-        setFeedback({ message: '', type: '' });
+        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
 
         if (!feedbackText.trim()) {
             showTemporaryFeedback('Please enter your feedback before submitting.', 'error');
@@ -649,7 +652,7 @@ export default function Home({ lemons }) {
 
             if (res.ok) {
                 console.log('Feedback submission successful!'); // Debug log
-                setFeedbackText('');
+                setFeedbackText_Local(''); // Use local setFeedbackText
                 showTemporaryFeedback('Thank you for your valuable feedback!', 'success');
             } else {
                 let errorDetails = '';
@@ -756,6 +759,7 @@ export default function Home({ lemons }) {
             const quantity = parseFloat(order.quantity);
             const pricePerKg = parseFloat(lemon?.['Price Per Kg'] || lemon.Price || 0);
             let itemPrice = pricePerKg * quantity;
+            let discountMsg = '';
             if (quantity > 50) {
                 itemPrice *= 0.90;
                 discountMsg = ` (10% bulk discount applied)`;
@@ -1179,7 +1183,7 @@ export default function Home({ lemons }) {
                         {customerReviews.map(review => (
                             <div key={review.id} className={styles.reviewCard}>
                                 <div className={styles.reviewerRating}>
-                                    {/* FIX: Wrap the two map calls in a Fragment */}
+                                    {/* Fix from previous iteration: Wrap the two map calls in a Fragment */}
                                     <>
                                         {Array.from({ length: review.rating }).map((_, i) => (
                                             <FaStar key={i} />
@@ -1650,7 +1654,7 @@ export default function Home({ lemons }) {
                                                     <label className={styles.label} htmlFor="feedback-text">Your Feedback</label>
                                                     <textarea
                                                         id="feedback-text"
-                                                        value={feedbackText}
+                                                        value={feedbackText} // Now uses feedbackText directly
                                                         onChange={handleFeedbackTextChange}
                                                         placeholder="Share your thoughts with us..."
                                                         required
