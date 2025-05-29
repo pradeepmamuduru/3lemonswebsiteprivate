@@ -8,7 +8,7 @@ import { AuthContext } from '../pages/_app';
 import { FaWhatsapp, FaStar, FaUserCircle, FaPlus, FaMinus, FaCheckCircle, FaExclamationCircle, FaInfoCircle, FaSpinner, FaBox, FaTimes, FaBars, FaPlusCircle, FaMinusCircle, FaMapMarkerAlt, FaPencilAlt, FaTrash } from 'react-icons/fa';
 
 
-// SheetDB API URLs
+// SheetDB API URLs - CONFIRMED BY USER
 const LEMONS_DATA_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Lemons';
 const SIGNUP_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Signup';
 const ORDERS_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Orders';
@@ -72,7 +72,7 @@ export default function Home({ lemons }) {
     const [userOrders, setUserOrders] = useState([]);
     const [isFetchingOrders, setIsFetchingOrders] = useState(false);
 
-    const [isUpdatingAccount, setIsUpdatingAccount] = useState(false); // Make sure this state is declared
+    const [isUpdatingAccount, setIsUpdatingAccount] = useState(false);
     const [accountDetailsForm, setAccountDetailsForm] = useState({ name: '', phone: '', address: '', pincode: '' });
 
 
@@ -164,42 +164,55 @@ export default function Home({ lemons }) {
         }
 
         try {
-            const searchUrl = `https://sheetdb.io/api/v1/wm0oxtmmfkndt/search?sheet=Signup&search={"Phone":"${trimmedPhone}"}`;
+            // Search for user by Phone in the Signup sheet
+            const searchUrl = `${SIGNUP_SHEET_URL.split('?')[0]}/search?sheet=Signup&search={"Phone":"${trimmedPhone}"}`;
             const res = await fetch(searchUrl);
 
-            if (!res.ok && res.status !== 404 && res.status !== 204) {
-                throw new Error(`Failed to verify user during login: ${res.status} ${res.statusText}`);
+            if (!res.ok) { // This handles 404, 204, and other non-2xx statuses
+                 // Attempt to parse error response for better feedback
+                let errorDetails = '';
+                try {
+                    const errorJson = await res.json();
+                    errorDetails = errorJson.message || JSON.stringify(errorJson);
+                } catch (jsonError) {
+                    errorDetails = res.statusText; // Fallback if response is not JSON
+                }
+                console.error(`Login search failed: ${res.status} - ${errorDetails}`);
+                // Don't throw error here, let the following logic handle the foundUser status
             }
 
             let users = [];
+            // SheetDB returns 204 No Content or 404 Not Found if no results for search
             if (res.status !== 204 && res.status !== 404) {
                 users = await res.json();
             }
 
-            if (!Array.isArray(users)) {
+            if (!Array.isArray(users)) { // Ensure it's an array for consistency
                 users = [];
             }
 
+            // Validate if the found user's name matches exactly (case-insensitive for name match)
             const foundUser = users.find(user =>
                 user.Phone === trimmedPhone && user.Name.toLowerCase() === trimmedName.toLowerCase()
             );
 
             if (foundUser) {
+                // Ensure the user object stored in context has consistent keys (lowercase name, phone, address, pincode)
                 const userForContext = {
                     name: foundUser.Name,
                     phone: foundUser.Phone,
                     address: foundUser.Address,
                     pincode: foundUser.Pincode
                 };
-                login(userForContext);
+                login(userForContext); // Use login from AuthContext
                 showTemporaryFeedback(`Welcome back, ${foundUser.Name}! 😊`, 'success');
                 closeLoginModal();
             } else {
                 showTemporaryFeedback('Invalid name or phone number. Please check your credentials or sign up.', 'error');
             }
         } catch (error) {
-            console.error('Login process error:', error);
-            showTemporaryFeedback('An error occurred during login. Please try again.', 'error');
+            console.error('Login process network/parsing error:', error);
+            showTemporaryFeedback(`An error occurred during login: ${error.message}. Please try again.`, 'error');
         } finally {
             setIsLoggingIn(false);
         }
@@ -245,11 +258,12 @@ export default function Home({ lemons }) {
         }
 
         try {
-            const existingUserSearchUrl = `https://sheetdb.io/api/v1/wm0oxtmmfkndt/search?sheet=Signup&search={"Phone":"${trimmedPhone}"}`;
+            // Check if phone number already exists in Signup sheet
+            const existingUserSearchUrl = `${SIGNUP_SHEET_URL.split('?')[0]}/search?sheet=Signup&search={"Phone":"${trimmedPhone}"}`;
             const existingUserRes = await fetch(existingUserSearchUrl);
 
             let existingUsers = [];
-            if (existingUserRes.ok && existingUserRes.status !== 204) {
+            if (existingUserRes.ok && existingUserRes.status !== 204 && existingUserRes.status !== 404) {
                 existingUsers = await existingUserRes.json();
                 if (!Array.isArray(existingUsers)) existingUsers = [];
             }
@@ -260,6 +274,7 @@ export default function Home({ lemons }) {
                 return;
             }
 
+            // Add new user - ADJUSTED FOR SignupDate COLUMN NAME IN YOUR SHEET
             const res = await fetch(SIGNUP_SHEET_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -269,27 +284,37 @@ export default function Home({ lemons }) {
                         Phone: trimmedPhone,
                         Address: trimmedAddress,
                         Pincode: trimmedPincode,
-                        'Signup Date': new Date().toLocaleString(),
+                        // Adjusted column name to match your sheet
+                        SignupDate: new Date().toLocaleString(),
                     },
                 }),
             });
 
             if (res.ok) {
+                // Ensure the user object stored in context has consistent keys
                 const newUserForContext = {
                     name: trimmedName,
                     phone: trimmedPhone,
                     address: trimmedAddress,
                     pincode: trimmedPincode
                 };
-                login(newUserForContext);
+                login(newUserForContext); // Log in the new user immediately
                 showTemporaryFeedback('Account created successfully! Welcome! 🎉', 'success');
                 closeSignUpModal();
             } else {
-                showTemporaryFeedback('Failed to create account. Please try again.', 'error');
+                let errorDetails = '';
+                try {
+                    const errorJson = await res.json();
+                    errorDetails = errorJson.message || JSON.stringify(errorJson);
+                } catch (jsonError) {
+                    errorDetails = res.statusText;
+                }
+                console.error('SheetDB signup error:', res.status, errorDetails);
+                showTemporaryFeedback(`Failed to create account: ${errorDetails}. Please try again.`, 'error');
             }
         } catch (error) {
-            console.error('Sign up error:', error);
-            showTemporaryFeedback('An error occurred during sign up. Please try again.', 'error');
+            console.error('Sign up process network/parsing error:', error);
+            showTemporaryFeedback(`An error occurred during sign up: ${error.message}. Please try again.`, 'error');
         } finally {
             setIsSigningUp(false);
         }
@@ -343,7 +368,8 @@ export default function Home({ lemons }) {
         }
 
         try {
-            const updateUrl = `https://sheetdb.io/api/v1/wm0oxtmmfkndt/Phone/${currentUser.phone}?sheet=Signup`;
+            // Update by Phone in Signup sheet
+            const updateUrl = `${SIGNUP_SHEET_URL.split('?')[0]}/Phone/${currentUser.phone}?sheet=Signup`;
             const res = await fetch(updateUrl, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -365,13 +391,19 @@ export default function Home({ lemons }) {
                 }));
                 showTemporaryFeedback('Account details updated successfully! ✅', 'success');
             } else {
-                const errorData = await res.json();
-                console.error('SheetDB account update error:', res.status, errorData);
-                showTemporaryFeedback(`Failed to update: ${errorData.message || 'Server error'}.`, 'error');
+                let errorDetails = '';
+                try {
+                    const errorJson = await res.json();
+                    errorDetails = errorJson.message || JSON.stringify(errorJson);
+                } catch (jsonError) {
+                    errorDetails = res.statusText;
+                }
+                console.error('SheetDB account update error:', res.status, errorDetails);
+                showTemporaryFeedback(`Failed to update: ${errorDetails}.`, 'error');
             }
         } catch (error) {
             console.error('Network error updating account:', error);
-            showTemporaryFeedback('An error occurred while updating details.', 'error');
+            showTemporaryFeedback(`An error occurred while updating details: ${error.message}.`, 'error');
         } finally {
             setIsUpdatingAccount(false);
         }
@@ -379,12 +411,53 @@ export default function Home({ lemons }) {
 
 
     // --- Address Management Functions ---
+    const fetchUserAddresses = useCallback(async () => {
+        if (!currentUser || !currentUser.phone) {
+            setUserAddresses([]);
+            return;
+        }
+        setIsManagingAddresses(true);
+        try {
+            // Search by UserPhone in the Addresses sheet
+            const searchUrl = `${ADDRESSES_SHEET_URL.split('?')[0]}/search?sheet=Addresses&search={"UserPhone":"${currentUser.phone}"}`;
+            const res = await fetch(searchUrl);
+
+            if (!res.ok) {
+                let errorDetails = '';
+                try {
+                    const errorJson = await res.json();
+                    errorDetails = errorJson.message || JSON.stringify(errorJson);
+                } catch (jsonError) {
+                    errorDetails = res.statusText;
+                }
+                console.error(`Failed to fetch addresses: ${res.status} - ${errorDetails}`);
+            }
+            let addresses = [];
+            if (res.status !== 204 && res.status !== 404) {
+                addresses = await res.json();
+            }
+
+            if (Array.isArray(addresses)) {
+                // SheetDB's API response usually includes an 'id' for each row.
+                // If it doesn't, we create a temporary unique key for React lists.
+                setUserAddresses(addresses.map(addr => ({ ...addr, id: addr.id || `${addr.UserPhone}-${addr.AddressName}-${Date.now() + Math.random()}` })));
+            } else {
+                setUserAddresses([]);
+            }
+        } catch (error) {
+            console.error("Error fetching user addresses:", error);
+            showTemporaryFeedback(`Failed to load addresses: ${error.message}.`, 'error');
+            setUserAddresses([]);
+        } finally {
+            setIsManagingAddresses(false);
+        }
+    }, [currentUser, showTemporaryFeedback]);
+
     const handleAddressFormChange = (e) => {
         const { name, value } = e.target;
-        if (name === 'phone' || name === 'pincode') {
+        if (name === 'pincode') {
             if (!/^\d*$/.test(value)) return;
-            if (name === 'phone' && value.length > 10) return;
-            if (name === 'pincode' && value.length > 6) return;
+            if (value.length > 6) return;
         }
         setAddressForm(prevForm => ({ ...prevForm, [name]: value }));
     };
@@ -432,13 +505,15 @@ export default function Home({ lemons }) {
         try {
             let response;
             if (id) {
-                const updateUrl = `https://sheetdb.io/api/v1/wm0oxtmmfkndt/id/${id}?sheet=Addresses`;
+                // Update by 'id' in Addresses sheet
+                const updateUrl = `${ADDRESSES_SHEET_URL.split('?')[0]}/id/${id}?sheet=Addresses`;
                 response = await fetch(updateUrl, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ data: addressData }),
                 });
             } else {
+                // POST new address to Addresses sheet
                 response = await fetch(ADDRESSES_SHEET_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -450,15 +525,21 @@ export default function Home({ lemons }) {
                 showTemporaryFeedback(`Address ${id ? 'updated' : 'added'} successfully!`, 'success');
                 setShowAddressForm(false);
                 setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' });
-                fetchUserAddresses();
+                fetchUserAddresses(); // Re-fetch to update list and get actual SheetDB ID for new address
             } else {
-                const errorData = await response.json();
-                console.error('SheetDB address save error:', response.status, errorData);
-                showTemporaryFeedback(`Failed to save address: ${errorData.message || 'Server error'}.`, 'error');
+                let errorDetails = '';
+                try {
+                    const errorJson = await response.json();
+                    errorDetails = errorJson.message || JSON.stringify(errorJson);
+                } catch (jsonError) {
+                    errorDetails = response.statusText;
+                }
+                console.error('SheetDB address save error:', response.status, errorDetails);
+                showTemporaryFeedback(`Failed to save address: ${errorDetails}.`, 'error');
             }
         } catch (error) {
             console.error('Network error saving address:', error);
-            showTemporaryFeedback('Network error. Could not save address.', 'error');
+            showTemporaryFeedback(`Network error. Could not save address: ${error.message}.`, 'error');
         } finally {
             setIsManagingAddresses(false);
         }
@@ -469,7 +550,8 @@ export default function Home({ lemons }) {
         setIsManagingAddresses(true);
         setFeedback({ message: '', type: '' });
         try {
-            const deleteUrl = `https://sheetdb.io/api/v1/wm0oxtmmfkndt/id/${addressId}?sheet=Addresses`;
+            // Delete by 'id' in Addresses sheet
+            const deleteUrl = `${ADDRESSES_SHEET_URL.split('?')[0]}/id/${addressId}?sheet=Addresses`;
             const response = await fetch(deleteUrl, {
                 method: 'DELETE',
             });
@@ -477,13 +559,19 @@ export default function Home({ lemons }) {
                 showTemporaryFeedback('Address deleted successfully!', 'success');
                 fetchUserAddresses();
             } else {
-                const errorData = await response.json();
-                console.error('SheetDB address delete error:', response.status, errorData);
-                showTemporaryFeedback(`Failed to delete address: ${errorData.message || 'Server error'}.`, 'error');
+                let errorDetails = '';
+                try {
+                    const errorJson = await response.json();
+                    errorDetails = errorJson.message || JSON.stringify(errorJson);
+                } catch (jsonError) {
+                    errorDetails = response.statusText;
+                }
+                console.error('SheetDB address delete error:', response.status, errorDetails);
+                showTemporaryFeedback(`Failed to delete address: ${errorDetails}.`, 'error');
             }
         } catch (error) {
             console.error('Network error deleting address:', error);
-            showTemporaryFeedback('Network error. Could not delete address.', 'error');
+            showTemporaryFeedback(`Network error. Could not delete address: ${error.message}.`, 'error');
         } finally {
             setIsManagingAddresses(false);
         }
@@ -539,19 +627,25 @@ export default function Home({ lemons }) {
                 setFeedbackText('');
                 showTemporaryFeedback('Thank you for your valuable feedback!', 'success');
             } else {
-                const errorData = await res.json();
-                console.error('SheetDB feedback submission error:', res.status, errorData);
-                showTemporaryFeedback(`Error submitting feedback: ${errorData.message || 'Server error'}`, 'error');
+                let errorDetails = '';
+                try {
+                    const errorJson = await res.json();
+                    errorDetails = errorJson.message || JSON.stringify(errorJson);
+                } catch (jsonError) {
+                    errorDetails = res.statusText;
+                }
+                console.error('SheetDB feedback submission error:', res.status, errorDetails);
+                showTemporaryFeedback(`Error submitting feedback: ${errorDetails}`, 'error');
             }
         } catch (error) {
-            console.error('Error submitting feedback:', error);
+            console.error('Error submitting feedback network/parsing error:', error);
             showTemporaryFeedback(`Error submitting feedback: ${error.message}`, 'error');
         } finally {
             setIsSubmittingFeedback(false);
         }
     };
 
-    // --- Calculation and Order Form Logic (Also placed at top) ---
+    // --- Calculation and Order Form Logic ---
     const calculateTotal = useCallback(() => {
         let totalPrice = 0;
         orders.forEach(order => {
@@ -670,15 +764,21 @@ export default function Home({ lemons }) {
                 setOrders([{ grade: '', quantity: '' }]);
                 setTotal(0);
                 if (activeAccountTab === 'yourOrders' && isLoggedIn) {
-                    fetchUserOrders();
+                    fetchUserOrders(); // Re-fetch orders for the sidebar
                 }
             } else {
-                const errorData = await res.json();
-                console.error('SheetDB order submission error:', res.status, errorData);
+                let errorDetails = '';
+                try {
+                    const errorJson = await res.json();
+                    errorDetails = errorJson.message || JSON.stringify(errorJson);
+                } catch (jsonError) {
+                    errorDetails = res.statusText;
+                }
+                console.error('SheetDB order submission error:', res.status, errorDetails);
                 showTemporaryFeedback('Failed to place order. Please try again.', 'error');
             }
         } catch (error) {
-            console.error('Error placing order:', error);
+            console.error('Error placing order network/parsing error:', error);
             showTemporaryFeedback('An error occurred while placing your order. Please check your internet connection.', 'error');
         } finally {
             setIsSubmitting(false);
@@ -724,72 +824,7 @@ export default function Home({ lemons }) {
     };
 
 
-    // --- Effects (placed after all functions they might call) ---
-    // Sync order form with currentUser from AuthContext
-    useEffect(() => {
-        if (currentUser) {
-            setAccountDetailsForm({
-                name: currentUser.name || '',
-                phone: currentUser.phone || '',
-                address: currentUser.address || '',
-                pincode: currentUser.pincode || ''
-            });
-            setForm(prevForm => ({
-                ...prevForm,
-                name: currentUser.name || prevForm.name,
-                contact: currentUser.phone || prevForm.contact,
-                delivery: currentUser.address || prevForm.delivery,
-            }));
-        } else {
-            setAccountDetailsForm({ name: '', phone: '', address: '', pincode: '' });
-            setForm({ name: '', delivery: '', contact: '' });
-        }
-    }, [currentUser]);
-
-    useEffect(() => {
-        calculateTotal();
-    }, [orders, lemons, calculateTotal]); // calculateTotal is now defined earlier
-
-    const fetchUserAddresses = useCallback(async () => {
-        if (!currentUser || !currentUser.phone) {
-            setUserAddresses([]);
-            return;
-        }
-        setIsManagingAddresses(true);
-        try {
-            const searchUrl = `https://sheetdb.io/api/v1/wm0oxtmmfkndt/search?sheet=Addresses&search={"UserPhone":"${currentUser.phone}"}`;
-            const res = await fetch(searchUrl);
-
-            if (!res.ok && res.status !== 404 && res.status !== 204) {
-                throw new Error(`Failed to fetch addresses: ${res.status} ${res.statusText}`);
-            }
-            let addresses = [];
-            if (res.status !== 204 && res.status !== 404) {
-                addresses = await res.json();
-            }
-
-            if (Array.isArray(addresses)) {
-                setUserAddresses(addresses.map(addr => ({ ...addr, id: addr.id || Date.now() + Math.random() })));
-            } else {
-                setUserAddresses([]);
-            }
-        } catch (error) {
-            console.error("Error fetching user addresses:", error);
-            showTemporaryFeedback('Failed to load addresses.', 'error');
-            setUserAddresses([]);
-        } finally {
-            setIsManagingAddresses(false);
-        }
-    }, [currentUser, showTemporaryFeedback]);
-
-    useEffect(() => {
-        if (isLoggedIn && currentUser?.phone && activeAccountTab === 'addresses') {
-            fetchUserAddresses();
-        } else if (activeAccountTab !== 'addresses') {
-            setUserAddresses([]);
-        }
-    }, [isLoggedIn, currentUser?.phone, activeAccountTab, fetchUserAddresses]);
-
+    // --- Fetch User Orders ---
     const fetchUserOrders = useCallback(async () => {
         if (!currentUser || !currentUser.phone) {
             setUserOrders([]);
@@ -797,11 +832,19 @@ export default function Home({ lemons }) {
         }
         setIsFetchingOrders(true);
         try {
-            const searchUrl = `https://sheetdb.io/api/v1/wm0oxtmmfkndt/search?sheet=Orders&search={"Phone":"${currentUser.phone}"}`;
+            // Search by Phone in the Orders sheet
+            const searchUrl = `${ORDERS_SHEET_URL.split('?')[0]}/search?sheet=Orders&search={"Phone":"${currentUser.phone}"}`;
             const res = await fetch(searchUrl);
 
-            if (!res.ok && res.status !== 404 && res.status !== 204) {
-                throw new Error(`Failed to fetch orders: ${res.status} ${res.statusText}`);
+            if (!res.ok) {
+                let errorDetails = '';
+                try {
+                    const errorJson = await res.json();
+                    errorDetails = errorJson.message || JSON.stringify(errorJson);
+                } catch (jsonError) {
+                    errorDetails = res.statusText;
+                }
+                console.error(`Failed to fetch orders: ${res.status} - ${errorDetails}`);
             }
             let ordersData = [];
             if (res.status !== 204 && res.status !== 404) {
@@ -815,18 +858,54 @@ export default function Home({ lemons }) {
             setUserOrders(ordersData.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp)));
         } catch (error) {
             console.error("Error fetching user orders:", error);
-            showTemporaryFeedback('Failed to load your orders.', 'error');
+            showTemporaryFeedback(`Failed to load your orders: ${error.message}.`, 'error');
             setUserOrders([]);
         } finally {
             setIsFetchingOrders(false);
         }
     }, [currentUser, showTemporaryFeedback]);
 
+
+    // --- Effects (placed after all functions they might call) ---
+    // Sync order form with currentUser from AuthContext
+    useEffect(() => {
+        if (currentUser) {
+            setAccountDetailsForm({
+                name: currentUser.name || '',
+                phone: currentUser.phone || '',
+                address: currentUser.address || '',
+                pincode: currentUser.pincode || ''
+            });
+            // Also pre-fill main order form with logged-in user data
+            setForm(prevForm => ({
+                ...prevForm,
+                name: currentUser.name || prevForm.name,
+                contact: currentUser.phone || prevForm.contact,
+                delivery: currentUser.address || prevForm.delivery,
+            }));
+        } else {
+            setAccountDetailsForm({ name: '', phone: '', address: '', pincode: '' });
+            setForm({ name: '', delivery: '', contact: '' }); // Clear form if logged out
+        }
+    }, [currentUser]);
+
+    useEffect(() => {
+        calculateTotal();
+    }, [orders, lemons, calculateTotal]);
+
+    useEffect(() => {
+        if (isLoggedIn && currentUser?.phone && activeAccountTab === 'addresses') {
+            fetchUserAddresses();
+        } else if (activeAccountTab !== 'addresses') {
+            setUserAddresses([]); // Clear addresses if not on addresses tab or not logged in
+        }
+    }, [isLoggedIn, currentUser?.phone, activeAccountTab, fetchUserAddresses]);
+
     useEffect(() => {
         if (isLoggedIn && currentUser?.phone && activeAccountTab === 'yourOrders') {
             fetchUserOrders();
         } else if (activeAccountTab !== 'yourOrders') {
-            setUserOrders([]);
+            setUserOrders([]); // Clear orders if not on orders tab or not logged in
         }
     }, [isLoggedIn, currentUser?.phone, activeAccountTab, fetchUserOrders]);
 
@@ -894,9 +973,10 @@ export default function Home({ lemons }) {
                         {Array.isArray(lemons) && lemons.length > 0 ? (
                             lemons.map((lemon, index) => (
                                 <div key={lemon.id || lemon.Grade || index} className={styles.lemonCard}>
-                                    {lemon.Image && (
+                                    {/* Adjusted to use 'Image url' to match your sheet */}
+                                    {lemon['Image url'] && (
                                         <Image
-                                            src={`/${lemon.Image}`}
+                                            src={`/${lemon['Image url']}`}
                                             alt={lemon.Grade || 'Lemon'}
                                             width={300}
                                             height={220}
@@ -1581,17 +1661,20 @@ export async function getStaticProps() {
     if (lemons.length === 0) {
         console.log("Using fallback lemon data.");
         lemons = [
-            { id: 1, Grade: 'Eureka Lemon', 'Price Per Kg': 1.50, 'Image': 'lemon-with-leaves.jpg', Description: 'Classic juicy lemons, perfect for beverages.' },
-            { id: 2, Grade: 'Meyer Lemon', 'Price Per Kg': 2.00, 'Image': 'sliced-lemon.jpeg', Description: 'Sweeter, less acidic, ideal for desserts and garnishes.' },
-            { id: 3, Grade: 'Lisbon Lemon', 'Price Per Kg': 1.75, 'Image': 'basket-of-lemons.jpeg', Description: 'Tart and tangy, great for cooking and zest.' },
-            { id: 4, Grade: 'Verna Lemon', 'Price Per Kg': 1.80, 'Image': 'lemon-tree.jpeg', Description: 'Large and flavorful, excellent for juicing.' },
+            // Adjusted 'Image url' to match your sheet's column name
+            { id: 1, Grade: 'Eureka Lemon', 'Price Per Kg': 1.50, 'Image url': 'lemon-with-leaves.jpg', Description: 'Classic juicy lemons, perfect for beverages.' },
+            { id: 2, Grade: 'Meyer Lemon', 'Price Per Kg': 2.00, 'Image url': 'sliced-lemon.jpeg', Description: 'Sweeter, less acidic, ideal for desserts and garnishes.' },
+            { id: 3, Grade: 'Lisbon Lemon', 'Price Per Kg': 1.75, 'Image url': 'basket-of-lemons.jpeg', Description: 'Tart and tangy, great for cooking and zest.' },
+            { id: 4, Grade: 'Verna Lemon', 'Price Per Kg': 1.80, 'Image url': 'lemon-tree.jpeg', Description: 'Large and flavorful, excellent for juicing.' },
         ];
     }
 
     // Ensure 'Price Per Kg' is consistent, if some data uses 'Price'
+    // Adjusted 'Image url' to be passed through consistently
     lemons = lemons.map(lemon => ({
         ...lemon,
-        'Price Per Kg': parseFloat(lemon['Price Per Kg'] || lemon.Price || 0)
+        'Price Per Kg': parseFloat(lemon['Price Per Kg'] || lemon.Price || 0),
+        'Image url': lemon['Image url'] || lemon.Image || '' // Ensure 'Image url' is picked up
     }));
 
 
