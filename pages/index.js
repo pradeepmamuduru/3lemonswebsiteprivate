@@ -10,10 +10,10 @@ import { FaWhatsapp, FaStar, FaUserCircle, FaPlus, FaMinus, FaCheckCircle, FaExc
 
 // SheetDB API URLs - CONFIRMED BY USER
 const LEMONS_DATA_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Lemons';
-const SIGNUP_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Signup'; // Ensure this matches sheet name
-const ORDERS_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Orders'; // Ensure this matches sheet name
-const ADDRESSES_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Addresses'; // Ensure this matches sheet name
-const FEEDBACK_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Feedback'; // Ensure this matches sheet name
+const ORDERS_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Orders'; 
+const SIGNUP_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Signup'; 
+const ADDRESSES_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Addresses'; 
+const FEEDBACK_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Feedback'; 
 
 // Helper for showing temporary feedback messages
 const useTemporaryFeedback = () => {
@@ -21,7 +21,7 @@ const useTemporaryFeedback = () => {
     const feedbackTimeoutRef = useRef(null);
 
     const showTemporaryFeedback = useCallback((message, type = 'info', duration = 3000) => {
-        setFeedback({ message, type }); // This setFeedback is local to the hook
+        setFeedback({ message, type });
         if (feedbackTimeoutRef.current) {
             clearTimeout(feedbackTimeoutRef.current);
         }
@@ -30,8 +30,8 @@ const useTemporaryFeedback = () => {
         }, duration);
     }, []);
 
-    // FIX: Return setFeedback as well, so it can be directly used for clearing/resetting from parent
-    return [feedback, showTemporaryFeedback, setFeedback]; // <--- CRITICAL CHANGE 1: EXPOSE setFeedback
+    // CRITICAL FIX: Return setFeedback so it can be used for clearing
+    return [feedback, showTemporaryFeedback, setFeedback]; 
 };
 
 
@@ -46,8 +46,8 @@ export default function Home({ lemons }) {
     const [total, setTotal] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // FIX: Destructure setFeedback from the hook
-    const [feedback, showTemporaryFeedback, setFeedback] = useTemporaryFeedback(); // <--- CRITICAL CHANGE 2: DESTRUCTURE setFeedback
+    // CRITICAL FIX: Destructure setFeedback from the hook
+    const [feedback, showTemporaryFeedback, setFeedback] = useTemporaryFeedback(); 
 
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [confirmedOrderDetails, setConfirmedOrderDetails] = useState(null);
@@ -68,8 +68,7 @@ export default function Home({ lemons }) {
     const [addressForm, setAddressForm] = useState({ id: null, addressName: '', fullAddress: '', pincode: '' });
     const [showAddressForm, setShowAddressForm] = useState(false);
 
-    // Renamed to avoid direct conflict, though with the fix above, it's less critical now
-    const [feedbackText, setFeedbackText_Local] = useState('');
+    const [feedbackText, setFeedbackText] = useState(''); // Correctly using a local state for this form
     const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
 
     const [userOrders, setUserOrders] = useState([]);
@@ -93,27 +92,27 @@ export default function Home({ lemons }) {
     const openLoginModal = () => {
         setShowLoginModal(true);
         setLoginForm({ name: '', phone: '' });
-        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
+        setFeedback({ message: '', type: '' }); // Uses the correctly destructured setFeedback
     };
 
     const closeLoginModal = () => {
         setShowLoginModal(false);
         setLoginForm({ name: '', phone: '' });
-        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
+        setFeedback({ message: '', type: '' }); // Uses the correctly destructured setFeedback
     };
 
     const openSignUpModal = () => {
         console.log('openSignUpModal called. Setting showSignUpModal to true.'); // DEBUG LOG
         setShowSignUpModal(true);
         setSignUpForm({ name: '', phone: '', address: '', pincode: '' });
-        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
+        setFeedback({ message: '', type: '' }); // Uses the correctly destructured setFeedback
     };
 
     const closeSignUpModal = () => {
         console.log('closeSignUpModal called. Setting showSignUpModal to false.'); // DEBUG LOG
         setShowSignUpModal(false);
         setSignUpForm({ name: '', phone: '', address: '', pincode: '' });
-        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
+        setFeedback({ message: '', type: '' }); // Uses the correctly destructured setFeedback
     };
 
     const toggleSidebar = () => {
@@ -122,13 +121,13 @@ export default function Home({ lemons }) {
             if (!isSidebarOpen) {
                 // When closing sidebar, reset tab and other states
                 setActiveAccountTab('accountDetails');
-                setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
+                setFeedback({ message: '', type: '' }); // Uses the correctly destructured setFeedback
                 if (currentUser) {
                     setAccountDetailsForm(currentUser);
                 }
                 setShowAddressForm(false);
                 setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' });
-                setFeedbackText_Local(''); // Use local setFeedbackText
+                setFeedbackText(''); // Resets the local feedback form text
                 setUserOrders([]);
             }
         } else {
@@ -151,7 +150,7 @@ export default function Home({ lemons }) {
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
         setIsLoggingIn(true);
-        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
+        setFeedback({ message: '', type: '' }); // Uses the correctly destructured setFeedback
 
         const { name, phone } = loginForm;
         const trimmedName = name.trim();
@@ -235,7 +234,7 @@ export default function Home({ lemons }) {
     const handleSignUpSubmit = async (e) => {
         e.preventDefault();
         setIsSigningUp(true);
-        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
+        setFeedback({ message: '', type: '' }); // Uses the correctly destructured setFeedback
 
         const { name, phone, address, pincode } = signUpForm;
         const trimmedName = name.trim();
@@ -365,7 +364,7 @@ export default function Home({ lemons }) {
         }
 
         setIsUpdatingAccount(true);
-        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
+        setFeedback({ message: '', type: '' }); // Uses the correctly destructured setFeedback
 
         const { name, address, pincode } = accountDetailsForm;
         const trimmedName = name.trim();
@@ -486,7 +485,7 @@ export default function Home({ lemons }) {
     const handleSaveAddress = async (e) => {
         e.preventDefault();
         setIsManagingAddresses(true);
-        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
+        setFeedback({ message: '', type: '' }); // Uses the correctly destructured setFeedback
 
         if (!currentUser || !currentUser.phone) {
             showTemporaryFeedback('Please log in to save addresses.', 'error');
@@ -556,7 +555,7 @@ export default function Home({ lemons }) {
                     const errorJson = await response.json();
                     errorDetails = errorJson.message || response.statusText;
                 } catch (jsonError) {
-                    errorDetails = response.statusText;
+                    errorDetails = res.statusText;
                 }
                 console.error('SheetDB address save error:', response.status, errorDetails); // Debug log
                 showTemporaryFeedback(`Failed to save address: ${errorDetails}.`, 'error');
@@ -572,7 +571,7 @@ export default function Home({ lemons }) {
     const handleDeleteAddress = async (addressId) => {
         if (!window.confirm('Are you sure you want to delete this address?')) return;
         setIsManagingAddresses(true);
-        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
+        setFeedback({ message: '', type: '' }); // Uses the correctly destructured setFeedback
         try {
             // Delete by 'id' in Addresses sheet
             const deleteUrl = `${ADDRESSES_SHEET_URL.split('?')[0]}/id/${addressId}?sheet=Addresses`;
@@ -590,9 +589,9 @@ export default function Home({ lemons }) {
                     const errorJson = await response.json();
                     errorDetails = errorJson.message || response.statusText;
                 } catch (jsonError) {
-                    errorDetails = response.statusText;
+                    errorDetails = res.statusText;
                 }
-                console.error('SheetDB address delete error:', response.status, errorDetails); // Debug log
+                console.error('SheetDB address delete error:', res.status, errorDetails); // Debug log
                 showTemporaryFeedback(`Failed to delete address: ${errorDetails}.`, 'error');
             }
         } catch (error) {
@@ -610,14 +609,14 @@ export default function Home({ lemons }) {
 
     // --- Feedback Submission ---
     const handleFeedbackTextChange = (e) => {
-        setFeedbackText_Local(e.target.value); // Use local setFeedbackText
-        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
+        setFeedbackText(e.target.value); // Uses local feedbackText state
+        setFeedback({ message: '', type: '' }); // Uses the correctly destructured setFeedback
     };
 
     const handleSubmitFeedback = async (e) => {
         e.preventDefault();
         setIsSubmittingFeedback(true);
-        setFeedback({ message: '', type: '' }); // Now correctly uses the setFeedback from useTemporaryFeedback
+        setFeedback({ message: '', type: '' }); // Uses the correctly destructured setFeedback
 
         if (!feedbackText.trim()) {
             showTemporaryFeedback('Please enter your feedback before submitting.', 'error');
@@ -652,7 +651,7 @@ export default function Home({ lemons }) {
 
             if (res.ok) {
                 console.log('Feedback submission successful!'); // Debug log
-                setFeedbackText_Local(''); // Use local setFeedbackText
+                setFeedbackText(''); // Resets the local feedback form text
                 showTemporaryFeedback('Thank you for your valuable feedback!', 'success');
             } else {
                 let errorDetails = '';
@@ -667,7 +666,7 @@ export default function Home({ lemons }) {
             }
         } catch (error) {
             console.error('Error submitting feedback network/parsing error:', error); // Debug log
-            showTemporaryFeedback(`Error submitting feedback: ${error.message}.`, 'error');
+            showTemporaryFeedback(`An error occurred during submission: ${error.message}. Please check your internet.`, 'error');
         } finally {
             setIsSubmittingFeedback(false);
         }
@@ -754,33 +753,41 @@ export default function Home({ lemons }) {
             return;
         }
 
+        let totalQuantityOrdered = 0;
         const orderDetails = validOrders.map(order => {
             const lemon = lemons.find(l => l.Grade === order.grade);
             const quantity = parseFloat(order.quantity);
+            totalQuantityOrdered += quantity; // Accumulate total quantity
             const pricePerKg = parseFloat(lemon?.['Price Per Kg'] || lemon.Price || 0);
             let itemPrice = pricePerKg * quantity;
-            let discountMsg = '';
+            let discountApplied = false;
             if (quantity > 50) {
                 itemPrice *= 0.90;
-                discountMsg = ` (10% bulk discount applied)`;
+                discountApplied = true;
             }
-            return `${quantity} kg of ${order.grade} (Approx. ₹${itemPrice.toFixed(2)})${discountMsg}`;
+            return `${quantity} kg of ${order.grade} (Approx. ₹${itemPrice.toFixed(2)}${discountApplied ? ' - 10% bulk discount' : ''})`;
         }).join('; ');
 
+        // Determine discount status for the SheetDB column
+        const discountStatus = orders.some(order => parseFloat(order.quantity) > 50) ? 'Yes (Bulk)' : 'No';
+
+        // --- MODIFIED orderData structure to EXACTLY match your SheetDB 'Orders' tab columns ---
         const orderData = {
-            Name: currentUser.name,
-            phone: currentUser.phone, // Use phone (lowercase) here to match Signup sheet structure
-            Address: currentUser.address || 'N/A',
-            Pincode: currentUser.pincode || 'N/A',
-            OrderDetails: orderDetails,
-            TotalAmount: total.toFixed(2),
-            Timestamp: new Date().toLocaleString(),
-            OrderType: orderType
+            name: currentUser.name,                 // Matches your 'name' column
+            quantity: totalQuantityOrdered.toFixed(2), // Total quantity of lemons ordered, matches 'quantity' column
+            quality: orderDetails,                  // Detailed order string, matches 'quality' column
+            delivery: `${currentUser.address || 'N/A'}, Pincode: ${currentUser.pincode || 'N/A'}`, // Combines address and pincode for 'delivery'
+            contact: currentUser.phone,             // Matches your 'contact' column
+            discount: discountStatus,               // Matches your 'discount' column
+            total: total.toFixed(2),                // Matches your 'total' column
         };
+        // --- END MODIFIED orderData structure ---
 
         setIsSubmitting(true);
         try {
-            console.log('Placing order to:', ORDERS_SHEET_URL); // Debug log
+            console.log('Placing order to:', ORDERS_SHEET_URL);
+            console.log('Order Data Payload:', JSON.stringify(orderData, null, 2)); // DEBUG: Log the actual payload being sent
+
             const res = await fetch(ORDERS_SHEET_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -788,7 +795,7 @@ export default function Home({ lemons }) {
             });
 
             if (res.ok) {
-                console.log('Order placement successful!'); // Debug log
+                console.log('Order placement successful! Response:', await res.json());
                 showTemporaryFeedback('Order placed successfully! We will contact you soon.', 'success');
                 setShowSuccessModal(true);
                 setOrders([{ grade: '', quantity: '' }]); // Reset order form after successful submission
@@ -800,15 +807,15 @@ export default function Home({ lemons }) {
                 let errorDetails = '';
                 try {
                     const errorJson = await res.json();
-                    errorDetails = errorJson.message || res.statusText;
+                    errorDetails = JSON.stringify(errorJson) || res.statusText;
                 } catch (jsonError) {
                     errorDetails = res.statusText;
                 }
-                console.error('SheetDB order submission error:', res.status, errorDetails); // Debug log
-                showTemporaryFeedback('Failed to place order. Please try again.', 'error');
+                console.error('SheetDB order submission error:', res.status, errorDetails);
+                showTemporaryFeedback(`Failed to place order: ${errorDetails}. Please try again.`, 'error');
             }
         } catch (error) {
-            console.error('Error placing order network/parsing error:', error); // Debug log
+            console.error('Error placing order network/parsing error:', error);
             showTemporaryFeedback('An error occurred while placing your order. Please check your internet connection.', 'error');
         } finally {
             setIsSubmitting(false);
@@ -854,7 +861,7 @@ export default function Home({ lemons }) {
     };
 
 
-    // --- Fetch User Orders ---
+    // --- Fetch User Orders (for account sidebar) ---
     const fetchUserOrders = useCallback(async () => {
         if (!currentUser || !currentUser.phone) {
             setUserOrders([]);
@@ -862,10 +869,9 @@ export default function Home({ lemons }) {
         }
         setIsFetchingOrders(true);
         try {
-            // Fetch orders by Phone from the Orders sheet
-            // IMPORTANT: Using 'Phone' (uppercase) for search on Orders sheet, assuming this is your column name
-            const searchUrl = `${ORDERS_SHEET_URL.split('?')[0]}/search?sheet=Orders&search={"Phone":"${currentUser.phone}"}`;
-            console.log('Fetch orders URL:', searchUrl); // Debug log
+            // IMPORTANT: Search 'orders' sheet by 'contact' (lowercase)
+            const searchUrl = `${ORDERS_SHEET_URL.split('?')[0]}/search?sheet=orders&search={"contact":"${currentUser.phone}"}`;
+            console.log('Fetching user orders from URL:', searchUrl); // Debug log
             const res = await fetch(searchUrl);
 
             let ordersData = [];
@@ -886,8 +892,10 @@ export default function Home({ lemons }) {
                 ordersData = [];
             }
 
-            // Sort orders by Timestamp (newest first)
-            setUserOrders(ordersData.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp)));
+            // SheetDB returns rows in the order they appear, but if you want to sort by date/time
+            // you'd need a 'timestamp' column in your 'orders' sheet. Since you don't have one,
+            // we'll just display them as received or add a new column in your sheet.
+            setUserOrders(ordersData); 
         } catch (error) {
             console.error("Error fetching user orders:", error); // Debug log
             showTemporaryFeedback(`Failed to load your orders: ${error.message}.`, 'error');
@@ -1631,12 +1639,15 @@ export default function Home({ lemons }) {
                                             ) : userOrders.length > 0 ? (
                                                 <div className={styles.ordersList}>
                                                     {userOrders.map((order, index) => (
-                                                        <div key={`${order.Timestamp}-${index}`} className={styles.orderCard}>
-                                                            <p><strong>Order Time:</strong> {new Date(order.Timestamp).toLocaleString()}</p>
-                                                            <p><strong>Delivery Address:</strong> {order.Address || 'N/A'}</p>
-                                                            <p><strong>Order Details:</strong> {order.OrderDetails}</p>
-                                                            <p className={styles.totalPrice}>Total: ₹{parseFloat(order.TotalAmount).toFixed(2)}</p>
-                                                            <p><strong>Ordered Via:</strong> {order.OrderType}</p>
+                                                        <div key={index} className={styles.orderItemCard}>
+                                                            {/* Displaying order details based on your 'Orders' sheet columns */}
+                                                            <p><strong>Name:</strong> {order.name || 'N/A'}</p>
+                                                            <p><strong>Contact:</strong> {order.contact || 'N/A'}</p>
+                                                            <p><strong>Delivery:</strong> {order.delivery || 'N/A'}</p>
+                                                            <p><strong>Total Quantity:</strong> {order.quantity || 'N/A'} kg</p>
+                                                            <p><strong>Details:</strong> {order.quality || 'N/A'}</p>
+                                                            <p><strong>Discount Applied:</strong> {order.discount || 'No'}</p>
+                                                            <p><strong>Total Amount:</strong> ₹{order.total || 'N/A'}</p>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -1654,7 +1665,7 @@ export default function Home({ lemons }) {
                                                     <label className={styles.label} htmlFor="feedback-text">Your Feedback</label>
                                                     <textarea
                                                         id="feedback-text"
-                                                        value={feedbackText} // Now uses feedbackText directly
+                                                        value={feedbackText}
                                                         onChange={handleFeedbackTextChange}
                                                         placeholder="Share your thoughts with us..."
                                                         required
