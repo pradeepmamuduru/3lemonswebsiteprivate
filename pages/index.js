@@ -804,7 +804,7 @@ export default function Home({ lemons }) {
                 const lemon = lemons.find(l => l.Grade === order.grade);
                 if (lemon) {
                     const quantity = parseFloat(order.quantity);
-                    const pricePerKg = parseFloat(lemon['Price Per Kg'] || lemon.Price || 0);
+                    const pricePerKg = parseFloat(lemon?.['Price Per Kg'] || lemon.Price || 0);
                     let itemCalculatedPrice = pricePerKg * quantity;
                     if (quantity > 50) {
                         itemCalculatedPrice *= 0.90;
