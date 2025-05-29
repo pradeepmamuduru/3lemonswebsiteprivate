@@ -283,7 +283,7 @@ export default function Home({ lemons }) {
                         phone: trimmedPhone, // IMPORTANT: Using 'phone' (lowercase) for column mapping
                         Address: trimmedAddress,
                         Pincode: trimmedPincode,
-                        SignupDate: new Date().toLocaleString(),
+                        SignupDate: new Date().toLocaleString(), // Using 'SignupDate' to match your actual Google Sheet column header (no space)
                     },
                 }),
             });
@@ -303,9 +303,9 @@ export default function Home({ lemons }) {
                 let errorDetails = '';
                 try {
                     const errorJson = await res.json();
-                    errorDetails = errorJson.message || res.statusText;
+                    errorDetails = errorJson.message || res.statusText; // Prefer SheetDB message if available
                 } catch (jsonError) {
-                    errorDetails = res.statusText;
+                    errorDetails = res.statusText; // Fallback to HTTP status text
                 }
                 console.error('SheetDB signup error:', res.status, errorDetails);
                 showTemporaryFeedback(`Failed to create account: ${errorDetails}. Please try again.`, 'error');
@@ -366,7 +366,7 @@ export default function Home({ lemons }) {
         }
 
         try {
-            // Update user in Signup sheet by Phone
+            // Update user in Signup sheet by phone
             // IMPORTANT: Using 'phone' (lowercase) in the URL path for SheetDB row update
             const updateUrl = `${SIGNUP_SHEET_URL.split('?')[0]}/phone/${currentUser.phone}?sheet=Signup`;
             const res = await fetch(updateUrl, {
@@ -740,7 +740,7 @@ export default function Home({ lemons }) {
 
         const orderData = {
             Name: currentUser.name,
-            Phone: currentUser.phone, // Use Phone (uppercase) for Orders sheet, as this is how it is.
+            phone: currentUser.phone, // Use phone (lowercase) here to match Signup sheet structure
             Address: currentUser.address || 'N/A',
             Pincode: currentUser.pincode || 'N/A',
             OrderDetails: orderDetails,
@@ -832,7 +832,7 @@ export default function Home({ lemons }) {
         setIsFetchingOrders(true);
         try {
             // Fetch orders by Phone from the Orders sheet
-            // IMPORTANT: Using 'Phone' (uppercase) for search on Orders sheet
+            // IMPORTANT: Using 'Phone' (uppercase) for search on Orders sheet, assuming this is your column name
             const searchUrl = `${ORDERS_SHEET_URL.split('?')[0]}/search?sheet=Orders&search={"Phone":"${currentUser.phone}"}`;
             const res = await fetch(searchUrl);
 
@@ -871,7 +871,7 @@ export default function Home({ lemons }) {
         if (currentUser) {
             setAccountDetailsForm({
                 name: currentUser.name || '',
-                phone: currentUser.phone || '',
+                phone: currentUser.phone || '', // Use lowercase 'phone' here for currentUser consistency
                 address: currentUser.address || '',
                 pincode: currentUser.pincode || ''
             });
@@ -879,7 +879,7 @@ export default function Home({ lemons }) {
             setForm(prevForm => ({
                 ...prevForm,
                 name: currentUser.name || prevForm.name,
-                contact: currentUser.phone || prevForm.contact,
+                contact: currentUser.phone || prevForm.contact, // Use lowercase 'phone' for currentUser consistency
                 delivery: currentUser.address || prevForm.delivery,
             }));
         } else {
@@ -1047,7 +1047,7 @@ export default function Home({ lemons }) {
                                 type="tel"
                                 className={styles.input}
                                 required
-                                value={currentUser?.phone || ''}
+                                value={currentUser?.phone || ''} // Use lowercase 'phone' here for consistency with currentUser
                                 readOnly={isLoggedIn} // Pre-fill and make read-only if logged in
                                 style={isLoggedIn ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
                                 maxLength={10}
@@ -1150,12 +1150,15 @@ export default function Home({ lemons }) {
                         {customerReviews.map(review => (
                             <div key={review.id} className={styles.reviewCard}>
                                 <div className={styles.reviewerRating}>
-                                    {Array.from({ length: review.rating }).map((_, i) => (
-                                        <FaStar key={i} />
-                                    ))}
-                                    {Array.from({ length: 5 - review.rating }).map((_, i) => (
-                                        <FaStar key={i + review.rating} style={{ opacity: 0.3 }} />
-                                    )}
+                                    {/* FIX: Wrap the two map calls in a Fragment */}
+                                    <>
+                                        {Array.from({ length: review.rating }).map((_, i) => (
+                                            <FaStar key={i} />
+                                        ))}
+                                        {Array.from({ length: 5 - review.rating }).map((_, i) => (
+                                            <FaStar key={i + review.rating} style={{ opacity: 0.3 }} />
+                                        ))}
+                                    </>
                                 </div>
                                 <p className={styles.reviewText}>"{review.text}"</p>
                                 <p className={styles.reviewerName}>- {review.name}</p>
@@ -1434,7 +1437,7 @@ export default function Home({ lemons }) {
                                                     id="acc-phone"
                                                     className={styles.input}
                                                     name="phone"
-                                                    value={accountDetailsForm.phone || ''}
+                                                    value={accountDetailsForm.phone || ''} // Use lowercase 'phone'
                                                     readOnly // Phone is read-only as it's the primary identifier
                                                     style={{ backgroundColor: '#f0f0f0', cursor: 'not-allowed' }}
                                                 />
