@@ -10,10 +10,10 @@ import { FaWhatsapp, FaStar, FaUserCircle, FaPlus, FaMinus, FaCheckCircle, FaExc
 
 // SheetDB API URLs - CONFIRMED BY USER
 const LEMONS_DATA_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Lemons';
-const SIGNUP_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Signup';
-const ORDERS_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Orders';
-const ADDRESSES_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Addresses';
-const FEEDBACK_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Feedback';
+const SIGNUP_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Signup'; // Ensure this matches sheet name
+const ORDERS_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Orders'; // Ensure this matches sheet name
+const ADDRESSES_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Addresses'; // Ensure this matches sheet name
+const FEEDBACK_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Feedback'; // Ensure this matches sheet name
 
 // Helper for showing temporary feedback messages
 const useTemporaryFeedback = () => {
@@ -41,7 +41,7 @@ export default function Home({ lemons }) {
 
     // --- State Variables (All useState and useMemo at the very top) ---
     const [orders, setOrders] = useState([{ grade: '', quantity: '' }]);
-    const [form, setForm] = useState({ name: '', delivery: '', contact: '' });
+    const [form, setForm] = useState({ name: '', delivery: '', contact: '' }); // This is for the main order form, will be pre-filled
     const [total, setTotal] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -90,7 +90,7 @@ export default function Home({ lemons }) {
     const openLoginModal = () => {
         setShowLoginModal(true);
         setLoginForm({ name: '', phone: '' });
-        setFeedback({ message: '', type: '' });
+        setFeedback({ message: '', type: '' }); // Clear any previous feedback
     };
 
     const closeLoginModal = () => {
@@ -115,6 +115,7 @@ export default function Home({ lemons }) {
         if (isLoggedIn) {
             setIsSidebarOpen(!isSidebarOpen);
             if (!isSidebarOpen) {
+                // When closing sidebar, reset tab and other states
                 setActiveAccountTab('accountDetails');
                 setFeedback({ message: '', type: '' });
                 if (currentUser) {
@@ -136,7 +137,7 @@ export default function Home({ lemons }) {
         const { name, value } = e.target;
         if (name === 'phone') {
             if (!/^\d*$/.test(value) || value.length > 10) {
-                return;
+                return; // Prevent non-digits or >10 digits
             }
         }
         setLoginForm(prev => ({ ...prev, [name]: value }));
@@ -145,11 +146,11 @@ export default function Home({ lemons }) {
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
         setIsLoggingIn(true);
-        setFeedback({ message: '', type: '' });
+        setFeedback({ message: '', type: '' }); // Clear feedback before new attempt
 
         const { name, phone } = loginForm;
         const trimmedName = name.trim();
-        const trimmedPhone = phone.trim();
+        const trimmedPhone = phone.trim(); // Trim input to match clean data in SheetDB
 
         if (!trimmedName || !trimmedPhone) {
             showTemporaryFeedback('Please enter both your name and phone number to log in.', 'error');
@@ -164,47 +165,43 @@ export default function Home({ lemons }) {
         }
 
         try {
-            // Search for user by Phone in the Signup sheet
-            const searchUrl = `${SIGNUP_SHEET_URL.split('?')[0]}/search?sheet=Signup&search={"Phone":"${trimmedPhone}"}`;
+            // SheetDB search by exact phone number
+            // IMPORTANT: Using 'phone' (lowercase) to match your column name in Signup sheet
+            const searchUrl = `${SIGNUP_SHEET_URL.split('?')[0]}/search?sheet=Signup&search={"phone":"${trimmedPhone}"}`;
             const res = await fetch(searchUrl);
 
-            if (!res.ok) { // This handles 404, 204, and other non-2xx statuses
-                 // Attempt to parse error response for better feedback
+            let users = [];
+            if (res.ok && res.status !== 204 && res.status !== 404) {
+                users = await res.json();
+            } else {
                 let errorDetails = '';
                 try {
-                    const errorJson = await res.json();
-                    errorDetails = errorJson.message || JSON.stringify(errorJson);
+                    errorDetails = (await res.json()).message || res.statusText;
                 } catch (jsonError) {
-                    errorDetails = res.statusText; // Fallback if response is not JSON
+                    errorDetails = res.statusText;
                 }
-                console.error(`Login search failed: ${res.status} - ${errorDetails}`);
-                // Don't throw error here, let the following logic handle the foundUser status
+                console.error(`Login search API responded with: ${res.status} ${errorDetails}`);
             }
 
-            let users = [];
-            // SheetDB returns 204 No Content or 404 Not Found if no results for search
-            if (res.status !== 204 && res.status !== 404) {
-                users = await res.json();
-            }
-
-            if (!Array.isArray(users)) { // Ensure it's an array for consistency
+            if (!Array.isArray(users)) { // Ensure users is an array
                 users = [];
             }
 
-            // Validate if the found user's name matches exactly (case-insensitive for name match)
+            // Find user where phone matches and name matches (case-insensitive for name)
+            // IMPORTANT: Using 'phone' (lowercase) to access the property from fetched data
             const foundUser = users.find(user =>
-                user.Phone === trimmedPhone && user.Name.toLowerCase() === trimmedName.toLowerCase()
+                user.phone === trimmedPhone && user.Name.toLowerCase() === trimmedName.toLowerCase()
             );
 
             if (foundUser) {
-                // Ensure the user object stored in context has consistent keys (lowercase name, phone, address, pincode)
+                // Store user data in AuthContext
                 const userForContext = {
                     name: foundUser.Name,
-                    phone: foundUser.Phone,
+                    phone: foundUser.phone, // Use lowercase 'phone' here
                     address: foundUser.Address,
                     pincode: foundUser.Pincode
                 };
-                login(userForContext); // Use login from AuthContext
+                login(userForContext); // Call context's login function
                 showTemporaryFeedback(`Welcome back, ${foundUser.Name}! 😊`, 'success');
                 closeLoginModal();
             } else {
@@ -212,9 +209,9 @@ export default function Home({ lemons }) {
             }
         } catch (error) {
             console.error('Login process network/parsing error:', error);
-            showTemporaryFeedback(`An error occurred during login: ${error.message}. Please try again.`, 'error');
+            showTemporaryFeedback(`An error occurred during login: ${error.message}. Please check your internet.`, 'error');
         } finally {
-            setIsLoggingIn(false);
+            setIsLoggingIn(false); // Always reset loading state
         }
     };
 
@@ -258,8 +255,9 @@ export default function Home({ lemons }) {
         }
 
         try {
-            // Check if phone number already exists in Signup sheet
-            const existingUserSearchUrl = `${SIGNUP_SHEET_URL.split('?')[0]}/search?sheet=Signup&search={"Phone":"${trimmedPhone}"}`;
+            // Check if phone number already exists before attempting to sign up
+            // IMPORTANT: Using 'phone' (lowercase) for search
+            const existingUserSearchUrl = `${SIGNUP_SHEET_URL.split('?')[0]}/search?sheet=Signup&search={"phone":"${trimmedPhone}"}`;
             const existingUserRes = await fetch(existingUserSearchUrl);
 
             let existingUsers = [];
@@ -268,44 +266,44 @@ export default function Home({ lemons }) {
                 if (!Array.isArray(existingUsers)) existingUsers = [];
             }
 
-            if (existingUsers.length > 0) {
+            // IMPORTANT: Accessing 'phone' (lowercase) from existing data
+            if (existingUsers.some(user => user.phone === trimmedPhone)) {
                 showTemporaryFeedback('An account with this phone number already exists. Please log in.', 'error');
                 setIsSigningUp(false);
                 return;
             }
 
-            // Add new user - ADJUSTED FOR SignupDate COLUMN NAME IN YOUR SHEET
+            // Proceed with signup if phone number is unique
             const res = await fetch(SIGNUP_SHEET_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     data: {
                         Name: trimmedName,
-                        Phone: trimmedPhone,
+                        phone: trimmedPhone, // IMPORTANT: Using 'phone' (lowercase) for column mapping
                         Address: trimmedAddress,
                         Pincode: trimmedPincode,
-                        // Adjusted column name to match your sheet
                         SignupDate: new Date().toLocaleString(),
                     },
                 }),
             });
 
             if (res.ok) {
-                // Ensure the user object stored in context has consistent keys
+                // If signup is successful, log in the new user automatically
                 const newUserForContext = {
                     name: trimmedName,
-                    phone: trimmedPhone,
+                    phone: trimmedPhone, // Use lowercase 'phone' here
                     address: trimmedAddress,
                     pincode: trimmedPincode
                 };
-                login(newUserForContext); // Log in the new user immediately
+                login(newUserForContext); // Call context's login function
                 showTemporaryFeedback('Account created successfully! Welcome! 🎉', 'success');
                 closeSignUpModal();
             } else {
                 let errorDetails = '';
                 try {
                     const errorJson = await res.json();
-                    errorDetails = errorJson.message || JSON.stringify(errorJson);
+                    errorDetails = errorJson.message || res.statusText;
                 } catch (jsonError) {
                     errorDetails = res.statusText;
                 }
@@ -314,20 +312,20 @@ export default function Home({ lemons }) {
             }
         } catch (error) {
             console.error('Sign up process network/parsing error:', error);
-            showTemporaryFeedback(`An error occurred during sign up: ${error.message}. Please try again.`, 'error');
+            showTemporaryFeedback(`An error occurred during sign up: ${error.message}. Please check your internet.`, 'error');
         } finally {
             setIsSigningUp(false);
         }
     };
 
     const handleLogout = () => {
-        logout();
-        setUserAddresses([]);
+        logout(); // Clear user from AuthContext and localStorage
+        setUserAddresses([]); // Clear sidebar data
         setUserOrders([]);
-        setOrders([{ grade: '', quantity: '' }]);
+        setOrders([{ grade: '', quantity: '' }]); // Reset order form
         setTotal(0);
         showTemporaryFeedback('You have been logged out.', 'info');
-        setIsSidebarOpen(false);
+        setIsSidebarOpen(false); // Close sidebar on logout
     };
 
     // --- Account Details Update ---
@@ -368,8 +366,9 @@ export default function Home({ lemons }) {
         }
 
         try {
-            // Update by Phone in Signup sheet
-            const updateUrl = `${SIGNUP_SHEET_URL.split('?')[0]}/Phone/${currentUser.phone}?sheet=Signup`;
+            // Update user in Signup sheet by Phone
+            // IMPORTANT: Using 'phone' (lowercase) in the URL path for SheetDB row update
+            const updateUrl = `${SIGNUP_SHEET_URL.split('?')[0]}/phone/${currentUser.phone}?sheet=Signup`;
             const res = await fetch(updateUrl, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -383,6 +382,7 @@ export default function Home({ lemons }) {
             });
 
             if (res.ok) {
+                // Update currentUser in AuthContext with new details
                 setCurrentUser(prevUser => ({
                     ...prevUser,
                     name: trimmedName,
@@ -394,7 +394,7 @@ export default function Home({ lemons }) {
                 let errorDetails = '';
                 try {
                     const errorJson = await res.json();
-                    errorDetails = errorJson.message || JSON.stringify(errorJson);
+                    errorDetails = errorJson.message || res.statusText;
                 } catch (jsonError) {
                     errorDetails = res.statusText;
                 }
@@ -418,23 +418,22 @@ export default function Home({ lemons }) {
         }
         setIsManagingAddresses(true);
         try {
-            // Search by UserPhone in the Addresses sheet
+            // Fetch addresses by UserPhone from the Addresses sheet
+            // IMPORTANT: Using 'UserPhone' to match your column name in Addresses sheet
             const searchUrl = `${ADDRESSES_SHEET_URL.split('?')[0]}/search?sheet=Addresses&search={"UserPhone":"${currentUser.phone}"}`;
             const res = await fetch(searchUrl);
 
-            if (!res.ok) {
-                let errorDetails = '';
+            let addresses = [];
+            if (res.ok && res.status !== 204 && res.status !== 404) {
+                addresses = await res.json();
+            } else {
+                 let errorDetails = '';
                 try {
-                    const errorJson = await res.json();
-                    errorDetails = errorJson.message || JSON.stringify(errorJson);
+                    errorDetails = (await res.json()).message || res.statusText;
                 } catch (jsonError) {
                     errorDetails = res.statusText;
                 }
-                console.error(`Failed to fetch addresses: ${res.status} - ${errorDetails}`);
-            }
-            let addresses = [];
-            if (res.status !== 204 && res.status !== 404) {
-                addresses = await res.json();
+                console.error(`Fetch addresses API responded with: ${res.status} ${errorDetails}`);
             }
 
             if (Array.isArray(addresses)) {
@@ -530,7 +529,7 @@ export default function Home({ lemons }) {
                 let errorDetails = '';
                 try {
                     const errorJson = await response.json();
-                    errorDetails = errorJson.message || JSON.stringify(errorJson);
+                    errorDetails = errorJson.message || response.statusText;
                 } catch (jsonError) {
                     errorDetails = response.statusText;
                 }
@@ -562,7 +561,7 @@ export default function Home({ lemons }) {
                 let errorDetails = '';
                 try {
                     const errorJson = await response.json();
-                    errorDetails = errorJson.message || JSON.stringify(errorJson);
+                    errorDetails = errorJson.message || response.statusText;
                 } catch (jsonError) {
                     errorDetails = response.statusText;
                 }
@@ -607,7 +606,7 @@ export default function Home({ lemons }) {
 
         const feedbackData = {
             Name: currentUser.name.trim(),
-            Phone: currentUser.phone.trim(),
+            Phone: currentUser.phone.trim(), // Use phone as received from currentUser (which is lowercase)
             Address: (currentUser.address || 'N/A').trim(),
             Feedback: feedbackText.trim(),
             'Feedback Date': new Date().toLocaleString(),
@@ -630,7 +629,7 @@ export default function Home({ lemons }) {
                 let errorDetails = '';
                 try {
                     const errorJson = await res.json();
-                    errorDetails = errorJson.message || JSON.stringify(errorJson);
+                    errorDetails = errorJson.message || res.statusText;
                 } catch (jsonError) {
                     errorDetails = res.statusText;
                 }
@@ -741,7 +740,7 @@ export default function Home({ lemons }) {
 
         const orderData = {
             Name: currentUser.name,
-            Phone: currentUser.phone,
+            Phone: currentUser.phone, // Use Phone (uppercase) for Orders sheet, as this is how it is.
             Address: currentUser.address || 'N/A',
             Pincode: currentUser.pincode || 'N/A',
             OrderDetails: orderDetails,
@@ -761,16 +760,16 @@ export default function Home({ lemons }) {
             if (res.ok) {
                 showTemporaryFeedback('Order placed successfully! We will contact you soon.', 'success');
                 setShowSuccessModal(true);
-                setOrders([{ grade: '', quantity: '' }]);
+                setOrders([{ grade: '', quantity: '' }]); // Reset order form after successful submission
                 setTotal(0);
                 if (activeAccountTab === 'yourOrders' && isLoggedIn) {
-                    fetchUserOrders(); // Re-fetch orders for the sidebar
+                    fetchUserOrders(); // Re-fetch orders for the sidebar to show the new order
                 }
             } else {
                 let errorDetails = '';
                 try {
                     const errorJson = await res.json();
-                    errorDetails = errorJson.message || JSON.stringify(errorJson);
+                    errorDetails = errorJson.message || res.statusText;
                 } catch (jsonError) {
                     errorDetails = res.statusText;
                 }
@@ -786,7 +785,7 @@ export default function Home({ lemons }) {
     };
 
     const generateWhatsAppLink = () => {
-        const whatsappPhoneNumber = '919539304300';
+        const whatsappPhoneNumber = '919539304300'; // Your WhatsApp number
 
         let message = `Hello! I'd like to place an order from 3 Lemons Traders.\n\n`;
         if (isLoggedIn && currentUser) {
@@ -832,29 +831,29 @@ export default function Home({ lemons }) {
         }
         setIsFetchingOrders(true);
         try {
-            // Search by Phone in the Orders sheet
+            // Fetch orders by Phone from the Orders sheet
+            // IMPORTANT: Using 'Phone' (uppercase) for search on Orders sheet
             const searchUrl = `${ORDERS_SHEET_URL.split('?')[0]}/search?sheet=Orders&search={"Phone":"${currentUser.phone}"}`;
             const res = await fetch(searchUrl);
 
-            if (!res.ok) {
+            let ordersData = [];
+            if (res.ok && res.status !== 204 && res.status !== 404) {
+                ordersData = await res.json();
+            } else {
                 let errorDetails = '';
                 try {
-                    const errorJson = await res.json();
-                    errorDetails = errorJson.message || JSON.stringify(errorJson);
+                    errorDetails = (await res.json()).message || res.statusText;
                 } catch (jsonError) {
                     errorDetails = res.statusText;
                 }
-                console.error(`Failed to fetch orders: ${res.status} - ${errorDetails}`);
-            }
-            let ordersData = [];
-            if (res.status !== 204 && res.status !== 404) {
-                ordersData = await res.json();
+                console.error(`Fetch orders API responded with: ${res.status} ${errorDetails}`);
             }
 
             if (!Array.isArray(ordersData)) {
                 ordersData = [];
             }
 
+            // Sort orders by Timestamp (newest first)
             setUserOrders(ordersData.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp)));
         } catch (error) {
             console.error("Error fetching user orders:", error);
@@ -867,7 +866,7 @@ export default function Home({ lemons }) {
 
 
     // --- Effects (placed after all functions they might call) ---
-    // Sync order form with currentUser from AuthContext
+    // Sync order form and account details form with currentUser from AuthContext
     useEffect(() => {
         if (currentUser) {
             setAccountDetailsForm({
@@ -885,14 +884,16 @@ export default function Home({ lemons }) {
             }));
         } else {
             setAccountDetailsForm({ name: '', phone: '', address: '', pincode: '' });
-            setForm({ name: '', delivery: '', contact: '' }); // Clear form if logged out
+            setForm({ name: '', delivery: '', contact: '' }); // Clear main order form if logged out
         }
     }, [currentUser]);
 
+    // Recalculate total whenever orders or lemons data changes
     useEffect(() => {
         calculateTotal();
-    }, [orders, lemons, calculateTotal]);
+    }, [orders, lemons, calculateTotal]); // calculateTotal is memoized, so it's stable
 
+    // Fetch addresses when sidebar is open and tab is 'addresses' and user is logged in
     useEffect(() => {
         if (isLoggedIn && currentUser?.phone && activeAccountTab === 'addresses') {
             fetchUserAddresses();
@@ -901,6 +902,7 @@ export default function Home({ lemons }) {
         }
     }, [isLoggedIn, currentUser?.phone, activeAccountTab, fetchUserAddresses]);
 
+    // Fetch orders when sidebar is open and tab is 'yourOrders' and user is logged in
     useEffect(() => {
         if (isLoggedIn && currentUser?.phone && activeAccountTab === 'yourOrders') {
             fetchUserOrders();
@@ -973,10 +975,10 @@ export default function Home({ lemons }) {
                         {Array.isArray(lemons) && lemons.length > 0 ? (
                             lemons.map((lemon, index) => (
                                 <div key={lemon.id || lemon.Grade || index} className={styles.lemonCard}>
-                                    {/* Adjusted to use 'Image url' to match your sheet */}
+                                    {/* Adjusted to use 'Image url' to match your sheet's column header */}
                                     {lemon['Image url'] && (
                                         <Image
-                                            src={`/${lemon['Image url']}`}
+                                            src={`/${lemon['Image url']}`} // Image paths should be relative to public folder
                                             alt={lemon.Grade || 'Lemon'}
                                             width={300}
                                             height={220}
@@ -1009,7 +1011,7 @@ export default function Home({ lemons }) {
                                 className={styles.input}
                                 required
                                 value={currentUser?.name || ''}
-                                readOnly={isLoggedIn}
+                                readOnly={isLoggedIn} // Pre-fill and make read-only if logged in
                                 style={isLoggedIn ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
                                 placeholder="Enter your name"
                             />
@@ -1017,7 +1019,7 @@ export default function Home({ lemons }) {
 
                         <div className={styles.formGroup}>
                             <label className={styles.label} htmlFor="delivery">Delivery Address</label>
-                            {isLoggedIn && currentUser?.address ? (
+                            {isLoggedIn && currentUser?.address ? ( // Pre-fill and make read-only if logged in
                                 <input
                                     id="delivery"
                                     className={styles.input}
@@ -1046,7 +1048,7 @@ export default function Home({ lemons }) {
                                 className={styles.input}
                                 required
                                 value={currentUser?.phone || ''}
-                                readOnly={isLoggedIn}
+                                readOnly={isLoggedIn} // Pre-fill and make read-only if logged in
                                 style={isLoggedIn ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
                                 maxLength={10}
                                 pattern="[0-9]{10}"
@@ -1071,6 +1073,7 @@ export default function Home({ lemons }) {
                                             <option
                                                 key={idx}
                                                 value={lemon.Grade}
+                                                // Disable already selected grades for other variety rows
                                                 disabled={orders.some(o => o.grade === lemon.Grade && orders.indexOf(order) !== index)}
                                             >
                                                 {lemon.Grade} – ₹{parseFloat(lemon['Price Per Kg'] || lemon.Price).toFixed(2)}/kg
@@ -1096,7 +1099,7 @@ export default function Home({ lemons }) {
                                     {parseFloat(order.quantity) > 50 && (
                                         <span className={styles.discountNote}> (10% bulk discount)</span>
                                     )}
-                                    {orders.length > 1 && (
+                                    {orders.length > 1 && ( // Only show remove button if there's more than one variety
                                         <button type="button" onClick={() => removeVariety(index)} className={styles.removeVarietyButton}>
                                             <FaMinus />
                                         </button>
@@ -1128,6 +1131,7 @@ export default function Home({ lemons }) {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className={`${styles.button} ${styles.whatsappButton}`}
+                                // Disable WhatsApp button if no valid order items
                                 style={{
                                     pointerEvents: (orders.filter(o => o.grade && o.quantity && parseFloat(o.quantity) > 0).length === 0) ? 'none' : 'auto',
                                     opacity: (orders.filter(o => o.grade && o.quantity && parseFloat(o.quantity) > 0).length === 0) ? 0.6 : 1
@@ -1151,7 +1155,7 @@ export default function Home({ lemons }) {
                                     ))}
                                     {Array.from({ length: 5 - review.rating }).map((_, i) => (
                                         <FaStar key={i + review.rating} style={{ opacity: 0.3 }} />
-                                    ))}
+                                    )}
                                 </div>
                                 <p className={styles.reviewText}>"{review.text}"</p>
                                 <p className={styles.reviewerName}>- {review.name}</p>
@@ -1355,7 +1359,7 @@ export default function Home({ lemons }) {
                                 </button>
                                 <button type="button" className={`${styles.modalButton} ${styles.cancel}`} onClick={() => {
                                     closeLoginModal();
-                                    openSignUpModal();
+                                    openSignUpModal(); // Option to switch to signup
                                 }}>
                                     New User? Sign Up
                                 </button>
@@ -1431,7 +1435,7 @@ export default function Home({ lemons }) {
                                                     className={styles.input}
                                                     name="phone"
                                                     value={accountDetailsForm.phone || ''}
-                                                    readOnly
+                                                    readOnly // Phone is read-only as it's the primary identifier
                                                     style={{ backgroundColor: '#f0f0f0', cursor: 'not-allowed' }}
                                                 />
                                             </div>
@@ -1517,7 +1521,7 @@ export default function Home({ lemons }) {
                                                     type="button"
                                                     className={`${styles.button} ${styles.addAddressButton}`}
                                                     onClick={() => {
-                                                        setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' });
+                                                        setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' }); // Clear for new address
                                                         setShowAddressForm(true);
                                                     }}
                                                 >
@@ -1661,7 +1665,7 @@ export async function getStaticProps() {
     if (lemons.length === 0) {
         console.log("Using fallback lemon data.");
         lemons = [
-            // Adjusted 'Image url' to match your sheet's column name
+            // Using 'Image url' to match your actual Google Sheet column header
             { id: 1, Grade: 'Eureka Lemon', 'Price Per Kg': 1.50, 'Image url': 'lemon-with-leaves.jpg', Description: 'Classic juicy lemons, perfect for beverages.' },
             { id: 2, Grade: 'Meyer Lemon', 'Price Per Kg': 2.00, 'Image url': 'sliced-lemon.jpeg', Description: 'Sweeter, less acidic, ideal for desserts and garnishes.' },
             { id: 3, Grade: 'Lisbon Lemon', 'Price Per Kg': 1.75, 'Image url': 'basket-of-lemons.jpeg', Description: 'Tart and tangy, great for cooking and zest.' },
@@ -1670,11 +1674,11 @@ export async function getStaticProps() {
     }
 
     // Ensure 'Price Per Kg' is consistent, if some data uses 'Price'
-    // Adjusted 'Image url' to be passed through consistently
+    // Ensure 'Image url' is picked up correctly from fetched data or fallback
     lemons = lemons.map(lemon => ({
         ...lemon,
         'Price Per Kg': parseFloat(lemon['Price Per Kg'] || lemon.Price || 0),
-        'Image url': lemon['Image url'] || lemon.Image || '' // Ensure 'Image url' is picked up
+        'Image url': lemon['Image url'] || '' // Ensure 'Image url' is correctly assigned
     }));
 
 
@@ -1682,6 +1686,6 @@ export async function getStaticProps() {
         props: {
             lemons,
         },
-        revalidate: 30,
+        revalidate: 30, // Re-generate page every 30 seconds
     };
 }
