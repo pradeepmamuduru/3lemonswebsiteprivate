@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo, Fragment, useContext 
 import Head from 'next/head';
 import Image from 'next/image';
 import styles from '../styles/styles.module.css';
-import { FaWhatsapp, FaStar, FaUserCircle, FaPlus, FaMinus, FaCheckCircle, FaExclamationCircle, FaInfoCircle, FaSpinner } from 'react-icons/fa';
+import { FaWhatsapp, FaStar, FaUserCircle, FaPlus, FaMinus, FaCheckCircle, FaExclamationCircle, FaInfoCircle, FaSpinner, FaBox } from 'react-icons/fa'; // Added FaBox for orders tab
 import { IoCloseCircleOutline, IoMenu } from 'react-icons/io5';
 import { AuthContext } from './_app'; // Import AuthContext
 
@@ -45,8 +45,10 @@ export default function Home({ lemons }) {
 
     // Account Sidebar states
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [activeAccountTab, setActiveAccountTab] = useState('accountDetails'); // 'accountDetails', 'addresses', 'feedback'
+    const [activeAccountTab, setActiveAccountTab] = useState('accountDetails'); // 'accountDetails', 'addresses', 'yourOrders', 'feedback'
     const [userAddresses, setUserAddresses] = useState([]); // Stores addresses fetched from SheetDB
+    const [userOrders, setUserOrders] = useState([]); // NEW: Stores orders fetched from SheetDB
+    const [isFetchingOrders, setIsFetchingOrders] = useState(false); // NEW: Loading state for fetching orders
     const [accountDetailsForm, setAccountDetailsForm] = useState({ name: '', phone: '', address: '', pincode: '' }); // For editing in sidebar
     const [isUpdatingAccount, setIsUpdatingAccount] = useState(false); // Loading state for account updates
     const [addressForm, setAddressForm] = useState({ id: null, addressName: '', fullAddress: '', pincode: '' }); // For adding/editing addresses
@@ -152,6 +154,71 @@ export default function Home({ lemons }) {
         }
     }, [isLoggedIn, currentUser?.phone, fetchUserAddresses]);
 
+    // NEW: Effect to fetch orders when user logs in or currentUser changes
+    const fetchUserOrders = useCallback(async (userName, userPhone) => {
+        if (!userName || !userPhone) return;
+        setIsFetchingOrders(true);
+        setUserOrders([]); // Clear previous orders
+        try {
+            // SheetDB supports searching by multiple fields, but it's an OR operation.
+            // For AND, we might need to fetch all and filter client-side, or make two calls.
+            // Let's assume name and contact are unique enough for this demo.
+            const res = await fetch(`${ORDERS_SUBMISSION_URL}?searchField=name&searchValue=${userName}&searchField=contact&searchValue=${userPhone}`);
+            if (!res.ok && res.status !== 404 && res.status !== 204) {
+                throw new Error(`Failed to fetch orders: ${res.status} ${res.statusText}`);
+            }
+            let ordersData = [];
+            if (res.status !== 204 && res.status !== 404) {
+                ordersData = await res.json();
+            }
+
+            if (Array.isArray(ordersData)) {
+                // Group orders by a unique identifier (e.g., combination of name, contact, and order date)
+                // Since SheetDB returns individual line items, we'll group them into "orders"
+                // This is a simplified grouping. A robust backend would return grouped orders.
+                const groupedOrders = ordersData.reduce((acc, item) => {
+                    const orderKey = `${item.name}-${item.contact}-${item['Order Date']}`;
+                    if (!acc[orderKey]) {
+                        acc[orderKey] = {
+                            id: orderKey, // Unique ID for the grouped order
+                            name: item.name,
+                            contact: item.contact,
+                            delivery: item.delivery,
+                            orderDate: item['Order Date'],
+                            items: [],
+                            total: 0,
+                        };
+                    }
+                    acc[orderKey].items.push({
+                        grade: item.quality,
+                        quantity: item.quantity,
+                        pricePerKg: item['Price Per Kg'],
+                        itemTotalPrice: item['Item Total Price'],
+                        discount: item.discount,
+                    });
+                    acc[orderKey].total += parseFloat(item['Item Total Price'] || 0); // Sum up item totals
+                    return acc;
+                }, {});
+
+                // Convert grouped object back to array
+                setUserOrders(Object.values(groupedOrders).sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate))); // Sort by date descending
+            } else {
+                setUserOrders([]);
+            }
+        } catch (error) {
+            console.error("Error fetching user orders:", error);
+            showTemporaryFeedback('Failed to load your orders.', 'error');
+        } finally {
+            setIsFetchingOrders(false);
+        }
+    }, [showTemporaryFeedback]);
+
+    useEffect(() => {
+        if (isLoggedIn && currentUser?.name && currentUser?.phone && activeAccountTab === 'yourOrders') {
+            fetchUserOrders(currentUser.name, currentUser.phone);
+        }
+    }, [isLoggedIn, currentUser?.name, currentUser?.phone, activeAccountTab, fetchUserOrders]);
+
 
     // --- Handlers for main order form changes ---
     const handleOrderChange = (index, field, value) => {
@@ -167,7 +234,8 @@ export default function Home({ lemons }) {
             const isDuplicate = selectedGrades.filter(g => g === value && g !== '').length > 1;
 
             if (isDuplicate) {
-                showTemporaryFeedback(`Variety "${value}" is already selected. Please choose a different one.`, 'error');
+                // Show toast message for duplicate selection
+                showTemporaryFeedback(`${currentUser?.name || 'You'}, are selecting the same variant again! 🧐`, 'error');
                 return; // Prevent update if duplicate
             }
         }
@@ -547,6 +615,7 @@ export default function Home({ lemons }) {
     const handleLogout = () => {
         logout(); // Use logout from AuthContext
         setUserAddresses([]); // Clear addresses on logout
+        setUserOrders([]); // Clear orders on logout
         setOrders([{ grade: '', quantity: '' }]); // Reset orders as well
         setTotal(0); // Reset total
         showTemporaryFeedback('You have been logged out.', 'info');
@@ -1338,6 +1407,12 @@ export default function Home({ lemons }) {
                                 Addresses
                             </button>
                             <button
+                                className={`${styles.tabButton} ${activeAccountTab === 'yourOrders' ? styles.active : ''}`}
+                                onClick={() => setActiveAccountTab('yourOrders')}
+                            >
+                                Your Orders
+                            </button>
+                            <button
                                 className={`${styles.tabButton} ${activeAccountTab === 'feedback' ? styles.active : ''}`}
                                 onClick={() => {
                                     setActiveAccountTab('feedback');
@@ -1539,6 +1614,45 @@ export default function Home({ lemons }) {
                                         </Fragment>
                                     ) : (
                                         <p style={{ textAlign: 'center', marginTop: '20px' }}>Please log in to manage your addresses.</p>
+                                    )}
+                                </Fragment>
+                            )}
+
+                            {activeAccountTab === 'yourOrders' && ( // NEW: Your Orders Tab Content
+                                <Fragment>
+                                    <h3>Your Recent Orders</h3>
+                                    {feedback.message && (feedback.type === 'success' || feedback.type === 'error' || feedback.type === 'info') && (
+                                        <p className={`${styles.feedbackMessage} ${styles[`feedback${feedback.type.charAt(0).toUpperCase() + feedback.type.slice(1)}`]}`}>
+                                            {feedback.message}
+                                        </p>
+                                    )}
+                                    {isFetchingOrders && <p style={{ textAlign: 'center' }}><FaSpinner className={styles.spinner} /> Loading orders...</p>}
+
+                                    {currentUser ? (
+                                        <div className={styles.ordersList}>
+                                            {userOrders.length > 0 ? (
+                                                userOrders.map(order => (
+                                                    <div key={order.id} className={styles.orderCard}>
+                                                        <h4>Order Date: {order.orderDate}</h4>
+                                                        <p><strong>Delivery Address:</strong> {order.delivery}</p>
+                                                        <p><strong>Items:</strong></p>
+                                                        <ul>
+                                                            {order.items.map((item, itemIndex) => (
+                                                                <li key={itemIndex}>
+                                                                    {item.quantity} kg of {item.grade} (₹{parseFloat(item.itemTotalPrice).toFixed(2)})
+                                                                    {item.discount === '10%' && <span className={styles.discountNote}> (10% bulk discount)</span>}
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                        <p className={styles.totalPrice}>Total: ₹{parseFloat(order.total).toFixed(2)}</p>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                !isFetchingOrders && <p style={{ textAlign: 'center', marginBottom: '20px' }}>No orders found for your account.</p>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <p style={{ textAlign: 'center', marginTop: '20px' }}>Please log in to view your orders.</p>
                                     )}
                                 </Fragment>
                             )}
