@@ -252,12 +252,13 @@
 }
 
 
-/* Form Section */
+/* Form Section - UPDATED BACKGROUND FOR CONTRAST */
 .formSection {
-    background-color: var(--secondary-green); /* Uses secondary green */
+    background-color: var(--lemon-cream); /* Changed to lemon cream for contrast */
     padding: 50px 20px;
     border-radius: var(--border-radius-large);
     margin-top: 60px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08); /* Added subtle shadow */
 }
 
 .form {
@@ -281,7 +282,7 @@
     display: block;
     font-weight: bold;
     margin-bottom: 8px;
-    color: var(--text-dark); /* Uses dark text color */
+    color: var(--text-dark);
     font-size: 1.1rem;
 }
 
@@ -289,7 +290,7 @@
 .select {
     width: 100%;
     padding: 12px;
-    border: 1px solid var(--border-medium); /* Uses medium border color */
+    border: 1px solid var(--border-medium);
     border-radius: var(--border-radius-medium);
     font-size: 1rem;
     box-sizing: border-box;
@@ -298,8 +299,8 @@
 
 .input:focus,
 .select:focus {
-    border-color: var(--primary-green); /* Uses primary green on focus */
-    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2); /* Soft glow matching primary green */
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
     outline: none;
 }
 
@@ -317,7 +318,7 @@
     font-weight: bold;
     font-size: 24px;
     text-align: right;
-    color: var(--primary-green); /* Uses primary green */
+    color: var(--primary-green);
 }
 
 .orderSummary h3 {
@@ -328,7 +329,7 @@
 .button {
     display: block;
     width: 100%;
-    background-color: var(--primary-green); /* Uses primary green */
+    background-color: var(--primary-green);
     color: white;
     border: none;
     padding: 12px 20px;
@@ -355,14 +356,14 @@
 
 /* Specific WhatsApp Button Styling */
 .whatsappButton {
-    background-color: var(--whatsapp-green-official); /* Uses official WhatsApp green */
+    background-color: var(--whatsapp-green-official);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .whatsappButton:hover {
-    background-color: var(--whatsapp-green-dark); /* Darker WhatsApp green on hover */
+    background-color: var(--whatsapp-green-dark);
 }
 
 .whatsappIcon {
@@ -385,27 +386,27 @@
 }
 
 .feedbackSuccess {
-    background-color: #D4EDDA; /* Light green for success */
-    color: #155724; /* Dark green text */
+    background-color: #D4EDDA;
+    color: #155724;
     border: 1px solid #C3E6CB;
 }
 
 .feedbackError {
-    background-color: #F8D7DA; /* Light red for error */
-    color: #721C24; /* Dark red text */
+    background-color: #F8D7DA;
+    color: #721C24;
     border: 1px solid #F5C6CB;
 }
 
 .feedbackInfo {
-    background-color: #D1ECF1; /* Light blue for info */
-    color: #0C5460; /* Dark blue text */
+    background-color: #D1ECF1;
+    color: #0C5460;
     border: 1px solid #BEE5EB;
 }
 
 
 /* Customer Reviews Section */
 .reviewsSection {
-    background-color: var(--light-bg-green); /* Uses light background green */
+    background-color: var(--light-bg-green);
     padding: 60px 20px;
     margin-top: 60px;
     border-radius: var(--border-radius-large);
@@ -419,7 +420,7 @@
 }
 
 .reviewCard {
-    background-color: var(--card-bg); /* White background */
+    background-color: var(--card-bg);
     padding: 30px;
     border-radius: var(--border-radius-large);
     box-shadow: 0 4px 15px var(--shadow-color);
@@ -438,13 +439,13 @@
 
 .reviewerName {
     font-weight: bold;
-    color: var(--primary-green); /* Uses primary green */
+    color: var(--primary-green);
     font-size: 1.1rem;
     margin-top: 10px;
 }
 
 .reviewerRating {
-    color: var(--accent-orange); /* Uses accent orange for stars */
+    color: var(--accent-orange);
     font-size: 1.2rem;
     margin-bottom: 10px;
 }
@@ -456,7 +457,7 @@
     padding: 30px 20px;
     font-size: 0.9rem;
     color: var(--text-medium);
-    background-color: var(--secondary-green); /* Uses secondary green */
+    background-color: var(--secondary-green);
     border-top: 1px solid var(--border-medium);
 }
 
@@ -493,7 +494,7 @@
 }
 
 .modalContent {
-    background-color: var(--card-bg); /* White background */
+    background-color: var(--card-bg);
     padding: 30px;
     border-radius: var(--border-radius-large);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
@@ -512,7 +513,7 @@
 }
 
 .modalTitle {
-    color: var(--primary-green); /* Uses primary green */
+    color: var(--primary-green);
     font-size: 2rem;
     margin-bottom: 20px;
 }
@@ -547,7 +548,7 @@
 }
 
 .modalButton {
-    background-color: var(--primary-green); /* Uses primary green */
+    background-color: var(--primary-green);
     color: white;
     padding: 12px 25px;
     border-radius: var(--border-radius-medium);
@@ -559,12 +560,12 @@
 }
 
 .modalButton:hover {
-    background-color: #388E3C; /* Darker shade of primary green */
+    background-color: #388E3C;
     transform: translateY(-1px);
 }
 
 .modalButton.cancel {
-    background-color: var(--border-medium); /* Grey for cancel */
+    background-color: var(--border-medium);
     color: var(--text-dark);
 }
 
@@ -590,21 +591,20 @@
 
 /* Specific styles for the success page/modal */
 .successPage {
-    background-color: var(--light-bg-green); /* Uses light background green */
+    background-color: var(--light-bg-green);
     padding: 50px 20px;
     border-radius: var(--border-radius-large);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
     max-width: 600px;
     width: 90%;
     text-align: center;
-    position: relative;
     margin: auto;
     transform: translateY(0);
     opacity: 1;
 }
 
 .successTitle {
-    color: var(--primary-green); /* Uses primary green */
+    color: var(--primary-green);
     font-size: 2.8rem;
     margin-bottom: 25px;
     font-weight: 700;
@@ -638,7 +638,7 @@
 }
 
 .accountSidebar {
-    background-color: var(--card-bg); /* White background */
+    background-color: var(--card-bg);
     width: 100%;
     max-width: 450px;
     box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
@@ -739,7 +739,7 @@
 }
 
 .addressItem {
-    background-color: #f9f9f9; /* Slightly off-white for list items */
+    background-color: #f9f9f9;
     border: 1px solid var(--border-light);
     border-radius: var(--border-radius-medium);
     padding: 15px;
@@ -794,7 +794,7 @@
 }
 
 .addAddressButton {
-    background-color: var(--blue-info); /* Uses blue for add new address */
+    background-color: var(--blue-info);
     color: white;
     padding: 10px 15px;
     border-radius: var(--border-radius-small);
@@ -846,7 +846,7 @@
 .feedbackForm button {
     align-self: flex-end;
     padding: 10px 20px;
-    background-color: var(--blue-info); /* Uses blue for feedback submit */
+    background-color: var(--blue-info);
     color: white;
     border: none;
     border-radius: var(--border-radius-small);
@@ -860,9 +860,56 @@
 
 .feedbackSuccessMessage {
     text-align: center;
-    color: var(--primary-green); /* Uses primary green for success message */
+    color: var(--primary-green);
     margin-top: 20px;
     font-weight: bold;
+}
+
+/* Orders List (New) */
+.ordersList {
+    margin-top: 20px;
+}
+
+.orderCard {
+    background-color: #f9f9f9;
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius-medium);
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.orderCard h4 {
+    color: var(--primary-green);
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.orderCard p {
+    margin: 5px 0;
+    color: var(--text-medium);
+}
+
+.orderCard ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+    border-top: 1px dashed var(--border-light);
+    padding-top: 10px;
+}
+
+.orderCard ul li {
+    margin-bottom: 5px;
+    color: var(--text-dark);
+}
+
+.orderCard .totalPrice {
+    font-weight: bold;
+    color: var(--primary-green);
+    font-size: 1.1rem;
+    margin-top: 10px;
+    text-align: right;
 }
 
 
