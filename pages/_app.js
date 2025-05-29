@@ -12,7 +12,8 @@ function MyApp({ Component, pageProps }) {
   // Load user from localStorage on initial load
   useEffect(() => {
     try {
-      const storedUser = localStorage.getItem('currentUser');
+      // CHANGE HERE: Use 'loggedInUser' to match the key used in index.js
+      const storedUser = localStorage.getItem('loggedInUser');
       if (storedUser) {
         const user = JSON.parse(storedUser);
         setCurrentUser(user);
@@ -21,16 +22,19 @@ function MyApp({ Component, pageProps }) {
     } catch (error) {
       console.error("Failed to load user from localStorage:", error);
       // Clear potentially corrupted data
-      localStorage.removeItem('currentUser');
+      // CHANGE HERE: Use 'loggedInUser' to match the key used in index.js
+      localStorage.removeItem('loggedInUser');
     }
   }, []);
 
   // Save user to localStorage whenever currentUser changes
   useEffect(() => {
     if (currentUser) {
-      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      // CHANGE HERE: Use 'loggedInUser' to match the key used in index.js
+      localStorage.setItem('loggedInUser', JSON.stringify(currentUser));
     } else {
-      localStorage.removeItem('currentUser');
+      // CHANGE HERE: Use 'loggedInUser' to match the key used in index.js
+      localStorage.removeItem('loggedInUser');
     }
   }, [currentUser]);
 
@@ -42,7 +46,7 @@ function MyApp({ Component, pageProps }) {
   const logout = () => {
     setCurrentUser(null);
     setIsLoggedIn(false);
-    // localStorage.removeItem('currentUser'); // This is handled by useEffect above
+    // localStorage.removeItem('loggedInUser'); // This is handled by useEffect above
   };
 
   return (
