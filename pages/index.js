@@ -41,6 +41,7 @@ export default function Home({ lemons }) {
 
     // Order form states
     const [orders, setOrders] = useState([{ grade: '', quantity: '' }]);
+    const [form, setForm] = useState({ name: '', delivery: '', contact: '' }); // <-- RE-INTRODUCED FORM STATE HERE
     const [total, setTotal] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -211,502 +212,213 @@ export default function Home({ lemons }) {
         }
     }, [isLoggedIn, currentUser?.phone, activeAccountTab, fetchUserOrders]);
 
-
-    // --- Functions for Login Modal ---
-    const openLoginModal = () => {
-        setShowLoginModal(true);
-        setLoginForm({ name: '', phone: '' }); // Clear login form fields on open
-        setFeedback({ message: '', type: '' });
-    };
-
-    const closeLoginModal = () => {
-        setShowLoginModal(false);
-        setLoginForm({ name: '', phone: '' }); // Clear login form fields on close
-        setFeedback({ message: '', type: '' });
-    };
-
-    const handleLoginFormChange = (e) => {
-        const { name, value } = e.target;
-        if (name === 'phone') {
-            if (!/^\d*$/.test(value) || value.length > 10) {
-                return;
-            }
-        }
-        setLoginForm(prev => ({ ...prev, [name]: value }));
-    };
-
-    // **FIXED: handleLoginSubmit function definition with corrected URL**
-    const handleLoginSubmit = async (e) => {
-        e.preventDefault();
-        setIsLoggingIn(true);
-        setFeedback({ message: '', type: '' });
-
-        const { name, phone } = loginForm;
-        const trimmedName = name.trim();
-        const trimmedPhone = phone.trim();
-
-        if (!trimmedName || !trimmedPhone) {
-            showTemporaryFeedback('Please enter both your name and phone number to log in.', 'error');
-            setIsLoggingIn(false);
-            return;
-        }
-
-        if (!/^\d{10}$/.test(trimmedPhone)) {
-            showTemporaryFeedback('Please enter a valid 10-digit mobile number.', 'error');
-            setIsLoggingIn(false);
-            return;
-        }
-
-        try {
-            // CORRECTED URL for SheetDB search for signup sheet
-            const searchUrl = `https://sheetdb.io/api/v1/wm0oxtmmfkndt/search?sheet=Signup&search={"Phone":"${trimmedPhone}"}`;
-            const res = await fetch(searchUrl);
-
-            if (!res.ok && res.status !== 404 && res.status !== 204) {
-                throw new Error(`Failed to verify user during login: ${res.status} ${res.statusText}`);
-            }
-
-            let users = [];
-            if (res.status !== 204 && res.status !== 404) {
-                users = await res.json();
-            }
-
-            if (!Array.isArray(users)) {
-                users = [];
-            }
-
-            const foundUser = users.find(user =>
-                user.Phone === trimmedPhone && user.Name.toLowerCase() === trimmedName.toLowerCase()
-            );
-
-            if (foundUser) {
-                // Ensure the user object stored in context has consistent keys (lowercase name, phone, address, pincode)
-                const userForContext = {
-                    name: foundUser.Name,
-                    phone: foundUser.Phone,
-                    address: foundUser.Address,
-                    pincode: foundUser.Pincode
-                };
-                login(userForContext); // Use login from AuthContext
-                showTemporaryFeedback(`Welcome back, ${foundUser.Name}! 😊`, 'success');
-                closeLoginModal();
-            } else {
-                showTemporaryFeedback('Invalid name or phone number. Please check your credentials or sign up.', 'error');
-            }
-        } catch (error) {
-            console.error('Login process error:', error);
-            showTemporaryFeedback('An error occurred during login. Please try again.', 'error');
-        } finally {
-            setIsLoggingIn(false);
-        }
-    };
+    // Added Hardcoded customer reviews - keep it here as it's static data
+    const customerReviews = useMemo(() => [
+        { id: 1, text: "The freshest lemons I've ever tasted! Perfect for my morning lemonade. Delivery was super fast too.", name: "Priya Sharma", rating: 5 },
+        { id: 2, text: "Excellent quality and consistent supply. My restaurant relies on these lemons. Highly recommended!", name: "Chef Anand Rao", rating: 5 },
+        { id: 3, text: "So convenient to get fresh lemons delivered home. They truly are farm fresh. My family loves them!", name: "Rajesh Kumar", rating: 5 },
+    ], []);
 
 
-    // --- Functions for Sign Up Modal ---
-    const openSignUpModal = () => {
-        setShowSignUpModal(true);
-        setSignUpForm({ name: '', phone: '', address: '', pincode: '' }); // Clear signup form fields on open
-        setFeedback({ message: '', type: '' });
-    };
+    // --- Handlers for main order form changes ---
+    const calculateTotal = useCallback(() => {
+        let totalPrice = 0;
+        orders.forEach(order => {
+            const lemon = lemons.find(l => l.Grade === order.grade);
+            if (lemon) {
+                const pricePerKg = parseFloat(lemon['Price Per Kg'] || lemon.Price); // Use 'Price' if 'Price Per Kg' not found, or vice-versa
+                const quantity = parseFloat(order.quantity);
 
-    const closeSignUpModal = () => {
-        setShowSignUpModal(false);
-        setSignUpForm({ name: '', phone: '', address: '', pincode: '' }); // Clear signup form fields on close
-        setFeedback({ message: '', type: '' });
-    };
-
-    const handleSignUpFormChange = (e) => {
-        const { name, value } = e.target;
-        if (name === 'phone' || name === 'pincode') { // Apply validation for both
-            if (!/^\d*$/.test(value)) return; // Only allow digits
-            if (name === 'phone' && value.length > 10) return;
-            if (name === 'pincode' && value.length > 6) return;
-        }
-        setSignUpForm(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleSignUpSubmit = async (e) => {
-        e.preventDefault();
-        setIsSigningUp(true);
-        setFeedback({ message: '', type: '' });
-
-        const { name, phone, address, pincode } = signUpForm;
-        const trimmedName = name.trim();
-        const trimmedPhone = phone.trim();
-        const trimmedAddress = address.trim();
-        const trimmedPincode = pincode.trim();
-
-        if (!trimmedName || !trimmedPhone || !trimmedAddress || !trimmedPincode) {
-            showTemporaryFeedback('All sign-up fields are required.', 'error');
-            setIsSigningUp(false);
-            return;
-        }
-
-        if (!/^\d{10}$/.test(trimmedPhone)) {
-            showTemporaryFeedback('Please enter a valid 10-digit mobile number.', 'error');
-            setIsSigningUp(false);
-            return;
-        }
-
-        if (!/^\d{6}$/.test(trimmedPincode)) {
-            showTemporaryFeedback('Please enter a valid 6-digit pincode.', 'error');
-            setIsSigningUp(false);
-            return;
-        }
-
-        try {
-            // CORRECTED URL for SheetDB search for signup sheet
-            const existingUserSearchUrl = `https://sheetdb.io/api/v1/wm0oxtmmfkndt/search?sheet=Signup&search={"Phone":"${trimmedPhone}"}`;
-            const existingUserRes = await fetch(existingUserSearchUrl);
-
-            let existingUsers = [];
-            if (existingUserRes.ok && existingUserRes.status !== 204) {
-                existingUsers = await existingUserRes.json();
-                if (!Array.isArray(existingUsers)) existingUsers = [];
-            }
-
-            if (existingUsers.length > 0) {
-                showTemporaryFeedback('An account with this phone number already exists. Please log in.', 'error');
-                setIsSigningUp(false);
-                return;
-            }
-
-            // Add new user
-            const res = await fetch(SIGNUP_SHEET_URL, { // This URL is correct for POST (adding a new row)
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    data: {
-                        Name: trimmedName,
-                        Phone: trimmedPhone,
-                        Address: trimmedAddress,
-                        Pincode: trimmedPincode,
-                        'Signup Date': new Date().toLocaleString(),
-                    },
-                }),
-            });
-
-            if (res.ok) {
-                // Ensure the user object stored in context has consistent keys (lowercase name, phone, address, pincode)
-                const newUserForContext = {
-                    name: trimmedName,
-                    phone: trimmedPhone,
-                    address: trimmedAddress,
-                    pincode: trimmedPincode
-                };
-                login(newUserForContext); // Log in the new user immediately
-                showTemporaryFeedback('Account created successfully! Welcome! 🎉', 'success');
-                closeSignUpModal();
-                // If there's an active order, try to resubmit with logged-in user info
-                // This part needs more robust handling based on your order flow.
-                // For now, let's just close modals.
-            } else {
-                showTemporaryFeedback('Failed to create account. Please try again.', 'error');
-            }
-        } catch (error) {
-            console.error('Sign up error:', error);
-            showTemporaryFeedback('An error occurred during sign up. Please try again.', 'error');
-        } finally {
-            setIsSigningUp(false);
-        }
-    };
-
-    // --- Logout Function ---
-    const handleLogout = () => {
-        logout(); // Use logout from AuthContext
-        setUserAddresses([]); // Clear addresses on logout
-        setUserOrders([]); // Clear orders on logout
-        setOrders([{ grade: '', quantity: '' }]); // Reset orders as well
-        setTotal(0); // Reset total
-        showTemporaryFeedback('You have been logged out.', 'info');
-        setIsSidebarOpen(false); // Close sidebar on logout
-    };
-
-    // --- Account Details Update ---
-    // Make sure accountDetailsForm is defined in state
-    const [accountDetailsForm, setAccountDetailsForm] = useState({ name: '', phone: '', address: '', pincode: '' });
-
-    const handleAccountDetailChange = (e) => {
-        const { name, value } = e.target;
-        // Basic validation for phone and pincode
-        if (name === 'phone' || name === 'pincode') {
-            if (!/^\d*$/.test(value)) return;
-            if (name === 'phone' && value.length > 10) return;
-            if (name === 'pincode' && value.length > 6) return;
-        }
-        setAccountDetailsForm(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleUpdateAccountDetails = async (e) => {
-        e.preventDefault();
-        if (!currentUser || !currentUser.phone) {
-            showTemporaryFeedback('No user logged in to update.', 'error');
-            return;
-        }
-
-        setIsUpdatingAccount(true);
-        setFeedback({ message: '', type: '' }); // Clear feedback
-
-        const { name, address, pincode } = accountDetailsForm;
-        const trimmedName = name.trim();
-        const trimmedAddress = address.trim();
-        const trimmedPincode = pincode.trim();
-
-        if (!trimmedName || !trimmedAddress || !trimmedPincode) {
-            showTemporaryFeedback('Name, Address, and Pincode cannot be empty.', 'error');
-            setIsUpdatingAccount(false);
-            return;
-        }
-        if (!/^\d{6}$/.test(trimmedPincode)) {
-            showTemporaryFeedback('Please enter a valid 6-digit pincode.', 'error');
-            setIsUpdatingAccount(false);
-            return;
-        }
-
-        try {
-            // CORRECTED URL for SheetDB PUT (update) operation
-            // Update by Phone is more robust for user profiles
-            const updateUrl = `https://sheetdb.io/api/v1/wm0oxtmmfkndt/Phone/${currentUser.phone}?sheet=Signup`;
-            const res = await fetch(updateUrl, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    data: {
-                        Name: trimmedName,
-                        Address: trimmedAddress,
-                        Pincode: trimmedPincode,
-                    },
-                }),
-            });
-
-            if (res.ok) {
-                // Update the currentUser in context so it's fresh everywhere
-                setCurrentUser(prevUser => ({
-                    ...prevUser,
-                    name: trimmedName,
-                    address: trimmedAddress,
-                    pincode: trimmedPincode
-                }));
-                showTemporaryFeedback('Account details updated successfully! ✅', 'success');
-            } else {
-                const errorData = await res.json();
-                console.error('SheetDB account update error:', res.status, errorData);
-                showTemporaryFeedback(`Failed to update: ${errorData.message || 'Server error'}.`, 'error');
-            }
-        } catch (error) {
-            console.error('Network error updating account:', error);
-            showTemporaryFeedback('An error occurred while updating details.', 'error');
-        } finally {
-            setIsUpdatingAccount(false);
-        }
-    };
-
-
-    // --- Address Management Functions ---
-    const handleAddressFormChange = (e) => {
-        const { name, value } = e.target;
-        if (name === 'phone' || name === 'pincode') { // Apply validation for both
-            if (!/^\d*$/.test(value)) return; // Only allow digits
-            if (name === 'phone' && value.length > 10) return;
-            if (name === 'pincode' && value.length > 6) return;
-        }
-        setAddressForm(prevForm => ({ ...prevForm, [name]: value }));
-    };
-
-    const handleSaveAddress = async (e) => {
-        e.preventDefault();
-        setIsManagingAddresses(true);
-        setFeedback({ message: '', type: '' });
-
-        if (!currentUser || !currentUser.phone) {
-            showTemporaryFeedback('Please log in to save addresses.', 'error');
-            setIsManagingAddresses(false);
-            return;
-        }
-
-        const { addressName, fullAddress, pincode, id } = addressForm;
-        const trimmedAddressName = addressName.trim();
-        const trimmedFullAddress = fullAddress.trim();
-        const trimmedPincode = pincode.trim();
-
-        if (!trimmedAddressName || !trimmedFullAddress || !trimmedPincode) {
-            showTemporaryFeedback('Please fill all address fields.', 'error');
-            setIsManagingAddresses(false);
-            return;
-        }
-        if (!/^\d{6}$/.test(trimmedPincode)) {
-            showTemporaryFeedback('Please enter a valid 6-digit pincode.', 'error');
-            setIsManagingAddresses(false);
-            return;
-        }
-
-        if (userAddresses.length >= 5 && !id) { // Max 5 addresses, only for new additions
-            showTemporaryFeedback('You can save a maximum of 5 addresses.', 'error');
-            setIsManagingAddresses(false);
-            return;
-        }
-
-        const addressData = {
-            UserPhone: currentUser.phone,
-            AddressName: trimmedAddressName,
-            FullAddress: trimmedFullAddress,
-            Pincode: trimmedPincode,
-        };
-
-        try {
-            let response;
-            if (id) {
-                // CORRECTED URL for SheetDB PUT (update) operation for addresses
-                const updateUrl = `https://sheetdb.io/api/v1/wm0oxtmmfkndt/id/${id}?sheet=Addresses`;
-                response = await fetch(updateUrl, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ data: addressData }),
-                });
-            } else {
-                // POST operation for adding new address
-                response = await fetch(ADDRESSES_SHEET_URL, { // This URL is correct for POST
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ data: addressData }),
-                });
-            }
-
-            if (response.ok) {
-                showTemporaryFeedback(`Address ${id ? 'updated' : 'added'} successfully!`, 'success');
-                setShowAddressForm(false);
-                setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' });
-                fetchUserAddresses(); // Re-fetch to update list and get actual SheetDB ID
-            } else {
-                const errorData = await response.json();
-                console.error('SheetDB address save error:', response.status, errorData);
-                showTemporaryFeedback(`Failed to save address: ${errorData.message || 'Server error'}.`, 'error');
-            }
-        } catch (error) {
-            console.error('Network error saving address:', error);
-            showTemporaryFeedback('Network error. Could not save address.', 'error');
-        } finally {
-            setIsManagingAddresses(false);
-        }
-    };
-
-    const handleDeleteAddress = async (addressId) => {
-        if (!window.confirm('Are you sure you want to delete this address?')) return;
-        setIsManagingAddresses(true);
-        setFeedback({ message: '', type: '' });
-        try {
-            // CORRECTED URL for SheetDB DELETE operation for addresses
-            const deleteUrl = `https://sheetdb.io/api/v1/wm0oxtmmfkndt/id/${addressId}?sheet=Addresses`;
-            const response = await fetch(deleteUrl, {
-                method: 'DELETE',
-            });
-            if (response.ok) {
-                showTemporaryFeedback('Address deleted successfully!', 'success');
-                fetchUserAddresses(); // Re-fetch to update list
-            } else {
-                const errorData = await response.json();
-                console.error('SheetDB address delete error:', response.status, errorData);
-                showTemporaryFeedback(`Failed to delete address: ${errorData.message || 'Server error'}.`, 'error');
-            }
-        } catch (error) {
-            console.error('Network error deleting address:', error);
-            showTemporaryFeedback('Network error. Could not delete address.', 'error');
-        } finally {
-            setIsManagingAddresses(false);
-        }
-    };
-
-    const handleEditAddress = (address) => {
-        setAddressForm({ id: address.id, addressName: address.AddressName, fullAddress: address.FullAddress, pincode: address.Pincode });
-        setShowAddressForm(true);
-    };
-
-
-    // --- Feedback Submission ---
-    const handleFeedbackTextChange = (e) => {
-        setFeedbackText(e.target.value);
-        setFeedback({ message: '', type: '' }); // Clear feedback messages on typing
-    };
-
-    const handleSubmitFeedback = async (e) => {
-        e.preventDefault();
-        setIsSubmittingFeedback(true);
-        setFeedback({ message: '', type: '' }); // Clear previous feedback
-
-        if (!feedbackText.trim()) {
-            showTemporaryFeedback('Please enter your feedback before submitting.', 'error');
-            setIsSubmittingFeedback(false);
-            return;
-        }
-
-        if (!isLoggedIn || !currentUser) {
-            showTemporaryFeedback('Please log in to submit feedback.', 'error');
-            setIsSubmittingFeedback(false);
-            return;
-        }
-
-        const feedbackData = {
-            Name: currentUser.name.trim(),
-            Phone: currentUser.phone.trim(),
-            Address: (currentUser.address || 'N/A').trim(),
-            Feedback: feedbackText.trim(),
-            'Feedback Date': new Date().toLocaleString(),
-        };
-
-        try {
-            // FEEDBACK_SHEET_URL is correct for POST
-            const res = await fetch(FEEDBACK_SHEET_URL, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ data: feedbackData })
-            });
-
-            if (res.ok) {
-                setFeedbackText('');
-                showTemporaryFeedback('Thank you for your valuable feedback!', 'success');
-            } else {
-                const errorData = await res.json();
-                console.error('SheetDB feedback submission error:', res.status, errorData);
-                showTemporaryFeedback(`Error submitting feedback: ${errorData.message || 'Server error'}`, 'error');
-            }
-        } catch (error) {
-            console.error('Error submitting feedback:', error);
-            showTemporaryFeedback(`Error submitting feedback: ${error.message}`, 'error');
-        } finally {
-            setIsSubmittingFeedback(false);
-        }
-    };
-
-
-    // --- Sidebar Toggle ---
-    const toggleSidebar = () => {
-        if (isLoggedIn) {
-            setIsSidebarOpen(!isSidebarOpen);
-            if (!isSidebarOpen) { // If opening, reset to default tab and clear messages
-                setActiveAccountTab('accountDetails');
-                setFeedback({ message: '', type: '' });
-                if (currentUser) {
-                    setAccountDetailsForm(currentUser);
+                if (!isNaN(pricePerKg) && !isNaN(quantity) && quantity > 0) {
+                    let itemPrice = pricePerKg * quantity;
+                    if (quantity > 50) {
+                        itemPrice *= 0.90; // 10% discount for quantity > 50
+                    }
+                    totalPrice += itemPrice;
                 }
-                setShowAddressForm(false);
-                setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' });
-                setFeedbackText('');
-                setUserOrders([]); // Clear orders when opening sidebar or switching tabs
             }
-        } else {
-            openLoginModal();
-            showTemporaryFeedback('Please log in to access your account.', 'info');
+        });
+        setTotal(totalPrice);
+    }, [orders, lemons]);
+
+    useEffect(() => {
+        calculateTotal();
+    }, [orders, lemons, calculateTotal]);
+
+
+    const handleOrderChange = (index, field, value) => {
+        const updated = [...orders];
+        if (field === 'quantity') {
+            // Ensure quantity is at least 0.5, or empty string if cleared
+            value = value === '' ? '' : String(Math.max(0.5, parseFloat(value) || 0.5));
+        }
+
+        // Handle unique variety selection
+        if (field === 'grade') {
+            const selectedGrades = updated.map((order, i) => (i === index ? value : order.grade));
+            // Check if the new value is a duplicate among other selected grades
+            const isDuplicate = selectedGrades.filter(g => g === value && g !== '').length > 1;
+            if (isDuplicate) {
+                // Show toast message for duplicate selection
+                showTemporaryFeedback(`${currentUser?.name || 'You'}, are selecting the same variety again! 🧐`, 'error');
+                return; // Prevent update if duplicate
+            }
+        }
+
+        updated[index][field] = value;
+        setOrders(updated);
+        // calculateTotal is called via useEffect based on orders dependency
+    };
+
+    const addAnotherVariety = () => {
+        // Prevent adding new variety if the last one is empty
+        const lastOrder = orders[orders.length - 1];
+        if (orders.length > 0 && (lastOrder.grade === '' || lastOrder.quantity === '')) {
+            showTemporaryFeedback('Please complete the current variety selection before adding a new one.', 'info');
+            return;
+        }
+
+        setOrders([...orders, { grade: '', quantity: '' }]);
+    };
+    const removeVariety = (index) => {
+        const updated = orders.filter((_, i) => i !== index);
+        setOrders(updated.length > 0 ? updated : [{ grade: '', quantity: '' }]); // Ensure at least one row remains
+        showTemporaryFeedback('Variety removed.', 'info');
+        // calculateTotal is called via useEffect based on orders dependency
+    };
+
+
+    // --- Main Order Submission Flow ---
+    const handlePlaceOrder = async (orderType) => {
+        if (!isLoggedIn) {
+            showTemporaryFeedback('Please log in to place an order.', 'error');
+            openLoginModal(); // Prompt user to log in
+            return;
+        }
+
+        // Validate order items
+        const validOrders = orders.filter(order => order.grade && order.quantity && parseFloat(order.quantity) > 0);
+        if (validOrders.length === 0) {
+            showTemporaryFeedback('Please add at least one lemon variety with a valid quantity (must be 0.5kg or more).', 'error');
+            return;
+        }
+
+        const hasInvalidQuantity = orders.some(order => {
+            return (order.grade && (order.quantity === '' || isNaN(parseFloat(order.quantity)) || parseFloat(order.quantity) <= 0));
+        });
+        if (hasInvalidQuantity) {
+            showTemporaryFeedback('Please ensure all selected varieties have a valid quantity (0.5kg or more).', 'error');
+            return;
+        }
+
+        if (total === 0) {
+            showTemporaryFeedback('Your order total is zero. Please add items to your cart.', 'error');
+            return;
+        }
+
+
+        // Prepare order details for SheetDB
+        const orderDetails = validOrders.map(order => {
+            const lemon = lemons.find(l => l.Grade === order.grade);
+            const quantity = parseFloat(order.quantity);
+            const pricePerKg = parseFloat(lemon?.['Price Per Kg'] || lemon.Price || 0);
+            let itemPrice = pricePerKg * quantity;
+            let discountMsg = '';
+            if (quantity > 50) {
+                itemPrice *= 0.90; // 10% discount for quantity > 50
+                discountMsg = ` (10% bulk discount applied)`;
+            }
+            return `${quantity} kg of ${order.grade} (Approx. ₹${itemPrice.toFixed(2)})${discountMsg}`;
+        }).join('; '); // Use semicolon to separate items for easier parsing in SheetDB
+
+        const orderData = {
+            Name: currentUser.name,
+            Phone: currentUser.phone,
+            Address: currentUser.address || 'N/A', // Use existing address or N/A
+            Pincode: currentUser.pincode || 'N/A', // Use existing pincode or N/A
+            OrderDetails: orderDetails, // Store as a single string
+            TotalAmount: total.toFixed(2),
+            Timestamp: new Date().toLocaleString(),
+            OrderType: orderType // 'Website' or 'WhatsApp'
+        };
+
+        setIsSubmitting(true);
+        try {
+            const res = await fetch(ORDERS_SHEET_URL, { // ORDERS_SHEET_URL is correct for POST
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: orderData }),
+            });
+
+            if (res.ok) {
+                showTemporaryFeedback('Order placed successfully! We will contact you soon.', 'success');
+                setShowSuccessModal(true); // Show success modal
+                // Reset order form
+                setOrders([{ grade: '', quantity: '' }]);
+                setTotal(0);
+                // Optionally refetch orders for the sidebar if it's open and on the right tab
+                if (activeAccountTab === 'yourOrders' && isLoggedIn) {
+                    fetchUserOrders();
+                }
+            } else {
+                const errorData = await res.json();
+                console.error('SheetDB order submission error:', res.status, errorData);
+                showTemporaryFeedback('Failed to place order. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Error placing order:', error);
+            showTemporaryFeedback('An error occurred while placing your order. Please check your internet connection.', 'error');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
 
+    // --- WhatsApp Link Generation ---
+    const generateWhatsAppLink = () => {
+        const whatsappPhoneNumber = '919539304300'; // Replace with your actual WhatsApp Business number
+
+        let message = `Hello! I'd like to place an order from 3 Lemons Traders.\n\n`;
+
+        // Add user details if logged in
+        if (isLoggedIn && currentUser) {
+            message += `Name: ${currentUser.name}\n`;
+            message += `Phone: ${currentUser.phone}\n`;
+            message += `Delivery Address: ${currentUser.address || 'Not provided'}\n`;
+            message += `Pincode: ${currentUser.pincode || 'Not provided'}\n\n`;
+        } else {
+            message += `(Please provide your Name, Phone Number, Delivery Address, and Pincode in the chat)\n\n`;
+        }
+
+        // Add order details
+        const validOrders = orders.filter(order => order.grade && order.quantity && parseFloat(order.quantity) > 0);
+        if (validOrders.length > 0) {
+            message += `My Order Details:\n`;
+            validOrders.forEach((order) => {
+                const lemon = lemons.find(l => l.Grade === order.grade);
+                if (lemon) {
+                    const quantity = parseFloat(order.quantity);
+                    const pricePerKg = parseFloat(lemon['Price Per Kg'] || lemon.Price || 0);
+                    let itemCalculatedPrice = pricePerKg * quantity;
+                    if (quantity > 50) {
+                        itemCalculatedPrice *= 0.90; // Apply discount for message
+                        message += `- ${quantity} kg of ${order.grade} (with 10% bulk discount) - Approx. ₹${itemCalculatedPrice.toFixed(2)}\n`;
+                    } else {
+                        message += `- ${quantity} kg of ${order.grade} - Approx. ₹${itemCalculatedPrice.toFixed(2)}\n`;
+                    }
+                }
+            });
+            message += `\nTotal Estimated Price: ₹${total.toFixed(2)}\n\n`;
+            message += `Please confirm availability and final amount.`;
+        } else {
+            message += `I'm interested in knowing more about your lemons.`;
+        }
+
+        return `https://wa.me/${whatsappPhoneNumber}?text=${encodeURIComponent(message)}`;
+    };
+
+
+    // --- Main Render ---
     return (
         <div className={styles.page}>
             <Head>
@@ -735,8 +447,7 @@ export default function Home({ lemons }) {
                         </button>
                     )}
                     {/* Hamburger menu for small screens - can be shown/hidden via CSS media queries */}
-                    {/* If you want to use the hamburger icon, ensure it's not hidden by CSS for small screens */}
-                    {/* <IoMenu className={styles.hamburgerIcon} onClick={toggleSidebar} /> */}
+                    {/* <FaBars className={styles.hamburgerIcon} onClick={toggleSidebar} /> */} {/* Changed to FaBars if needed */}
                 </div>
             </header>
 
@@ -775,7 +486,7 @@ export default function Home({ lemons }) {
                             lemons.map((lemon, index) => (
                                 <div key={lemon.id || lemon.Grade || index} className={styles.lemonCard}>
                                     {/* Ensure image src matches what's in your public folder or accessible path */}
-                                    {lemon.Image && ( // Changed from 'Image url' to 'Image' based on your SheetDB data
+                                    {lemon.Image && (
                                         <Image
                                             src={`/${lemon.Image}`} // Assuming images like 'lemon-eureka.jpg' are in public/
                                             alt={lemon.Grade || 'Lemon'}
@@ -786,7 +497,7 @@ export default function Home({ lemons }) {
                                         />
                                     )}
                                     <p className={styles.cardTitle}>
-                                        {lemon.Grade} – ₹{parseFloat(lemon['Price']).toFixed(2)}/kg {/* Changed to 'Price' based on your data */}
+                                        {lemon.Grade} – ₹{parseFloat(lemon['Price Per Kg'] || lemon.Price).toFixed(2)}/kg
                                     </p>
                                     <p className={styles.cardDescription}>{lemon.Description}</p>
                                 </div>
@@ -813,6 +524,7 @@ export default function Home({ lemons }) {
                                 value={currentUser?.name || ''} // Use currentUser.name
                                 readOnly={isLoggedIn} // Make read-only if logged in
                                 style={isLoggedIn ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                                placeholder="Enter your name"
                             />
                         </div>
 
@@ -832,7 +544,7 @@ export default function Home({ lemons }) {
                                     id="delivery"
                                     className={styles.input}
                                     required
-                                    value={form.delivery}
+                                    value={form.delivery} // Use form.delivery for non-logged-in
                                     onChange={(e) => setForm({ ...form, delivery: e.target.value })}
                                     placeholder="Enter your full delivery address"
                                 />
@@ -860,7 +572,7 @@ export default function Home({ lemons }) {
                         {orders.map((order, index) => (
                             <Fragment key={index}>
                                 <div className={styles.formGroup}>
-                                    <label className={styles.label} htmlFor={`grade-${index}`}>Select Grade</label>
+                                    <label className={styles.label} htmlFor={`grade-${index}`}>Select Variety</label>
                                     <select
                                         id={`grade-${index}`}
                                         className={styles.select}
@@ -876,7 +588,7 @@ export default function Home({ lemons }) {
                                                 // Disable already selected grades, except for the current row
                                                 disabled={orders.some(o => o.grade === lemon.Grade && orders.indexOf(order) !== index)}
                                             >
-                                                {lemon.Grade} – ₹{parseFloat(lemon['Price']).toFixed(2)}/kg
+                                                {lemon.Grade} – ₹{parseFloat(lemon['Price Per Kg'] || lemon.Price).toFixed(2)}/kg
                                             </option>
                                         ))}
                                     </select>
@@ -932,7 +644,6 @@ export default function Home({ lemons }) {
                                 rel="noopener noreferrer"
                                 className={`${styles.button} ${styles.whatsappButton}`}
                                 // Disable WhatsApp button if validation fails or data missing
-                                // Re-evaluate logic if form.contact is needed for WhatsApp
                                 style={{
                                     pointerEvents: (orders.filter(o => o.grade && o.quantity && parseFloat(o.quantity) > 0).length === 0) ? 'none' : 'auto',
                                     opacity: (orders.filter(o => o.grade && o.quantity && parseFloat(o.quantity) > 0).length === 0) ? 0.6 : 1
@@ -1396,16 +1107,28 @@ export default function Home({ lemons }) {
                                                 <div className={styles.ordersList}>
                                                     {Object.keys(userOrders).sort((a, b) => new Date(b) - new Date(a)).map(dateKey => (
                                                         <div key={dateKey} className={styles.orderGroup}>
-                                                            <h4>Orders on {new Date(dateKey).toLocaleDateString()}</h4> {/* Display date for grouping */}
-                                                            {userOrders[dateKey].map((order, orderIndex) => (
-                                                                <div key={`${order.timestamp}-${orderIndex}`} className={styles.orderCard}>
-                                                                    <p><strong>Order Time:</strong> {new Date(order.timestamp).toLocaleTimeString()}</p>
-                                                                    <p><strong>Delivery Address:</strong> {order.address || 'N/A'}</p>
-                                                                    <p><strong>Order Details:</strong> {order.orderDetails}</p>
-                                                                    <p className={styles.totalPrice}>Total: ₹{parseFloat(order.totalAmount).toFixed(2)}</p>
-                                                                    <p><strong>Ordered Via:</strong> {order.orderType}</p>
+                                                            <h4>Order Date: {new Date(dateKey).toLocaleDateString()}</h4> {/* Display date for grouping */}
+                                                            {/* If orders are grouped by a unique ID, loop through that ID */}
+                                                            {/* Assuming userOrders[dateKey] is an array of orders from that date */}
+                                                            {userOrders[dateKey] && Array.isArray(userOrders[dateKey]) ? (
+                                                                userOrders[dateKey].map((order, orderIndex) => (
+                                                                    <div key={`${order.timestamp}-${orderIndex}`} className={styles.orderCard}>
+                                                                        <p><strong>Order Time:</strong> {new Date(order.timestamp).toLocaleTimeString()}</p>
+                                                                        <p><strong>Delivery Address:</strong> {order.address || 'N/A'}</p>
+                                                                        <p><strong>Order Details:</strong> {order.orderDetails}</p>
+                                                                        <p className={styles.totalPrice}>Total: ₹{parseFloat(order.totalAmount).toFixed(2)}</p>
+                                                                        <p><strong>Ordered Via:</strong> {order.orderType}</p>
+                                                                    </div>
+                                                                ))
+                                                            ) : ( // Fallback if userOrders[dateKey] is not an array (e.g., if it's the grouped object itself)
+                                                                <div key={userOrders[dateKey].id} className={styles.orderCard}>
+                                                                    <p><strong>Order Time:</strong> {new Date(userOrders[dateKey].timestamp).toLocaleTimeString()}</p>
+                                                                    <p><strong>Delivery Address:</strong> {userOrders[dateKey].address || 'N/A'}</p>
+                                                                    <p><strong>Order Details:</strong> {userOrders[dateKey].orderDetails}</p>
+                                                                    <p className={styles.totalPrice}>Total: ₹{parseFloat(userOrders[dateKey].totalAmount).toFixed(2)}</p>
+                                                                    <p><strong>Ordered Via:</strong> {userOrders[dateKey].orderType}</p>
                                                                 </div>
-                                                            ))}
+                                                            )}
                                                         </div>
                                                     ))}
                                                 </div>
@@ -1472,12 +1195,20 @@ export async function getStaticProps() {
     if (lemons.length === 0) {
         console.log("Using fallback lemon data.");
         lemons = [
-            { id: 1, Grade: 'Eureka Lemon', 'Price Per Kg': 1.50, 'Image': 'lemon-eureka.jpg', Description: 'Classic juicy lemons, perfect for beverages.' },
-            { id: 2, Grade: 'Meyer Lemon', 'Price Per Kg': 2.00, 'Image': 'lemon-meyer.jpg', Description: 'Sweeter, less acidic, ideal for desserts and garnishes.' },
-            { id: 3, Grade: 'Lisbon Lemon', 'Price Per Kg': 1.75, 'Image': 'lemon-lisbon.jpg', Description: 'Tart and tangy, great for cooking and zest.' },
-            { id: 4, Grade: 'Verna Lemon', 'Price Per Kg': 1.80, 'Image': 'lemon-verna.jpg', Description: 'Large and flavorful, excellent for juicing.' },
+            { id: 1, Grade: 'Eureka Lemon', 'Price Per Kg': 1.50, 'Image': 'lemon-with-leaves.jpg', Description: 'Classic juicy lemons, perfect for beverages.' },
+            { id: 2, Grade: 'Meyer Lemon', 'Price Per Kg': 2.00, 'Image': 'sliced-lemon.jpeg', Description: 'Sweeter, less acidic, ideal for desserts and garnishes.' },
+            { id: 3, Grade: 'Lisbon Lemon', 'Price Per Kg': 1.75, 'Image': 'basket-of-lemons.jpeg', Description: 'Tart and tangy, great for cooking and zest.' },
+            { id: 4, Grade: 'Verna Lemon', 'Price Per Kg': 1.80, 'Image': 'lemon-tree.jpeg', Description: 'Large and flavorful, excellent for juicing.' },
         ];
     }
+
+    // Ensure 'Price Per Kg' is consistent, if some data uses 'Price'
+    // This loop ensures that the 'Price Per Kg' property always exists for consistency
+    lemons = lemons.map(lemon => ({
+        ...lemon,
+        'Price Per Kg': parseFloat(lemon['Price Per Kg'] || lemon.Price || 0) // Prioritize 'Price Per Kg', fallback to 'Price'
+    }));
+
 
     return {
         props: {
