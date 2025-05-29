@@ -2,15 +2,15 @@ import React, { useState, useEffect, useCallback, useMemo, Fragment, useContext,
 import Head from 'next/head';
 import Image from 'next/image';
 import styles from '../styles/styles.module.css';
-import { AuthContext } from '../pages/_app'; // Assuming _app.js is in the pages directory
+import { AuthContext } from '../pages/_app';
 
 // Import all necessary icons
 import { FaWhatsapp, FaStar, FaUserCircle, FaPlus, FaMinus, FaCheckCircle, FaExclamationCircle, FaInfoCircle, FaSpinner, FaBox, FaTimes, FaBars, FaPlusCircle, FaMinusCircle, FaMapMarkerAlt, FaPencilAlt, FaTrash } from 'react-icons/fa';
 
 
-// SheetDB API URLs (Using your provided URLs)
+// SheetDB API URLs
 const LEMONS_DATA_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Lemons';
-const SIGNUP_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Signup'; // Corrected base URL for Signup sheet
+const SIGNUP_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Signup';
 const ORDERS_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Orders';
 const ADDRESSES_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Addresses';
 const FEEDBACK_SHEET_URL = 'https://sheetdb.io/api/v1/wm0oxtmmfkndt?sheet=Feedback';
@@ -28,7 +28,7 @@ const useTemporaryFeedback = () => {
         feedbackTimeoutRef.current = setTimeout(() => {
             setFeedback({ message: '', type: '' });
         }, duration);
-    }, []); // Empty dependency array means this function is created once
+    }, []);
 
     return [feedback, showTemporaryFeedback];
 };
@@ -40,21 +40,17 @@ export default function Home({ lemons }) {
     const { isLoggedIn, currentUser, login, logout, setCurrentUser } = useContext(AuthContext);
 
     // --- State Variables ---
-    // Order form states
     const [orders, setOrders] = useState([{ grade: '', quantity: '' }]);
-    const [form, setForm] = useState({ name: '', delivery: '', contact: '' }); // <-- ESSENTIAL: This state is used in JSX
+    const [form, setForm] = useState({ name: '', delivery: '', contact: '' });
     const [total, setTotal] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Consolidated Feedback State (for all messages: order, signup, login, logout, account)
     const [feedback, showTemporaryFeedback] = useTemporaryFeedback();
 
-    // Modal states for order confirmation/success (from previous code, but not directly used in the new flow)
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [confirmedOrderDetails, setConfirmedOrderDetails] = useState(null);
-    const [showSuccessModal, setShowSuccessModal] = useState(false); // Used for general order success
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-    // User authentication/account states
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [loginForm, setLoginForm] = useState({ name: '', phone: '' });
     const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -63,206 +59,77 @@ export default function Home({ lemons }) {
     const [signUpForm, setSignUpForm] = useState({ name: '', phone: '', address: '', pincode: '' });
     const [isSigningUp, setIsSigningUp] = useState(false);
 
-    // Account Sidebar states
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [activeAccountTab, setActiveAccountTab] = useState('accountDetails'); // 'accountDetails', 'addresses', 'yourOrders', 'feedback'
+    const [activeAccountTab, setActiveAccountTab] = useState('accountDetails');
     const [userAddresses, setUserAddresses] = useState([]);
-    const [isManagingAddresses, setIsManagingAddresses] = useState(false); // Loading state for address actions
-    const [addressForm, setAddressForm] = useState({ id: null, addressName: '', fullAddress: '', pincode: '' }); // For adding/editing addresses
-    const [showAddressForm, setShowAddressForm] = useState(false); // To show/hide add/edit address form
+    const [isManagingAddresses, setIsManagingAddresses] = useState(false);
+    const [addressForm, setAddressForm] = useState({ id: null, addressName: '', fullAddress: '', pincode: '' });
+    const [showAddressForm, setShowAddressForm] = useState(false);
 
-    // Feedback specific states for the sidebar feedback tab
     const [feedbackText, setFeedbackText] = useState('');
     const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
 
-    // New state for user orders (fetched from SheetDB)
     const [userOrders, setUserOrders] = useState([]);
     const [isFetchingOrders, setIsFetchingOrders] = useState(false);
 
-    // Hardcoded customer reviews - kept separate as static data
+    const [accountDetailsForm, setAccountDetailsForm] = useState({ name: '', phone: '', address: '', pincode: '' }); // Declare here
+
+    // Hardcoded customer reviews
     const customerReviews = useMemo(() => [
         { id: 1, text: "The freshest lemons I've ever tasted! Perfect for my morning lemonade. Delivery was super fast too.", name: "Priya Sharma", rating: 5 },
         { id: 2, text: "Excellent quality and consistent supply. My restaurant relies on these lemons. Highly recommended!", name: "Chef Anand Rao", rating: 5 },
         { id: 3, text: "So convenient to get fresh lemons delivered home. They truly are farm fresh. My family loves them!", name: "Rajesh Kumar", rating: 5 },
     ], []);
 
-    // --- All Function Definitions (IMPORTANT: Defined BEFORE first use in JSX or effects) ---
 
-    // --- Calculation and Order Form Logic ---
-    const calculateTotal = useCallback(() => {
-        let totalPrice = 0;
-        orders.forEach(order => {
-            const lemon = lemons.find(l => l.Grade === order.grade);
-            if (lemon) {
-                const pricePerKg = parseFloat(lemon['Price Per Kg'] || lemon.Price || 0);
-                const quantity = parseFloat(order.quantity);
+    // --- All Function Definitions (Moved to top after state declarations) ---
 
-                if (!isNaN(pricePerKg) && !isNaN(quantity) && quantity > 0) {
-                    let itemPrice = pricePerKg * quantity;
-                    if (quantity > 50) {
-                        itemPrice *= 0.90; // 10% discount for quantity > 50
-                    }
-                    totalPrice += itemPrice;
+    // --- Modal & Sidebar Helper Functions ---
+    const openLoginModal = () => {
+        setShowLoginModal(true);
+        setLoginForm({ name: '', phone: '' });
+        setFeedback({ message: '', type: '' });
+    };
+
+    const closeLoginModal = () => {
+        setShowLoginModal(false);
+        setLoginForm({ name: '', phone: '' });
+        setFeedback({ message: '', type: '' });
+    };
+
+    const openSignUpModal = () => {
+        setShowSignUpModal(true);
+        setSignUpForm({ name: '', phone: '', address: '', pincode: '' });
+        setFeedback({ message: '', type: '' });
+    };
+
+    const closeSignUpModal = () => {
+        setShowSignUpModal(false);
+        setSignUpForm({ name: '', phone: '', address: '', pincode: '' });
+        setFeedback({ message: '', type: '' });
+    };
+
+    const toggleSidebar = () => {
+        if (isLoggedIn) {
+            setIsSidebarOpen(!isSidebarOpen);
+            if (!isSidebarOpen) {
+                setActiveAccountTab('accountDetails');
+                setFeedback({ message: '', type: '' });
+                if (currentUser) {
+                    setAccountDetailsForm(currentUser);
                 }
+                setShowAddressForm(false);
+                setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' });
+                setFeedbackText('');
+                setUserOrders([]);
             }
-        });
-        setTotal(totalPrice);
-    }, [orders, lemons]); // Dependencies for useCallback
-
-    const handleOrderChange = (index, field, value) => {
-        const updated = [...orders];
-        if (field === 'quantity') {
-            value = value === '' ? '' : String(Math.max(0.5, parseFloat(value) || 0.5));
-        }
-
-        if (field === 'grade') {
-            const selectedGrades = updated.map((order, i) => (i === index ? value : order.grade));
-            const isDuplicate = selectedGrades.filter(g => g === value && g !== '').length > 1;
-            if (isDuplicate) {
-                showTemporaryFeedback(`${currentUser?.name || 'You'}, are selecting the same variety again! 🧐`, 'error');
-                return;
-            }
-        }
-
-        updated[index][field] = value;
-        setOrders(updated);
-        // calculateTotal is called via useEffect based on orders dependency
-    };
-
-    const addAnotherVariety = () => {
-        const lastOrder = orders[orders.length - 1];
-        if (orders.length > 0 && (lastOrder.grade === '' || lastOrder.quantity === '')) {
-            showTemporaryFeedback('Please complete the current variety selection before adding a new one.', 'info');
-            return;
-        }
-        setOrders([...orders, { grade: '', quantity: '' }]);
-    };
-
-    const removeVariety = (index) => {
-        const updated = orders.filter((_, i) => i !== index);
-        setOrders(updated.length > 0 ? updated : [{ grade: '', quantity: '' }]);
-        showTemporaryFeedback('Variety removed.', 'info');
-        // calculateTotal is called via useEffect based on orders dependency
-    };
-
-    const handlePlaceOrder = async (orderType) => {
-        if (!isLoggedIn) {
-            showTemporaryFeedback('Please log in to place an order.', 'error');
+        } else {
             openLoginModal();
-            return;
-        }
-
-        const validOrders = orders.filter(order => order.grade && order.quantity && parseFloat(order.quantity) > 0);
-        if (validOrders.length === 0) {
-            showTemporaryFeedback('Please add at least one lemon variety with a valid quantity (must be 0.5kg or more).', 'error');
-            return;
-        }
-
-        const hasInvalidQuantity = orders.some(order => {
-            return (order.grade && (order.quantity === '' || isNaN(parseFloat(order.quantity)) || parseFloat(order.quantity) <= 0));
-        });
-        if (hasInvalidQuantity) {
-            showTemporaryFeedback('Please ensure all selected varieties have a valid quantity (0.5kg or more).', 'error');
-            return;
-        }
-
-        if (total === 0) {
-            showTemporaryFeedback('Your order total is zero. Please add items to your cart.', 'error');
-            return;
-        }
-
-        const orderDetails = validOrders.map(order => {
-            const lemon = lemons.find(l => l.Grade === order.grade);
-            const quantity = parseFloat(order.quantity);
-            const pricePerKg = parseFloat(lemon?.['Price Per Kg'] || lemon.Price || 0);
-            let itemPrice = pricePerKg * quantity;
-            let discountMsg = '';
-            if (quantity > 50) {
-                itemPrice *= 0.90;
-                discountMsg = ` (10% bulk discount applied)`;
-            }
-            return `${quantity} kg of ${order.grade} (Approx. ₹${itemPrice.toFixed(2)})${discountMsg}`;
-        }).join('; ');
-
-        const orderData = {
-            Name: currentUser.name,
-            Phone: currentUser.phone,
-            Address: currentUser.address || 'N/A',
-            Pincode: currentUser.pincode || 'N/A',
-            OrderDetails: orderDetails,
-            TotalAmount: total.toFixed(2),
-            Timestamp: new Date().toLocaleString(),
-            OrderType: orderType
-        };
-
-        setIsSubmitting(true);
-        try {
-            const res = await fetch(ORDERS_SHEET_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ data: orderData }),
-            });
-
-            if (res.ok) {
-                showTemporaryFeedback('Order placed successfully! We will contact you soon.', 'success');
-                setShowSuccessModal(true);
-                setOrders([{ grade: '', quantity: '' }]);
-                setTotal(0);
-                if (activeAccountTab === 'yourOrders' && isLoggedIn) {
-                    fetchUserOrders();
-                }
-            } else {
-                const errorData = await res.json();
-                console.error('SheetDB order submission error:', res.status, errorData);
-                showTemporaryFeedback('Failed to place order. Please try again.', 'error');
-            }
-        } catch (error) {
-            console.error('Error placing order:', error);
-            showTemporaryFeedback('An error occurred while placing your order. Please check your internet connection.', 'error');
-        } finally {
-            setIsSubmitting(false);
+            showTemporaryFeedback('Please log in to access your account.', 'info');
         }
     };
 
-    const generateWhatsAppLink = () => {
-        const whatsappPhoneNumber = '919539304300';
-
-        let message = `Hello! I'd like to place an order from 3 Lemons Traders.\n\n`;
-        if (isLoggedIn && currentUser) {
-            message += `Name: ${currentUser.name}\n`;
-            message += `Phone: ${currentUser.phone}\n`;
-            message += `Delivery Address: ${currentUser.address || 'Not provided'}\n`;
-            message += `Pincode: ${currentUser.pincode || 'Not provided'}\n\n`;
-        } else {
-            message += `(Please provide your Name, Phone Number, Delivery Address, and Pincode in the chat)\n\n`;
-        }
-
-        const validOrders = orders.filter(order => order.grade && order.quantity && parseFloat(order.quantity) > 0);
-        if (validOrders.length > 0) {
-            message += `My Order Details:\n`;
-            validOrders.forEach((order) => {
-                const lemon = lemons.find(l => l.Grade === order.grade);
-                if (lemon) {
-                    const quantity = parseFloat(order.quantity);
-                    const pricePerKg = parseFloat(lemon['Price Per Kg'] || lemon.Price || 0);
-                    let itemCalculatedPrice = pricePerKg * quantity;
-                    if (quantity > 50) {
-                        itemCalculatedPrice *= 0.90;
-                        message += `- ${quantity} kg of ${order.grade} (with 10% bulk discount) - Approx. ₹${itemCalculatedPrice.toFixed(2)}\n`;
-                    } else {
-                        message += `- ${quantity} kg of ${order.grade} - Approx. ₹${itemCalculatedPrice.toFixed(2)}\n`;
-                    }
-                }
-            });
-            message += `\nTotal Estimated Price: ₹${total.toFixed(2)}\n\n`;
-            message += `Please confirm availability and final amount.`;
-        } else {
-            message += `I'm interested in knowing more about your lemons.`;
-        }
-        return `https://wa.me/${whatsappPhoneNumber}?text=${encodeURIComponent(message)}`;
-    };
-
-    // --- Auth Form Handlers (also moved to top) ---
+    // --- Auth Form Handlers ---
     const handleLoginFormChange = (e) => {
         const { name, value } = e.target;
         if (name === 'phone') {
@@ -437,8 +304,6 @@ export default function Home({ lemons }) {
     };
 
     // --- Account Details Update ---
-    const [accountDetailsForm, setAccountDetailsForm] = useState({ name: '', phone: '', address: '', pincode: '' }); // Declare here
-
     const handleAccountDetailChange = (e) => {
         const { name, value } = e.target;
         if (name === 'phone' || name === 'pincode') {
@@ -684,12 +549,8 @@ export default function Home({ lemons }) {
         }
     };
 
-
-    // --- Effects for loading data (placed after all functions they might call) ---
-    useEffect(() => {
-        calculateTotal();
-    }, [orders, lemons, calculateTotal]);
-
+    // --- Effects (placed after all functions they might call) ---
+    // Sync order form with currentUser from AuthContext
     useEffect(() => {
         if (currentUser) {
             setAccountDetailsForm({
@@ -708,7 +569,93 @@ export default function Home({ lemons }) {
             setAccountDetailsForm({ name: '', phone: '', address: '', pincode: '' });
             setForm({ name: '', delivery: '', contact: '' });
         }
-    }, [currentUser]); // Dependencies for this effect
+    }, [currentUser]);
+
+    useEffect(() => {
+        calculateTotal();
+    }, [orders, lemons, calculateTotal]);
+
+    const fetchUserAddresses = useCallback(async () => {
+        if (!currentUser || !currentUser.phone) {
+            setUserAddresses([]);
+            return;
+        }
+        setIsManagingAddresses(true);
+        try {
+            const searchUrl = `https://sheetdb.io/api/v1/wm0oxtmmfkndt/search?sheet=Addresses&search={"UserPhone":"${currentUser.phone}"}`;
+            const res = await fetch(searchUrl);
+
+            if (!res.ok && res.status !== 404 && res.status !== 204) {
+                throw new Error(`Failed to fetch addresses: ${res.status} ${res.statusText}`);
+            }
+            let addresses = [];
+            if (res.status !== 204 && res.status !== 404) {
+                addresses = await res.json();
+            }
+
+            if (Array.isArray(addresses)) {
+                setUserAddresses(addresses.map(addr => ({ ...addr, id: addr.id || Date.now() + Math.random() })));
+            } else {
+                setUserAddresses([]);
+            }
+        } catch (error) {
+            console.error("Error fetching user addresses:", error);
+            showTemporaryFeedback('Failed to load addresses.', 'error');
+            setUserAddresses([]);
+        } finally {
+            setIsManagingAddresses(false);
+        }
+    }, [currentUser, showTemporaryFeedback]);
+
+    useEffect(() => {
+        if (isLoggedIn && currentUser?.phone && activeAccountTab === 'addresses') {
+            fetchUserAddresses();
+        } else if (activeAccountTab !== 'addresses') {
+            setUserAddresses([]);
+        }
+    }, [isLoggedIn, currentUser?.phone, activeAccountTab, fetchUserAddresses]);
+
+    const fetchUserOrders = useCallback(async () => {
+        if (!currentUser || !currentUser.phone) {
+            setUserOrders([]);
+            return;
+        }
+        setIsFetchingOrders(true);
+        try {
+            const searchUrl = `https://sheetdb.io/api/v1/wm0oxtmmfkndt/search?sheet=Orders&search={"Phone":"${currentUser.phone}"}`;
+            const res = await fetch(searchUrl);
+
+            if (!res.ok && res.status !== 404 && res.status !== 204) {
+                throw new Error(`Failed to fetch orders: ${res.status} ${res.statusText}`);
+            }
+            let ordersData = [];
+            if (res.status !== 204 && res.status !== 404) {
+                ordersData = await res.json();
+            }
+
+            if (!Array.isArray(ordersData)) {
+                ordersData = [];
+            }
+
+            // Group orders by a unique identifier (e.g., Timestamp if precise enough)
+            setUserOrders(ordersData.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp))); // Sort directly
+        } catch (error) {
+            console.error("Error fetching user orders:", error);
+            showTemporaryFeedback('Failed to load your orders.', 'error');
+            setUserOrders([]);
+        } finally {
+            setIsFetchingOrders(false);
+        }
+    }, [currentUser, showTemporaryFeedback]);
+
+    useEffect(() => {
+        if (isLoggedIn && currentUser?.phone && activeAccountTab === 'yourOrders') {
+            fetchUserOrders();
+        } else if (activeAccountTab !== 'yourOrders') {
+            setUserOrders([]);
+        }
+    }, [isLoggedIn, currentUser?.phone, activeAccountTab, fetchUserOrders]);
+
 
     // --- Main Render ---
     return (
@@ -1316,7 +1263,7 @@ export default function Home({ lemons }) {
                                                     type="button"
                                                     className={`${styles.button} ${styles.addAddressButton}`}
                                                     onClick={() => {
-                                                        setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' }); // Clear for new
+                                                        setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' });
                                                         setShowAddressForm(true);
                                                     }}
                                                 >
@@ -1380,22 +1327,20 @@ export default function Home({ lemons }) {
                                         </>
                                     )}
 
-                                    {activeAccountTab === 'yourOrders' && ( // Your Orders Tab Content
+                                    {activeAccountTab === 'yourOrders' && (
                                         <>
                                             <h3>Your Recent Orders</h3>
                                             {isFetchingOrders ? (
                                                 <p style={{ textAlign: 'center' }}><FaSpinner className={styles.spinner} /> Loading orders...</p>
-                                            ) : userOrders.length > 0 ? ( // Check if userOrders is not empty
+                                            ) : userOrders.length > 0 ? (
                                                 <div className={styles.ordersList}>
-                                                    {/* The sorting and grouping logic for userOrders is handled in fetchUserOrders */}
-                                                    {/* Loop through each order */}
                                                     {userOrders.map((order, index) => (
-                                                        <div key={`${order.timestamp}-${index}`} className={styles.orderCard}>
-                                                            <p><strong>Order Time:</strong> {new Date(order.timestamp).toLocaleString()}</p>
-                                                            <p><strong>Delivery Address:</strong> {order.address || 'N/A'}</p>
-                                                            <p><strong>Order Details:</strong> {order.orderDetails}</p>
-                                                            <p className={styles.totalPrice}>Total: ₹{parseFloat(order.totalAmount).toFixed(2)}</p>
-                                                            <p><strong>Ordered Via:</strong> {order.orderType}</p>
+                                                        <div key={`${order.Timestamp}-${index}`} className={styles.orderCard}>
+                                                            <p><strong>Order Time:</strong> {new Date(order.Timestamp).toLocaleString()}</p>
+                                                            <p><strong>Delivery Address:</strong> {order.Address || 'N/A'}</p>
+                                                            <p><strong>Order Details:</strong> {order.OrderDetails}</p>
+                                                            <p className={styles.totalPrice}>Total: ₹{parseFloat(order.TotalAmount).toFixed(2)}</p>
+                                                            <p><strong>Ordered Via:</strong> {order.OrderType}</p>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -1451,11 +1396,11 @@ export async function getStaticProps() {
             }
         } else {
             console.warn(`Failed to fetch lemons: ${res.status} ${res.statusText}`);
-            lemons = []; // Ensure lemons is an array even on error or empty response
+            lemons = [];
         }
     } catch (error) {
         console.error('Error fetching lemons from SheetDB:', error);
-        lemons = []; // Ensure lemons is an array even on network error
+        lemons = [];
     }
 
     // Fallback data if SheetDB fetch fails or returns empty
@@ -1480,6 +1425,6 @@ export async function getStaticProps() {
         props: {
             lemons,
         },
-        revalidate: 30, // Re-generate page every 30 seconds
+        revalidate: 30,
     };
 }
