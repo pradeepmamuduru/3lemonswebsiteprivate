@@ -100,12 +100,14 @@ export default function Home({ lemons }) {
     };
 
     const openSignUpModal = () => {
+        console.log('openSignUpModal called. Setting showSignUpModal to true.'); // DEBUG LOG
         setShowSignUpModal(true);
         setSignUpForm({ name: '', phone: '', address: '', pincode: '' });
         setFeedback({ message: '', type: '' });
     };
 
     const closeSignUpModal = () => {
+        console.log('closeSignUpModal called. Setting showSignUpModal to false.'); // DEBUG LOG
         setShowSignUpModal(false);
         setSignUpForm({ name: '', phone: '', address: '', pincode: '' });
         setFeedback({ message: '', type: '' });
@@ -168,11 +170,13 @@ export default function Home({ lemons }) {
             // SheetDB search by exact phone number
             // IMPORTANT: Using 'phone' (lowercase) to match your column name in Signup sheet
             const searchUrl = `${SIGNUP_SHEET_URL.split('?')[0]}/search?sheet=Signup&search={"phone":"${trimmedPhone}"}`;
+            console.log('Login search URL:', searchUrl); // Debug log
             const res = await fetch(searchUrl);
 
             let users = [];
             if (res.ok && res.status !== 204 && res.status !== 404) {
                 users = await res.json();
+                console.log('Login search API response (parsed):', users); // Debug log
             } else {
                 let errorDetails = '';
                 try {
@@ -180,7 +184,7 @@ export default function Home({ lemons }) {
                 } catch (jsonError) {
                     errorDetails = res.statusText;
                 }
-                console.error(`Login search API responded with: ${res.status} ${errorDetails}`);
+                console.error(`Login search API responded with: ${res.status} ${errorDetails}`); // Debug log
             }
 
             if (!Array.isArray(users)) { // Ensure users is an array
@@ -208,7 +212,7 @@ export default function Home({ lemons }) {
                 showTemporaryFeedback('Invalid name or phone number. Please check your credentials or sign up.', 'error');
             }
         } catch (error) {
-            console.error('Login process network/parsing error:', error);
+            console.error('Login process network/parsing error:', error); // Debug log
             showTemporaryFeedback(`An error occurred during login: ${error.message}. Please check your internet.`, 'error');
         } finally {
             setIsLoggingIn(false); // Always reset loading state
@@ -258,12 +262,21 @@ export default function Home({ lemons }) {
             // Check if phone number already exists before attempting to sign up
             // IMPORTANT: Using 'phone' (lowercase) for search
             const existingUserSearchUrl = `${SIGNUP_SHEET_URL.split('?')[0]}/search?sheet=Signup&search={"phone":"${trimmedPhone}"}`;
+            console.log('Signup existing user check URL:', existingUserSearchUrl); // Debug log
             const existingUserRes = await fetch(existingUserSearchUrl);
 
             let existingUsers = [];
             if (existingUserRes.ok && existingUserRes.status !== 204 && existingUserRes.status !== 404) {
                 existingUsers = await existingUserRes.json();
-                if (!Array.isArray(existingUsers)) existingUsers = [];
+                console.log('Existing user check response (parsed):', existingUsers); // Debug log
+            } else {
+                let errorDetails = '';
+                try {
+                    errorDetails = (await existingUserRes.json()).message || existingUserRes.statusText;
+                } catch (jsonError) {
+                    errorDetails = existingUserRes.statusText;
+                }
+                console.error(`Existing user check API responded with: ${existingUserRes.status} ${errorDetails}`); // Debug log
             }
 
             // IMPORTANT: Accessing 'phone' (lowercase) from existing data
@@ -274,6 +287,7 @@ export default function Home({ lemons }) {
             }
 
             // Proceed with signup if phone number is unique
+            console.log('Attempting to POST new user to Signup sheet.'); // Debug log
             const res = await fetch(SIGNUP_SHEET_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -289,6 +303,7 @@ export default function Home({ lemons }) {
             });
 
             if (res.ok) {
+                console.log('Signup POST successful!'); // Debug log
                 // If signup is successful, log in the new user automatically
                 const newUserForContext = {
                     name: trimmedName,
@@ -307,11 +322,11 @@ export default function Home({ lemons }) {
                 } catch (jsonError) {
                     errorDetails = res.statusText; // Fallback to HTTP status text
                 }
-                console.error('SheetDB signup error:', res.status, errorDetails);
+                console.error('SheetDB signup error:', res.status, errorDetails); // Debug log
                 showTemporaryFeedback(`Failed to create account: ${errorDetails}. Please try again.`, 'error');
             }
         } catch (error) {
-            console.error('Sign up process network/parsing error:', error);
+            console.error('Sign up process network/parsing error:', error); // Debug log
             showTemporaryFeedback(`An error occurred during sign up: ${error.message}. Please check your internet.`, 'error');
         } finally {
             setIsSigningUp(false);
@@ -369,6 +384,7 @@ export default function Home({ lemons }) {
             // Update user in Signup sheet by phone
             // IMPORTANT: Using 'phone' (lowercase) in the URL path for SheetDB row update
             const updateUrl = `${SIGNUP_SHEET_URL.split('?')[0]}/phone/${currentUser.phone}?sheet=Signup`;
+            console.log('Update account URL:', updateUrl); // Debug log
             const res = await fetch(updateUrl, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -382,6 +398,7 @@ export default function Home({ lemons }) {
             });
 
             if (res.ok) {
+                console.log('Account update successful!'); // Debug log
                 // Update currentUser in AuthContext with new details
                 setCurrentUser(prevUser => ({
                     ...prevUser,
@@ -398,11 +415,11 @@ export default function Home({ lemons }) {
                 } catch (jsonError) {
                     errorDetails = res.statusText;
                 }
-                console.error('SheetDB account update error:', res.status, errorDetails);
+                console.error('SheetDB account update error:', res.status, errorDetails); // Debug log
                 showTemporaryFeedback(`Failed to update: ${errorDetails}.`, 'error');
             }
         } catch (error) {
-            console.error('Network error updating account:', error);
+            console.error('Network error updating account:', error); // Debug log
             showTemporaryFeedback(`An error occurred while updating details: ${error.message}.`, 'error');
         } finally {
             setIsUpdatingAccount(false);
@@ -421,11 +438,13 @@ export default function Home({ lemons }) {
             // Fetch addresses by UserPhone from the Addresses sheet
             // IMPORTANT: Using 'UserPhone' to match your column name in Addresses sheet
             const searchUrl = `${ADDRESSES_SHEET_URL.split('?')[0]}/search?sheet=Addresses&search={"UserPhone":"${currentUser.phone}"}`;
+            console.log('Fetch addresses URL:', searchUrl); // Debug log
             const res = await fetch(searchUrl);
 
             let addresses = [];
             if (res.ok && res.status !== 204 && res.status !== 404) {
                 addresses = await res.json();
+                console.log('Fetched addresses (parsed):', addresses); // Debug log
             } else {
                  let errorDetails = '';
                 try {
@@ -433,7 +452,7 @@ export default function Home({ lemons }) {
                 } catch (jsonError) {
                     errorDetails = res.statusText;
                 }
-                console.error(`Fetch addresses API responded with: ${res.status} ${errorDetails}`);
+                console.error(`Fetch addresses API responded with: ${res.status} ${errorDetails}`); // Debug log
             }
 
             if (Array.isArray(addresses)) {
@@ -444,7 +463,7 @@ export default function Home({ lemons }) {
                 setUserAddresses([]);
             }
         } catch (error) {
-            console.error("Error fetching user addresses:", error);
+            console.error("Error fetching user addresses:", error); // Debug log
             showTemporaryFeedback(`Failed to load addresses: ${error.message}.`, 'error');
             setUserAddresses([]);
         } finally {
@@ -506,6 +525,7 @@ export default function Home({ lemons }) {
             if (id) {
                 // Update by 'id' in Addresses sheet
                 const updateUrl = `${ADDRESSES_SHEET_URL.split('?')[0]}/id/${id}?sheet=Addresses`;
+                console.log('Update address URL:', updateUrl); // Debug log
                 response = await fetch(updateUrl, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -513,6 +533,7 @@ export default function Home({ lemons }) {
                 });
             } else {
                 // POST new address to Addresses sheet
+                console.log('Add new address URL:', ADDRESSES_SHEET_URL); // Debug log
                 response = await fetch(ADDRESSES_SHEET_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -521,6 +542,7 @@ export default function Home({ lemons }) {
             }
 
             if (response.ok) {
+                console.log('Address save successful!'); // Debug log
                 showTemporaryFeedback(`Address ${id ? 'updated' : 'added'} successfully!`, 'success');
                 setShowAddressForm(false);
                 setAddressForm({ id: null, addressName: '', fullAddress: '', pincode: '' });
@@ -533,11 +555,11 @@ export default function Home({ lemons }) {
                 } catch (jsonError) {
                     errorDetails = response.statusText;
                 }
-                console.error('SheetDB address save error:', response.status, errorDetails);
+                console.error('SheetDB address save error:', response.status, errorDetails); // Debug log
                 showTemporaryFeedback(`Failed to save address: ${errorDetails}.`, 'error');
             }
         } catch (error) {
-            console.error('Network error saving address:', error);
+            console.error('Network error saving address:', error); // Debug log
             showTemporaryFeedback(`Network error. Could not save address: ${error.message}.`, 'error');
         } finally {
             setIsManagingAddresses(false);
@@ -551,10 +573,12 @@ export default function Home({ lemons }) {
         try {
             // Delete by 'id' in Addresses sheet
             const deleteUrl = `${ADDRESSES_SHEET_URL.split('?')[0]}/id/${addressId}?sheet=Addresses`;
+            console.log('Delete address URL:', deleteUrl); // Debug log
             const response = await fetch(deleteUrl, {
                 method: 'DELETE',
             });
             if (response.ok) {
+                console.log('Address delete successful!'); // Debug log
                 showTemporaryFeedback('Address deleted successfully!', 'success');
                 fetchUserAddresses();
             } else {
@@ -565,11 +589,11 @@ export default function Home({ lemons }) {
                 } catch (jsonError) {
                     errorDetails = response.statusText;
                 }
-                console.error('SheetDB address delete error:', response.status, errorDetails);
+                console.error('SheetDB address delete error:', response.status, errorDetails); // Debug log
                 showTemporaryFeedback(`Failed to delete address: ${errorDetails}.`, 'error');
             }
         } catch (error) {
-            console.error('Network error deleting address:', error);
+            console.error('Network error deleting address:', error); // Debug log
             showTemporaryFeedback(`Network error. Could not delete address: ${error.message}.`, 'error');
         } finally {
             setIsManagingAddresses(false);
@@ -613,6 +637,7 @@ export default function Home({ lemons }) {
         };
 
         try {
+            console.log('Submitting feedback to:', FEEDBACK_SHEET_URL); // Debug log
             const res = await fetch(FEEDBACK_SHEET_URL, {
                 method: 'POST',
                 headers: {
@@ -623,6 +648,7 @@ export default function Home({ lemons }) {
             });
 
             if (res.ok) {
+                console.log('Feedback submission successful!'); // Debug log
                 setFeedbackText('');
                 showTemporaryFeedback('Thank you for your valuable feedback!', 'success');
             } else {
@@ -633,12 +659,12 @@ export default function Home({ lemons }) {
                 } catch (jsonError) {
                     errorDetails = res.statusText;
                 }
-                console.error('SheetDB feedback submission error:', res.status, errorDetails);
-                showTemporaryFeedback(`Error submitting feedback: ${errorDetails}`, 'error');
+                console.error('SheetDB feedback submission error:', res.status, errorDetails); // Debug log
+                showTemporaryFeedback(`Error submitting feedback: ${errorDetails}.`, 'error');
             }
         } catch (error) {
-            console.error('Error submitting feedback network/parsing error:', error);
-            showTemporaryFeedback(`Error submitting feedback: ${error.message}`, 'error');
+            console.error('Error submitting feedback network/parsing error:', error); // Debug log
+            showTemporaryFeedback(`Error submitting feedback: ${error.message}.`, 'error');
         } finally {
             setIsSubmittingFeedback(false);
         }
@@ -730,7 +756,6 @@ export default function Home({ lemons }) {
             const quantity = parseFloat(order.quantity);
             const pricePerKg = parseFloat(lemon?.['Price Per Kg'] || lemon.Price || 0);
             let itemPrice = pricePerKg * quantity;
-            let discountMsg = '';
             if (quantity > 50) {
                 itemPrice *= 0.90;
                 discountMsg = ` (10% bulk discount applied)`;
@@ -751,6 +776,7 @@ export default function Home({ lemons }) {
 
         setIsSubmitting(true);
         try {
+            console.log('Placing order to:', ORDERS_SHEET_URL); // Debug log
             const res = await fetch(ORDERS_SHEET_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -758,6 +784,7 @@ export default function Home({ lemons }) {
             });
 
             if (res.ok) {
+                console.log('Order placement successful!'); // Debug log
                 showTemporaryFeedback('Order placed successfully! We will contact you soon.', 'success');
                 setShowSuccessModal(true);
                 setOrders([{ grade: '', quantity: '' }]); // Reset order form after successful submission
@@ -773,11 +800,11 @@ export default function Home({ lemons }) {
                 } catch (jsonError) {
                     errorDetails = res.statusText;
                 }
-                console.error('SheetDB order submission error:', res.status, errorDetails);
+                console.error('SheetDB order submission error:', res.status, errorDetails); // Debug log
                 showTemporaryFeedback('Failed to place order. Please try again.', 'error');
             }
         } catch (error) {
-            console.error('Error placing order network/parsing error:', error);
+            console.error('Error placing order network/parsing error:', error); // Debug log
             showTemporaryFeedback('An error occurred while placing your order. Please check your internet connection.', 'error');
         } finally {
             setIsSubmitting(false);
@@ -834,11 +861,13 @@ export default function Home({ lemons }) {
             // Fetch orders by Phone from the Orders sheet
             // IMPORTANT: Using 'Phone' (uppercase) for search on Orders sheet, assuming this is your column name
             const searchUrl = `${ORDERS_SHEET_URL.split('?')[0]}/search?sheet=Orders&search={"Phone":"${currentUser.phone}"}`;
+            console.log('Fetch orders URL:', searchUrl); // Debug log
             const res = await fetch(searchUrl);
 
             let ordersData = [];
             if (res.ok && res.status !== 204 && res.status !== 404) {
                 ordersData = await res.json();
+                console.log('Fetched orders (parsed):', ordersData); // Debug log
             } else {
                 let errorDetails = '';
                 try {
@@ -846,7 +875,7 @@ export default function Home({ lemons }) {
                 } catch (jsonError) {
                     errorDetails = res.statusText;
                 }
-                console.error(`Fetch orders API responded with: ${res.status} ${errorDetails}`);
+                console.error(`Fetch orders API responded with: ${res.status} ${errorDetails}`); // Debug log
             }
 
             if (!Array.isArray(ordersData)) {
@@ -856,7 +885,7 @@ export default function Home({ lemons }) {
             // Sort orders by Timestamp (newest first)
             setUserOrders(ordersData.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp)));
         } catch (error) {
-            console.error("Error fetching user orders:", error);
+            console.error("Error fetching user orders:", error); // Debug log
             showTemporaryFeedback(`Failed to load your orders: ${error.message}.`, 'error');
             setUserOrders([]);
         } finally {
@@ -1236,6 +1265,7 @@ export default function Home({ lemons }) {
 
             {/* --- Sign Up Form Modal --- */}
             {showSignUpModal && (
+                console.log('Signup modal JSX is attempting to render'), // DEBUG LOG
                 <div className={`${styles.modalOverlay} ${showSignUpModal ? styles.visible : ''}`}>
                     <div className={styles.modalContent}>
                         <button className={styles.modalCloseButton} onClick={closeSignUpModal}>
@@ -1362,6 +1392,7 @@ export default function Home({ lemons }) {
                                 </button>
                                 <button type="button" className={`${styles.modalButton} ${styles.cancel}`} onClick={() => {
                                     closeLoginModal();
+                                    console.log('Switching to signup modal from login.'); // DEBUG LOG
                                     openSignUpModal(); // Option to switch to signup
                                 }}>
                                     New User? Sign Up
