@@ -1,30 +1,35 @@
 /* styles/globals.css */
 
-/* Global CSS Variables - NEW COLOR THEME */
+/* Global CSS Variables - NEW, CHEERFUL COLOR THEME */
 :root {
-    --primary-green: #4CAF50; /* A fresh, vibrant green for main accents, buttons, titles */
-    --secondary-green: #8BC34A; /* A slightly lighter green for softer accents, form sections */
-    --light-bg-green: #F0F8F0; /* Very light green for the overall page background */
-    --lemon-yellow: #FFEB3B; /* Bright, zesty yellow for highlights, "add variety" button */
-    --lemon-cream: #FFFDD0; /* NEW: A soft, creamy yellow for contrasting backgrounds like the order form */
-    --accent-orange: #FFC107; /* Warm orange/yellow for hero buttons, stars (from original) */
-    --text-dark: #333333; /* Dark charcoal for primary text */
-    --text-medium: #555555; /* Medium gray for secondary text */
-    --card-bg: #FFFFFF; /* Pure white for cards, modals, and other prominent elements */
-    --border-light: #E0E0E0; /* Light gray for borders */
-    --border-medium: #CCCCCC; /* Medium gray for stronger borders */
+    --primary-green: #66BB6A; /* Brighter, more energetic green for primary actions */
+    --primary-green-dark: #388E3C; /* Darker shade for hover states */
+    --secondary-green: #DCEDC8; /* Very light, calming green for backgrounds */
+    --light-bg-green: #F0F8F0; /* Almost white with a hint of green, for main page background */
+    --lemon-yellow: #FFD740; /* Vibrant, golden yellow for accents and specific buttons */
+    --lemon-cream: #FFFDD0; /* Soft, creamy yellow for contrasting sections */
+    --accent-orange: #FF9800; /* A clear orange for hero buttons, stars, login/signup */
+    --accent-orange-dark: #FB8C00; /* Darker orange for hover */
+
+    --text-dark: #212121; /* Dark charcoal for most text */
+    --text-medium: #616161; /* Medium gray for secondary text */
+    --card-bg: #FFFFFF; /* Crisp white for cards and modals */
+    --border-light: #E0E0E0; /* Light gray for subtle borders */
+    --border-medium: #BDBDBD; /* Medium gray for more defined borders */
     --shadow-color: rgba(0, 0, 0, 0.1); /* Soft shadow */
+    --shadow-strong: rgba(0, 0, 0, 0.15); /* Slightly stronger shadow for hover */
+
     --whatsapp-green-official: #25D366; /* Official WhatsApp green */
     --whatsapp-green-dark: #128C7E; /* Darker WhatsApp green on hover */
-    --red-danger: #dc3545; /* Standard red for delete/error */
-    --red-danger-dark: #c82333; /* Darker red on hover */
-    --blue-info: #007bff; /* Standard blue for info/add buttons */
-    --blue-info-dark: #0056b3; /* Darker blue on hover */
+    --red-danger: #EF5350; /* Softer red for danger/error */
+    --red-danger-dark: #E53935; /* Darker red on hover */
+    --blue-info: #2196F3; /* Standard blue for info/add buttons */
+    --blue-info-dark: #1976D2; /* Darker blue on hover */
 
-    --transition-ease: all 0.3s ease;
-    --border-radius-small: 5px;
-    --border-radius-medium: 8px;
-    --border-radius-large: 12px; /* Consistent with hero/card radius */
+    --transition-ease: all 0.3s ease-out; /* Smoother transitions */
+    --border-radius-small: 6px; /* Slightly more rounded */
+    --border-radius-medium: 10px; /* More rounded */
+    --border-radius-large: 16px; /* Significantly more rounded for prominent elements */
 }
 
 /* Global Reset and Base Styles */
@@ -40,9 +45,9 @@ html {
 body {
     margin: 0;
     padding: 0;
-    font-family: 'Inter', sans-serif; /* Changed to Inter for consistency with styles.module.css */
+    font-family: 'Inter', sans-serif;
     color: var(--text-dark);
-    background-color: var(--light-bg-green); /* Apply the new light green background globally */
+    background-color: var(--light-bg-green);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -54,5 +59,15 @@ a {
 }
 
 button {
-    font-family: 'Inter', sans-serif; /* Changed to Inter */
+    font-family: 'Inter', sans-serif;
+}
+
+/* Spinner animation for loading states */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
 }
